@@ -1,0 +1,23 @@
+.vscode/**
+.vscode-test/**
+src/**
+.gitignore
+.yarnrc
+vsc-extension-quickstart.md
+**/tsconfig.json
+**/.eslintrc.json
+**/*.map
+**/*.ts
+**/.vscode-test.*
+
+# Exclude non-runtime assets
+sample-data/**
+scripts/**
+docs/**
+IMPLEMENTATION_STATUS.md
+TESTING_RESULTS.md
+CONTRIBUTING.md
+*.md
+!README.md
+!CHANGELOG.md
+!LICENSE
