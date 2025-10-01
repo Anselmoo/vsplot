@@ -115,6 +115,15 @@ export class DataPreviewProvider implements vscode.WebviewViewProvider {
         });
     }
 
+    /**
+     * Generate HTML for the webview
+     * 
+     * This method loads external CSS and JavaScript files from media/dataPreview/
+     * to keep the provider code clean and maintainable.
+     * 
+     * @param webview - The webview to generate HTML for
+     * @returns HTML string with references to external resources
+     */
     private _getHtmlForWebview(webview: vscode.Webview) {
         const cfg = vscode.workspace.getConfiguration('vsplot');
         const rowsPerPage = cfg.get<number>('rowsPerPage', 150);

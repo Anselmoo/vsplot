@@ -1,3 +1,17 @@
+/**
+ * Data Preview Webview Styles
+ * 
+ * This stylesheet provides VSCode-themed styling for the data preview panel.
+ * It uses CSS custom properties (variables) from VSCode to match the editor theme.
+ * 
+ * Key sections:
+ * - Base layout (body, header, controls)
+ * - Table styling (responsive with sticky headers)
+ * - Pagination controls
+ * - Statistics panel (with compact mode)
+ * - Form elements (buttons, inputs, selects)
+ */
+
 body {
     font-family: var(--vscode-font-family);
     color: var(--vscode-foreground);

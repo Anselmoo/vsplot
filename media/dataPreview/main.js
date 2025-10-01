@@ -1,16 +1,28 @@
-// Data Preview Webview Script
-// This script handles all the UI logic for the data preview panel
+/**
+ * Data Preview Webview Script
+ * 
+ * This script handles all the UI logic for the data preview panel in VSPlot.
+ * It manages data display, pagination, search, sorting, row selection, statistics,
+ * and communication with the extension host.
+ * 
+ * @module dataPreview/main
+ */
 
+// VSCode API for webview communication
 const vscode = acquireVsCodeApi();
-let currentData = null;
-let compactCards = false;
-let previewIcons = true;
-let filteredData = null;
-let selectedRows = new Set();
-let currentPage = 1;
-let rowsPerPage = 150;
 
-// Initialize from configuration passed via data attributes
+// State variables
+let currentData = null;           // Original dataset from extension
+let compactCards = false;          // Compact mode for stats panel
+let previewIcons = true;           // Show icons in stats
+let filteredData = null;           // Currently filtered/searched dataset
+let selectedRows = new Set();      // Set of selected row indices
+let currentPage = 1;               // Current page number for pagination
+let rowsPerPage = 150;             // Number of rows per page
+
+/**
+ * Initialize configuration from data attributes on body element
+ */
 function initializeConfig() {
     const body = document.body;
     rowsPerPage = parseInt(body.getAttribute('data-rows-per-page') || '150');
@@ -18,6 +30,10 @@ function initializeConfig() {
     previewIcons = body.getAttribute('data-show-icons') === 'true';
 }
 
+/**
+ * Message handler for extension → webview communication
+ * @listens window:message
+ */
 window.addEventListener('message', event => {
     const message = event.data;
     switch (message.type) {
@@ -46,6 +62,10 @@ window.addEventListener('message', event => {
     }
 });
 
+/**
+ * Display data in the table with pagination
+ * Updates table headers, body, pagination controls, and statistics
+ */
 function displayData() {
     if (!currentData) return;
 
