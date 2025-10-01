@@ -46,7 +46,7 @@ jobs:
         run: bash scripts/download-data.sh || true
 
       - name: Test
-        run: npm test
+        run: xvfb-run -a npm test
 
       - name: Package VSIX (artifact)
         run: |
@@ -85,7 +85,7 @@ jobs:
 
       - name: Publish to Marketplace
         env:
-          VSCE_PAT: ${{ secrets.vsce package }}
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
         run: |
           VSIX_FILE=$(ls *.vsix | head -n1 || true)
           if [ -n "$VSIX_FILE" ]; then
