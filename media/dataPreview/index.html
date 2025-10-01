@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Preview</title>
+    <meta http-equiv="Content-Security-Policy" content="{{CSP}}">
+    <link rel="stylesheet" href="{{STYLES_URI}}">
+</head>
+<body data-rows-per-page="{{ROWS_PER_PAGE}}" data-compact-cards="{{COMPACT_CARDS}}" data-show-icons="{{SHOW_ICONS}}">
+    <div class="header">
+        <h2 id="title">Data Preview</h2>
+        <div class="file-info" id="fileInfo"></div>
+    </div>
+
+    <div class="controls">
+        <input type="text" id="searchInput" placeholder="Search data..." />
+        <button id="exportBtn">Export Filtered Data</button>
+        <button id="chartBtn">Create Chart</button>
+        <label for="delimiterSelect">Delimiter:</label>
+        <select id="delimiterSelect">
+            <option value="auto">Auto</option>
+            <option value=",">Comma ,</option>
+            <option value="|">Pipe |</option>
+            <option value=";">Semicolon ;</option>
+            <option value=":">Colon :</option>
+            <option value="\t">Tab \t</option>
+            <option value=" ">Space ␠</option>
+        </select>
+    </div>
+
+    <div class="table-container">
+        <div class="no-data" id="noData">No data to display</div>
+        <table id="dataTable" style="display: none;">
+            <thead id="tableHead"></thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+
+    <div class="pagination" id="pagination"></div>
+
+    <div class="stats-panel {{COMPACT_CLASS}}" id="previewStatsPanel">
+        <div class="section-title">Statistics</div>
+        <div class="stats-controls">
+            <label for="statsColumn">Column</label>
+            <select id="statsColumn"></select>
+            <label style="display:flex;align-items:center;gap:6px;">
+                <input type="checkbox" id="statsSelectedOnly" />
+                <span>Use selected rows only</span>
+            </label>
+                <span style="flex:1"></span>
+            <label style="display:flex;align-items:center;gap:6px;">
+                <input type="checkbox" id="iconsToggle" {{ICONS_CHECKED}} />
+                <span>Icons</span>
+            </label>
+            <span style="width:8px"></span>
+                <label style="display:flex;align-items:center;gap:6px;">
+                    <input type="checkbox" id="compactCardsToggle" {{COMPACT_CHECKED}} />
+                    <span>Compact</span>
+                </label>
+        </div>
+        <div id="previewStats" class="stats-grid"></div>
+    </div>
+
+    <script nonce="{{NONCE}}" src="{{SCRIPT_URI}}"></script>
+</body>
+</html>
