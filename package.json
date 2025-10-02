@@ -73,24 +73,24 @@
       "explorer/context": [
         {
           "command": "vsplot.previewData",
-          "when": "resourceExtname =~ /\\.(csv|json|txt|dat)$/",
+          "when": "resourceExtname =~ /\\.(csv|json|txt|dat|tsv|tab|out|data)$/",
           "group": "navigation"
         },
         {
           "command": "vsplot.plotData",
-          "when": "resourceExtname =~ /\\.(csv|json)$/",
+          "when": "resourceExtname =~ /\\.(csv|json|tsv|tab|out|data)$/",
           "group": "navigation"
         }
       ],
       "editor/title": [
         {
           "command": "vsplot.previewData",
-          "when": "resourceExtname =~ /\\.(csv|json|txt|dat)$/",
+          "when": "resourceExtname =~ /\\.(csv|json|txt|dat|tsv|tab|out|data)$/",
           "group": "navigation"
         },
         {
           "command": "vsplot.plotData",
-          "when": "resourceExtname =~ /\\.(csv|json)$/",
+          "when": "resourceExtname =~ /\\.(csv|json|tsv|tab|out|data)$/",
           "group": "navigation@2"
         }
       ]

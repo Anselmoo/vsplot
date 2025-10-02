@@ -6,7 +6,7 @@ export interface ParsedData {
     headers: string[];
     rows: (string | number)[][];
     fileName: string;
-    fileType: 'csv' | 'json' | 'txt' | 'dat';
+    fileType: 'csv' | 'json' | 'txt' | 'dat' | 'tsv' | 'tab' | 'out' | 'data';
     totalRows: number;
     detectedDelimiter?: string;
 }
@@ -27,7 +27,13 @@ export async function parseDataFile(uri: vscode.Uri, options?: { delimiter?: str
                 return parseJSON(content, fileName);
             case '.txt':
             case '.dat':
-                return parseDelimited(content, fileName, fileExtension.slice(1) as 'txt' | 'dat', options?.delimiter);
+            case '.out':
+            case '.data':
+            case '.tab':
+                return parseDelimited(content, fileName, fileExtension.slice(1) as 'txt' | 'dat' | 'out' | 'data' | 'tab' | 'tsv', options?.delimiter);
+            case '.tsv':
+                // TSV files have tab delimiter by default
+                return parseDelimited(content, fileName, 'tsv', options?.delimiter ?? '\t');
             default:
                 vscode.window.showErrorMessage(`Unsupported file type: ${fileExtension}`);
                 return null;
@@ -137,7 +143,7 @@ function parseJSON(content: string, fileName: string): ParsedData {
     }
 }
 
-function parseDelimited(content: string, fileName: string, fileType: 'txt' | 'dat', overrideDelimiter?: string): ParsedData {
+function parseDelimited(content: string, fileName: string, fileType: 'txt' | 'dat' | 'tsv' | 'tab' | 'out' | 'data', overrideDelimiter?: string): ParsedData {
     const lines = content.trim().split('\n');
     if (lines.length === 0) {
         throw new Error('File is empty');
