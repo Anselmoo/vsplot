@@ -69,7 +69,7 @@ export function registerDataCommands(
             }
 
             // Find data files in workspace
-            const dataFilePatterns = ['**/*.csv', '**/*.json', '**/*.txt', '**/*.dat'];
+            const dataFilePatterns = ['**/*.csv', '**/*.json', '**/*.txt', '**/*.dat', '**/*.tsv', '**/*.tab', '**/*.out', '**/*.data'];
             const allFiles: vscode.Uri[] = [];
 
             for (const pattern of dataFilePatterns) {

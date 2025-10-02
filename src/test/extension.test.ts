@@ -208,4 +208,72 @@ suite("Extension Test Suite", () => {
 			state.decimals === 0 || state.decimals === 1 || state.decimals === 2,
 		);
 	});
+
+	test("Preview TSV file without error", async function () {
+		this.timeout(15000);
+		const ext = vscode.extensions.getExtension(EXTENSION_ID);
+		assert.ok(ext, "Extension should be discoverable");
+		const basePath = ext ? ext.extensionPath : undefined;
+		assert.ok(basePath, "Extension path should be defined");
+
+		const tsvPath = path.join(basePath as string, "sample-data", "test.tsv");
+		const uri = vscode.Uri.file(tsvPath);
+
+		const doc = await vscode.workspace.openTextDocument(uri);
+		await vscode.window.showTextDocument(doc);
+
+		await vscode.commands.executeCommand("vsplot.previewData", uri);
+		assert.ok(true);
+	});
+
+	test("Preview TAB file without error", async function () {
+		this.timeout(15000);
+		const ext = vscode.extensions.getExtension(EXTENSION_ID);
+		assert.ok(ext, "Extension should be discoverable");
+		const basePath = ext ? ext.extensionPath : undefined;
+		assert.ok(basePath, "Extension path should be defined");
+
+		const tabPath = path.join(basePath as string, "sample-data", "test.tab");
+		const uri = vscode.Uri.file(tabPath);
+
+		const doc = await vscode.workspace.openTextDocument(uri);
+		await vscode.window.showTextDocument(doc);
+
+		await vscode.commands.executeCommand("vsplot.previewData", uri);
+		assert.ok(true);
+	});
+
+	test("Preview OUT file without error", async function () {
+		this.timeout(15000);
+		const ext = vscode.extensions.getExtension(EXTENSION_ID);
+		assert.ok(ext, "Extension should be discoverable");
+		const basePath = ext ? ext.extensionPath : undefined;
+		assert.ok(basePath, "Extension path should be defined");
+
+		const outPath = path.join(basePath as string, "sample-data", "test.out");
+		const uri = vscode.Uri.file(outPath);
+
+		const doc = await vscode.workspace.openTextDocument(uri);
+		await vscode.window.showTextDocument(doc);
+
+		await vscode.commands.executeCommand("vsplot.previewData", uri);
+		assert.ok(true);
+	});
+
+	test("Preview DATA file without error", async function () {
+		this.timeout(15000);
+		const ext = vscode.extensions.getExtension(EXTENSION_ID);
+		assert.ok(ext, "Extension should be discoverable");
+		const basePath = ext ? ext.extensionPath : undefined;
+		assert.ok(basePath, "Extension path should be defined");
+
+		const dataPath = path.join(basePath as string, "sample-data", "test.data");
+		const uri = vscode.Uri.file(dataPath);
+
+		const doc = await vscode.workspace.openTextDocument(uri);
+		await vscode.window.showTextDocument(doc);
+
+		await vscode.commands.executeCommand("vsplot.previewData", uri);
+		assert.ok(true);
+	});
 });

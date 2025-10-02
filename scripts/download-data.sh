@@ -125,6 +125,46 @@ Tablet|West|850|Q2
 EOF
 echo "✅ Sales sample data created successfully"
 
+# Create test.tsv file for TSV format testing
+echo "📊 Creating TSV test file..."
+cat > "$DATA_DIR/test.tsv" << 'EOF'
+Name	Age	Score
+Alice	25	95.5
+Bob	30	87.3
+Charlie	35	92.1
+EOF
+echo "✅ TSV test file created successfully"
+
+# Create test.tab file for TAB format testing
+echo "📊 Creating TAB test file..."
+cat > "$DATA_DIR/test.tab" << 'EOF'
+Product	Sales	Revenue
+Widget	100	1250.50
+Gadget	150	2375.75
+Tool	75	937.25
+EOF
+echo "✅ TAB test file created successfully"
+
+# Create test.out file for OUT format testing
+echo "📊 Creating OUT test file..."
+cat > "$DATA_DIR/test.out" << 'EOF'
+X,Y,Z
+1.0,2.5,3.7
+2.0,4.1,5.2
+3.0,6.3,7.8
+EOF
+echo "✅ OUT test file created successfully"
+
+# Create test.data file for DATA format testing
+echo "📊 Creating DATA test file..."
+cat > "$DATA_DIR/test.data" << 'EOF'
+Temperature Pressure Humidity
+25.5 1013.25 65
+26.2 1012.80 68
+24.8 1014.10 62
+EOF
+echo "✅ DATA test file created successfully"
+
 echo ""
 echo "🎉 All sample datasets downloaded and created successfully!"
 echo "📁 Data files are located in: $DATA_DIR"
@@ -137,5 +177,9 @@ echo "  - weather.csv: US airport traffic sample"
 echo "  - 3d-sample.json: 3D scatter plot data"
 echo "  - timeseries-sample.csv: Time series data"
 echo "  - sales-sample.dat: Categorical sales data"
+echo "  - test.tsv: TSV format test file"
+echo "  - test.tab: TAB format test file"
+echo "  - test.out: OUT format test file"
+echo "  - test.data: DATA format test file"
 echo ""
 echo "🚀 Ready to test VSPlot extension with sample data!"
