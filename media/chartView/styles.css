@@ -1,0 +1,183 @@
+/**
+ * Chart View Styles
+ * 
+ * This stylesheet provides styling for the chart visualization webview.
+ * Uses VS Code theme variables for consistent appearance across themes.
+ */
+
+/* Base body styles */
+body {
+    font-family: var(--vscode-font-family);
+    color: var(--vscode-foreground);
+    background-color: var(--vscode-editor-background);
+    padding: 16px;
+    margin: 0;
+}
+
+/* Header section */
+.header {
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--vscode-widget-border);
+}
+
+/* Controls container */
+.controls {
+    margin-bottom: 16px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* Control group for related controls */
+.control-group {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+/* Labels */
+label {
+    font-size: 0.9em;
+    color: var(--vscode-descriptionForeground);
+    white-space: nowrap;
+}
+
+/* Select dropdowns and buttons */
+select, button {
+    background: var(--vscode-dropdown-background);
+    color: var(--vscode-dropdown-foreground);
+    border: 1px solid var(--vscode-dropdown-border);
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Button specific styles */
+button {
+    background: var(--vscode-button-background);
+    color: var(--vscode-button-foreground);
+    border: none;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.1);
+}
+
+button:hover {
+    background: var(--vscode-button-hoverBackground);
+}
+
+/* Chart container */
+.chart-container {
+    position: relative;
+    height: 500px;
+    width: 100%;
+    background: var(--vscode-editor-background);
+    border: 1px solid var(--vscode-widget-border);
+    border-radius: 6px;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+/* No data placeholder */
+.no-data {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: var(--vscode-descriptionForeground);
+    font-size: 1.1em;
+}
+
+/* Zoom controls overlay */
+.zoom-controls {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    display: flex;
+    gap: 8px;
+    z-index: 1000;
+}
+
+.zoom-controls button {
+    padding: 4px 8px;
+    font-size: 0.8em;
+    min-width: auto;
+}
+
+/* Chart statistics cards */
+.chart-stats {
+    margin-top: 12px;
+    padding: 14px 16px;
+    background: var(--vscode-editorWidget-background);
+    border: 1px solid var(--vscode-widget-border);
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.12);
+    font-size: 0.9em;
+    color: var(--vscode-foreground);
+}
+
+.chart-stats .section-title {
+    font-weight: 600;
+    color: var(--vscode-descriptionForeground);
+    margin-bottom: 8px;
+}
+
+/* Stats grid layout */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 8px 16px;
+    font-variant-numeric: tabular-nums;
+}
+
+.stat {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Badge/icon for stats */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    border-radius: 4px;
+    background: var(--vscode-input-background);
+    color: var(--vscode-descriptionForeground);
+    font-size: 12px;
+}
+
+/* Hide icons when no-icons class is applied */
+.no-icons .badge {
+    display: none;
+}
+
+/* Compact card layout */
+.chart-stats.compact {
+    padding: 10px 12px;
+    border-radius: 6px;
+}
+
+.chart-stats.compact .stats-grid {
+    gap: 6px 12px;
+}
+
+.chart-stats.compact .badge {
+    width: 16px;
+    height: 16px;
+    font-size: 11px;
+}
+
+/* Error message display */
+.error-message {
+    color: var(--vscode-errorForeground);
+    background: var(--vscode-inputValidation-errorBackground);
+    border: 1px solid var(--vscode-inputValidation-errorBorder);
+    padding: 12px;
+    border-radius: 4px;
+    margin-bottom: 16px;
+}
