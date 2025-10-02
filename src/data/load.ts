@@ -11,6 +11,20 @@ export interface ParsedData {
     detectedDelimiter?: string;
 }
 
+/**
+ * Parse a data file and return structured data
+ * 
+ * Supports CSV, JSON, and delimited text files (TXT, DAT, TSV, TAB, OUT, DATA).
+ * 
+ * Delimiter Detection:
+ * - Auto-detects delimiter for non-CSV files from: comma, pipe, semicolon, colon, tab, space
+ * - User can override delimiter via options.delimiter parameter
+ * - TSV files default to tab delimiter unless overridden
+ * 
+ * @param uri - URI of the file to parse
+ * @param options - Optional settings including delimiter override
+ * @returns Promise resolving to ParsedData or null if unsupported file type
+ */
 export async function parseDataFile(uri: vscode.Uri, options?: { delimiter?: string }): Promise<ParsedData | null> {
     try {
         const filePath = uri.fsPath;
@@ -143,6 +157,22 @@ function parseJSON(content: string, fileName: string): ParsedData {
     }
 }
 
+/**
+ * Parse delimited text files (TXT, DAT, TSV, TAB, OUT, DATA)
+ * 
+ * Features:
+ * - Auto-detects delimiter from common candidates: comma, pipe, semicolon, colon, tab, space
+ * - Scores delimiters by column count and consistency across first 6 lines
+ * - Allows user override of delimiter via options parameter
+ * - Fallback to comma delimiter if no multi-column delimiter detected
+ * - Auto-detects headers vs numeric data in first line
+ * 
+ * @param content - File content as string
+ * @param fileName - Name of the file being parsed
+ * @param fileType - Type of file (txt, dat, tsv, tab, out, data)
+ * @param overrideDelimiter - Optional delimiter to use instead of auto-detection
+ * @returns ParsedData object with headers, rows, and detected delimiter
+ */
 function parseDelimited(content: string, fileName: string, fileType: 'txt' | 'dat' | 'tsv' | 'tab' | 'out' | 'data', overrideDelimiter?: string): ParsedData {
     const lines = content.trim().split('\n');
     if (lines.length === 0) {
@@ -153,6 +183,7 @@ function parseDelimited(content: string, fileName: string, fileType: 'txt' | 'da
     const firstLine = lines[0];
     let delimiter = overrideDelimiter ?? '';
     if (!delimiter) {
+        // Candidates cover all common delimiters: comma, pipe, semicolon, colon, tab, space
         const candidates = [',', '|', ';', ':', '\t', ' '];
         let best = ',';
         let bestScore = -1;
@@ -175,6 +206,7 @@ function parseDelimited(content: string, fileName: string, fileType: 'txt' | 'da
                 best = cand;
             }
         }
+        // Fallback to comma if no delimiter produces multiple columns
         delimiter = best;
     }
 
