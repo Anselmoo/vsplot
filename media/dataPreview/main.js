@@ -130,7 +130,13 @@ function bindHeaderEvents() {
                 if (checked) selectedRows.add(globalIndex);
             });
             const rows = document.querySelectorAll('tbody tr');
-            rows.forEach(r => checked ? r.classList.add('row-selected') : r.classList.remove('row-selected'));
+            rows.forEach(r => {
+                if (checked) {
+                    r.classList.add('row-selected');
+                } else {
+                    r.classList.remove('row-selected');
+                }
+            });
         });
     }
     const headers = document.querySelectorAll('th.sortable');
