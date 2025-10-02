@@ -38,6 +38,11 @@ fish scripts/download-data.fish
 - Keep webview code CSP-safe (nonce, no inline event handlers)
 - Prefer minimal, focused changes; avoid broad refactors unless discussed
 
+## Architecture
+- See [`docs/WEBVIEW_ARCHITECTURE.md`](docs/WEBVIEW_ARCHITECTURE.md) for webview implementation details
+- Webview UI uses template-based architecture with `{{PLACEHOLDER}}` syntax
+- HTML/CSS/JS are in separate files under `media/` directories
+
 ## Release
 - Update `CHANGELOG.md`
 - Ensure `package.json` metadata points to `Anselmoo/vsplot`

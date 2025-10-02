@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import type { ParsedData } from '../data/load.js';
 import { parseDataFile } from '../data/load.js';
+import { loadHtmlTemplate, getNonce } from './webviewUtils';
 
 export class DataPreviewProvider implements vscode.WebviewViewProvider {
     public static readonly viewType = 'vsplot.dataPreview';
@@ -118,8 +119,9 @@ export class DataPreviewProvider implements vscode.WebviewViewProvider {
     /**
      * Generate HTML for the webview
      * 
-     * This method loads external CSS and JavaScript files from media/dataPreview/
-     * to keep the provider code clean and maintainable.
+     * This method loads an external HTML template from media/dataPreview/index.html
+     * and replaces placeholders with actual values to keep the provider code 
+     * clean and maintainable.
      * 
      * @param webview - The webview to generate HTML for
      * @returns HTML string with references to external resources
@@ -143,73 +145,19 @@ export class DataPreviewProvider implements vscode.WebviewViewProvider {
         // Build HTML with external resources
         const csp = `default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}' ${webview.cspSource};`;
         
-        return `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data Preview</title>
-    <meta http-equiv="Content-Security-Policy" content="${csp}">
-    <link rel="stylesheet" href="${stylesUri}">
-</head>
-<body data-rows-per-page="${rowsPerPage}" data-compact-cards="${compactCards}" data-show-icons="${showIconsDefault}">
-    <div class="header">
-        <h2 id="title">Data Preview</h2>
-        <div class="file-info" id="fileInfo"></div>
-    </div>
-
-    <div class="controls">
-        <input type="text" id="searchInput" placeholder="Search data..." />
-        <button id="exportBtn">Export Filtered Data</button>
-        <button id="chartBtn">Create Chart</button>
-        <label for="delimiterSelect">Delimiter:</label>
-        <select id="delimiterSelect">
-            <option value="auto">Auto</option>
-            <option value=",">Comma ,</option>
-            <option value="|">Pipe |</option>
-            <option value=";">Semicolon ;</option>
-            <option value=":">Colon :</option>
-            <option value="\t">Tab \\t</option>
-            <option value=" ">Space ␠</option>
-        </select>
-    </div>
-
-    <div class="table-container">
-        <div class="no-data" id="noData">No data to display</div>
-        <table id="dataTable" style="display: none;">
-            <thead id="tableHead"></thead>
-            <tbody id="tableBody"></tbody>
-        </table>
-    </div>
-
-    <div class="pagination" id="pagination"></div>
-
-    <div class="stats-panel ${compactCards ? 'compact' : ''}" id="previewStatsPanel">
-        <div class="section-title">Statistics</div>
-        <div class="stats-controls">
-            <label for="statsColumn">Column</label>
-            <select id="statsColumn"></select>
-            <label style="display:flex;align-items:center;gap:6px;">
-                <input type="checkbox" id="statsSelectedOnly" />
-                <span>Use selected rows only</span>
-            </label>
-                <span style="flex:1"></span>
-            <label style="display:flex;align-items:center;gap:6px;">
-                <input type="checkbox" id="iconsToggle" ${showIconsDefault ? 'checked' : ''} />
-                <span>Icons</span>
-            </label>
-            <span style="width:8px"></span>
-                <label style="display:flex;align-items:center;gap:6px;">
-                    <input type="checkbox" id="compactCardsToggle" ${compactCards ? 'checked' : ''} />
-                    <span>Compact</span>
-                </label>
-        </div>
-        <div id="previewStats" class="stats-grid"></div>
-    </div>
-
-    <script nonce="${nonce}" src="${scriptUri}"></script>
-</body>
-</html>`;
+        // Load HTML template and replace placeholders
+        return loadHtmlTemplate(this._extensionUri, 'media/dataPreview/index.html', {
+            CSP: csp,
+            NONCE: nonce,
+            STYLES_URI: stylesUri.toString(),
+            SCRIPT_URI: scriptUri.toString(),
+            ROWS_PER_PAGE: String(rowsPerPage),
+            COMPACT_CARDS: String(compactCards),
+            SHOW_ICONS: String(showIconsDefault),
+            COMPACT_CLASS: compactCards ? 'compact' : '',
+            ICONS_CHECKED: showIconsDefault ? 'checked' : '',
+            COMPACT_CHECKED: compactCards ? 'checked' : ''
+        });
     }
 }
 
@@ -227,13 +175,4 @@ function toCSV(headers: string[], rows: (string|number)[][]): string {
         return s;
     };
     return [headers.map(esc).join(','), ...rows.map(r => r.map(esc).join(','))].join('\n');
-}
-
-function getNonce() {
-    let text = '';
-    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    for (let i = 0; i < 32; i++) {
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
-    return text;
 }
