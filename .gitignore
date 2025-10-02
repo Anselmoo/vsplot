@@ -17,3 +17,6 @@ sample-data/
 *.key
 id_rsa
 id_rsa.pub
+
+# serena for mcp support
+.serena
