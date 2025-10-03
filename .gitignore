@@ -4,6 +4,12 @@ node_modules
 .vscode-test/
 *.vsix
 
+# Coverage files
+coverage/
+.nyc_output/
+.c8/
+*.lcov
+
 # --- Local and sensitive files (do not commit) ---
 # Sample data (kept out of repository to avoid accidental publishing of private datasets)
 sample-data/

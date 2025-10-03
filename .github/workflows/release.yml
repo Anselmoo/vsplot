@@ -48,6 +48,21 @@ jobs:
       - name: Test
         run: xvfb-run -a npm test
 
+      - name: Generate Coverage Report
+        if: always()
+        run: xvfb-run -a npm run test:coverage
+        continue-on-error: true
+
+      - name: Upload Coverage to Codecov
+        if: always()
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage/lcov.info
+          flags: unittests
+          name: codecov-vsplot
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
+
       - name: Package VSIX (artifact)
         run: |
           npx vsce package --no-dependencies || npx vsce package --yarn=false --no-dependencies
