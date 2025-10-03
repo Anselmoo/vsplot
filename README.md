@@ -26,10 +26,49 @@ Preview and visualize CSV/JSON/TXT/DAT directly in VS Code. Explore tables with 
   - Number formatting (decimals, thousands), style presets
   - Stats + dataset meta cards; compact and icons toggles
 
+## Supported Formats
+
+VSPlot supports the following file formats with automatic parsing:
+
+### File Extensions
+- **CSV** (`.csv`) - Comma-separated values with optional comment filtering
+- **JSON** (`.json`) - Standard JSON data files
+- **TXT** (`.txt`) - Text files with auto-detected delimiters
+- **DAT** (`.dat`) - Data files with auto-detected delimiters
+- **TSV** (`.tsv`) - Tab-separated values (auto-defaults to tab delimiter)
+- **TAB** (`.tab`) - Tab-delimited files
+- **OUT** (`.out`) - Output files with auto-detected delimiters
+- **DATA** (`.data`) - Generic data files with auto-detected delimiters
+
+### Supported Delimiters
+The parser automatically detects the following delimiters (or you can manually override):
+- **Comma** (`,`) - Standard CSV format
+- **Pipe** (`|`) - Common in database exports
+- **Semicolon** (`;`) - Common in European CSV files
+- **Colon** (`:`) - Used in some configuration files
+- **Tab** (`\t`) - Standard for TSV/TAB files
+- **Space** (` `) - Common in scientific data files
+
+### Comment Line Support
+By default, VSPlot filters out lines starting with these comment markers:
+- **Hash** (`#`) - Common in scripting languages and data formats
+- **Percent** (`%`) - Common in MATLAB, LaTeX, statistical formats
+- **Double Slash** (`//`) - Common in C-style languages
+
+Comment markers can be customized programmatically via the API.
+
+### Documentation
+- [Supported Formats Reference](docs/SUPPORTED_FORMATS.md) - Comprehensive format, delimiter, and feature documentation
+- [Comment Handling Guide](docs/COMMENT_HANDLING.md) - Detailed comment filtering documentation
+- [Delimiter Detection Guide](docs/DELIMITER_DETECTION.md) - Auto-detection algorithm and manual overrides
+
+### Example Data Files
+Sample data files demonstrating all features are available in `sample-data/` and `test-data/` directories. Run `bash scripts/setup-test-data.sh` to generate them.
+
 ## Usage
 
 - Explorer context menu:
-  - “Preview Data” for `.csv`, `.json`, `.txt`, `.dat`
+  - “Preview Data” for `.csv`, `.json`, `.txt`, `.dat`, `.tsv`, `.tab`, `.out`, `.data`
   - “Plot Data” for `.csv`, `.json`
 - From Data Preview: use “Create Chart” to open Chart View with filtered rows.
 

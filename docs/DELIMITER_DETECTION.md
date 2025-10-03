@@ -62,7 +62,8 @@ Alice:30:NYC
 Bob:25:LA
 ```
 
-**Auto-detected delimiter**: `:` (colon)
+**Auto-detected delimiter**: `:` (colon)  
+**Example file**: `test-data/colon-delimited.txt`
 
 ### Pipe-Delimited File
 
@@ -72,7 +73,8 @@ Widget|10.99|5
 Gadget|25.50|3
 ```
 
-**Auto-detected delimiter**: `|` (pipe)
+**Auto-detected delimiter**: `|` (pipe)  
+**Example files**: `test-data/pipe-delimited.dat`, `sample-data/sales-sample.dat`
 
 ### Space-Delimited File
 
@@ -82,7 +84,30 @@ x y z
 4.5 5.5 6.5
 ```
 
-**Auto-detected delimiter**: ` ` (space)
+**Auto-detected delimiter**: ` ` (space)  
+**Example files**: `test-data/space-delimited.txt`, `sample-data/test.data`
+
+### Semicolon-Delimited File
+
+```
+Country;Population;GDP;Continent
+France;67.4;2940;Europe
+Germany;83.2;4230;Europe
+```
+
+**Auto-detected delimiter**: `;` (semicolon)  
+**Example file**: `sample-data/semicolon-delimited.csv`
+
+### Tab-Delimited File
+
+```
+Name	Age	Score
+Alice	25	95.5
+Bob	30	87.3
+```
+
+**Auto-detected delimiter**: `\t` (tab)  
+**Example files**: `sample-data/test.tsv`, `sample-data/test.tab`
 
 ### Single Column File
 

@@ -165,6 +165,17 @@ Temperature Pressure Humidity
 EOF
 echo "✅ DATA test file created successfully"
 
+# Create semicolon-delimited file for delimiter testing
+echo "📊 Creating semicolon-delimited test file..."
+cat > "$DATA_DIR/semicolon-delimited.csv" << 'EOF'
+Country;Population;GDP;Continent
+France;67.4;2940;Europe
+Germany;83.2;4230;Europe
+Italy;59.1;2010;Europe
+Spain;47.4;1430;Europe
+EOF
+echo "✅ Semicolon-delimited test file created successfully"
+
 # Create test-data directory for delimiter detection tests
 TEST_DATA_DIR="test-data"
 mkdir -p "$TEST_DATA_DIR"
@@ -261,6 +272,7 @@ echo "  - test.tsv: TSV format test file"
 echo "  - test.tab: TAB format test file"
 echo "  - test.out: OUT format test file"
 echo "  - test.data: DATA format test file"
+echo "  - semicolon-delimited.csv: Semicolon-separated sample (delimiter tests)"
 echo "  - colon-delimited.txt: Colon-separated sample (delimiter tests)"
 echo "  - pipe-delimited.dat: Pipe-separated sample (delimiter tests)"
 echo "  - space-delimited.txt: Space-separated sample (delimiter tests)"
