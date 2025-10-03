@@ -1,6 +1,7 @@
 # VSPlot — Data Preview and Charts in VS Code
 
 ![Release CI](https://github.com/Anselmoo/vsplot/actions/workflows/release.yml/badge.svg)
+[![codecov](https://codecov.io/gh/Anselmoo/vsplot/branch/main/graph/badge.svg)](https://codecov.io/gh/Anselmoo/vsplot)
 
 ![VSPlot Banner](images/banner-1200x630.png)
 
