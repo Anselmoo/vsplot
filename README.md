@@ -11,6 +11,7 @@ Preview and visualize CSV/JSON/TXT/DAT directly in VS Code. Explore tables with 
 - Data Preview:
   - Search, sort, pagination, row selection
   - Delimiter auto-detection with override (comma, pipe, tab, space, etc.)
+  - Comment line filtering (skips lines starting with #, %, //)
   - Export filtered rows to CSV
   - Stats panel with count/min/max/avg/median/stddev
   - Compact cards and small badges toggles

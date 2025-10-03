@@ -1,30 +1,30 @@
-#!/usr/bin/env fish
+#!/bin/bash
 
-# VSPlot Data Download Script - Fish Shell Version
-# Downloads sample datasets for testing the VS Code data visualization extension
+# VSPlot Test Data Setup Script
+# Downloads sample datasets and creates test fixtures for the VS Code data visualization extension
 
-# Set the data directory
-set DATA_DIR "../sample-data"
+# Set the data directory (project-root/sample-data)
+DATA_DIR="sample-data"
 
 # Create sample-data directory if it doesn't exist
-mkdir -p $DATA_DIR
+mkdir -p "$DATA_DIR"
 
-echo "🚀 Downloading sample datasets for VSPlot..."
+echo "🚀 Setting up sample datasets and test fixtures for VSPlot..."
 
 # Function to download with progress
-function download_file
-    set url $argv[1]
-    set filename $argv[2]
-    set description $argv[3]
+download_file() {
+    local url="$1"
+    local filename="$2"
+    local description="$3"
 
     echo "📊 Downloading $description..."
-    if curl -L --progress-bar -o "$DATA_DIR/$filename" "$url"
+    if curl -L --progress-bar -o "$DATA_DIR/$filename" "$url"; then
         echo "✅ $description downloaded successfully as $filename"
     else
         echo "❌ Failed to download $description"
         return 1
-    end
-end
+    fi
+}
 
 # Download Iris dataset (classic ML dataset)
 download_file \
@@ -48,11 +48,12 @@ download_file \
 download_file \
     "https://raw.githubusercontent.com/plotly/datasets/master/2011_february_us_airport_traffic.csv" \
     "weather.csv" \
-    "US Airport Traffic dataset"
+    "US airport traffic sample"
 
 # Create a sample 3D dataset as JSON
 echo "📊 Creating 3D sample data..."
-printf '{
+cat > "$DATA_DIR/3d-sample.json" << 'EOF'
+{
   "title": "3D Scatter Plot Sample Data",
   "description": "Sample 3D coordinates with categories",
   "data": [
@@ -68,12 +69,13 @@ printf '{
     {"x": 2.6, "y": 2.7, "z": 4.1, "category": "A", "value": 16}
   ]
 }
-' > "$DATA_DIR/3d-sample.json"
+EOF
 echo "✅ 3D sample data created successfully"
 
 # Create a sample time series dataset
 echo "📊 Creating time series sample data..."
-printf 'Date,Temperature,Humidity,Pressure
+cat > "$DATA_DIR/timeseries-sample.csv" << 'EOF'
+Date,Temperature,Humidity,Pressure
 2024-01-01,18.5,65,1013.2
 2024-01-02,19.2,68,1012.8
 2024-01-03,17.8,72,1014.1
@@ -89,12 +91,13 @@ printf 'Date,Temperature,Humidity,Pressure
 2024-01-13,18.1,71,1014.5
 2024-01-14,17.4,74,1015.1
 2024-01-15,16.8,76,1015.8
-' > "$DATA_DIR/timeseries-sample.csv"
+EOF
 echo "✅ Time series sample data created successfully"
 
 # Create a sample categorical dataset
 echo "📊 Creating categorical sample data..."
-printf 'Product|Region|Sales|Quarter
+cat > "$DATA_DIR/sales-sample.dat" << 'EOF'
+Product|Region|Sales|Quarter
 Laptop|North|1500|Q1
 Laptop|South|1200|Q1
 Laptop|East|1800|Q1
@@ -119,48 +122,132 @@ Tablet|North|900|Q2
 Tablet|South|750|Q2
 Tablet|East|1050|Q2
 Tablet|West|850|Q2
-' > "$DATA_DIR/sales-sample.dat"
+EOF
 echo "✅ Sales sample data created successfully"
 
 # Create test.tsv file for TSV format testing
 echo "📊 Creating TSV test file..."
-printf 'Name	Age	Score
+cat > "$DATA_DIR/test.tsv" << 'EOF'
+Name	Age	Score
 Alice	25	95.5
 Bob	30	87.3
 Charlie	35	92.1
-' > "$DATA_DIR/test.tsv"
+EOF
 echo "✅ TSV test file created successfully"
 
 # Create test.tab file for TAB format testing
 echo "📊 Creating TAB test file..."
-printf 'Product	Sales	Revenue
+cat > "$DATA_DIR/test.tab" << 'EOF'
+Product	Sales	Revenue
 Widget	100	1250.50
 Gadget	150	2375.75
 Tool	75	937.25
-' > "$DATA_DIR/test.tab"
+EOF
 echo "✅ TAB test file created successfully"
 
 # Create test.out file for OUT format testing
 echo "📊 Creating OUT test file..."
-printf 'X,Y,Z
+cat > "$DATA_DIR/test.out" << 'EOF'
+X,Y,Z
 1.0,2.5,3.7
 2.0,4.1,5.2
 3.0,6.3,7.8
-' > "$DATA_DIR/test.out"
+EOF
 echo "✅ OUT test file created successfully"
 
 # Create test.data file for DATA format testing
 echo "📊 Creating DATA test file..."
-printf 'Temperature Pressure Humidity
+cat > "$DATA_DIR/test.data" << 'EOF'
+Temperature Pressure Humidity
 25.5 1013.25 65
 26.2 1012.80 68
 24.8 1014.10 62
-' > "$DATA_DIR/test.data"
+EOF
 echo "✅ DATA test file created successfully"
+
+# Create test-data directory for delimiter detection tests
+TEST_DATA_DIR="test-data"
+mkdir -p "$TEST_DATA_DIR"
+
+echo "📊 Creating test delimiter fixtures..."
+cat > "$TEST_DATA_DIR/colon-delimited.txt" << 'EOF'
+name:age:city
+Alice:30:Seattle
+Bob:25:Portland
+Carol:35:San Francisco
+EOF
+
+cat > "$TEST_DATA_DIR/pipe-delimited.dat" << 'EOF'
+product|price|quantity
+Widget|19.99|5
+Gadget|29.99|3
+Thingamajig|9.99|12
+EOF
+
+cat > "$TEST_DATA_DIR/space-delimited.txt" << 'EOF'
+planet mass gravity
+Mercury 0.055 3.7
+Venus 0.815 8.87
+Earth 1.0 9.81
+EOF
+
+cat > "$TEST_DATA_DIR/single-column.txt" << 'EOF'
+value
+alpha
+beta
+gamma
+EOF
+echo "✅ Test delimiter fixtures created successfully"
+
+# Create test files with comments for comment handling tests
+echo "📊 Creating comment handling test fixtures..."
+cat > "$TEST_DATA_DIR/csv-with-comments.csv" << 'EOF'
+# This is a comment line
+# Another comment
+Name,Age,Score
+Alice,25,95.5
+% This is also a comment (percent marker)
+Bob,30,87.3
+// This is a slash comment
+Charlie,35,92.1
+EOF
+
+cat > "$TEST_DATA_DIR/txt-with-comments.txt" << 'EOF'
+# Data file with hash comments
+name:age:city
+# First record below
+Alice:30:Seattle
+Bob:25:Portland
+# Another comment
+Carol:35:San Francisco
+EOF
+
+cat > "$TEST_DATA_DIR/dat-with-comments.dat" << 'EOF'
+// Pipe-delimited data with slash comments
+product|price|quantity
+Widget|19.99|5
+// Mid-file comment
+Gadget|29.99|3
+% Percent comment marker
+Thingamajig|9.99|12
+EOF
+
+cat > "$TEST_DATA_DIR/custom-comment-markers.txt" << 'EOF'
+## Custom double-hash comment
+! Exclamation comment
+data1,data2,data3
+1,2,3
+## Another custom comment
+4,5,6
+! Another exclamation
+7,8,9
+EOF
+echo "✅ Comment handling test fixtures created successfully"
 
 echo ""
 echo "🎉 All sample datasets downloaded and created successfully!"
 echo "📁 Data files are located in: $DATA_DIR"
+echo "📁 Test fixtures are located in: $TEST_DATA_DIR"
 echo ""
 echo "Available datasets:"
 echo "  - iris.csv: Classic flower classification dataset"
@@ -174,5 +261,13 @@ echo "  - test.tsv: TSV format test file"
 echo "  - test.tab: TAB format test file"
 echo "  - test.out: OUT format test file"
 echo "  - test.data: DATA format test file"
+echo "  - colon-delimited.txt: Colon-separated sample (delimiter tests)"
+echo "  - pipe-delimited.dat: Pipe-separated sample (delimiter tests)"
+echo "  - space-delimited.txt: Space-separated sample (delimiter tests)"
+echo "  - single-column.txt: Single column sample (delimiter fallback tests)"
+echo "  - csv-with-comments.csv: CSV with comment lines (comment handling tests)"
+echo "  - txt-with-comments.txt: TXT with hash comments (comment handling tests)"
+echo "  - dat-with-comments.dat: DAT with multiple comment markers (comment handling tests)"
+echo "  - custom-comment-markers.txt: File for custom comment marker tests"
 echo ""
 echo "🚀 Ready to test VSPlot extension with sample data!"

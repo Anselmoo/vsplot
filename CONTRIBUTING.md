@@ -24,13 +24,9 @@ npm run watch
 ```fish
 npm run build:images
 ```
-- Download sample data (bash):
+- Setup test data:
 ```bash
-bash scripts/download-data.sh
-```
-- Download sample data (fish):
-```fish
-fish scripts/download-data.fish
+bash scripts/setup-test-data.sh
 ```
 
 ## Coding Standards

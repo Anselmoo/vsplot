@@ -11,6 +11,11 @@ export interface ParsedData {
     detectedDelimiter?: string;
 }
 
+export interface ParseOptions {
+    delimiter?: string;
+    commentMarkers?: string[];
+}
+
 /**
  * Parse a data file and return structured data
  * 
@@ -21,11 +26,15 @@ export interface ParsedData {
  * - User can override delimiter via options.delimiter parameter
  * - TSV files default to tab delimiter unless overridden
  * 
+ * Comment Handling:
+ * - Skips lines starting with #, %, // by default
+ * - User can override comment markers via options.commentMarkers parameter
+ * 
  * @param uri - URI of the file to parse
- * @param options - Optional settings including delimiter override
+ * @param options - Optional settings including delimiter override and comment markers
  * @returns Promise resolving to ParsedData or null if unsupported file type
  */
-export async function parseDataFile(uri: vscode.Uri, options?: { delimiter?: string }): Promise<ParsedData | null> {
+export async function parseDataFile(uri: vscode.Uri, options?: ParseOptions): Promise<ParsedData | null> {
     try {
         const filePath = uri.fsPath;
         const fileName = path.basename(filePath);
@@ -34,9 +43,12 @@ export async function parseDataFile(uri: vscode.Uri, options?: { delimiter?: str
         // Read file content
         const content = await fs.promises.readFile(filePath, 'utf8');
 
+        // Default comment markers: #, %, //
+        const commentMarkers = options?.commentMarkers ?? ['#', '%', '//'];
+
         switch (fileExtension) {
             case '.csv':
-                return parseCSV(content, fileName);
+                return parseCSV(content, fileName, commentMarkers);
             case '.json':
                 return parseJSON(content, fileName);
             case '.txt':
@@ -44,10 +56,10 @@ export async function parseDataFile(uri: vscode.Uri, options?: { delimiter?: str
             case '.out':
             case '.data':
             case '.tab':
-                return parseDelimited(content, fileName, fileExtension.slice(1) as 'txt' | 'dat' | 'out' | 'data' | 'tab' | 'tsv', options?.delimiter);
+                return parseDelimited(content, fileName, fileExtension.slice(1) as 'txt' | 'dat' | 'out' | 'data' | 'tab' | 'tsv', options?.delimiter, commentMarkers);
             case '.tsv':
                 // TSV files have tab delimiter by default
-                return parseDelimited(content, fileName, 'tsv', options?.delimiter ?? '\t');
+                return parseDelimited(content, fileName, 'tsv', options?.delimiter ?? '\t', commentMarkers);
             default:
                 vscode.window.showErrorMessage(`Unsupported file type: ${fileExtension}`);
                 return null;
@@ -58,19 +70,41 @@ export async function parseDataFile(uri: vscode.Uri, options?: { delimiter?: str
     }
 }
 
-function parseCSV(content: string, fileName: string): ParsedData {
+/**
+ * Check if a line is a comment based on configured comment markers
+ * 
+ * @param line - Line to check
+ * @param commentMarkers - Array of comment marker strings
+ * @returns true if line starts with any comment marker, false otherwise
+ */
+function isCommentLine(line: string, commentMarkers: string[]): boolean {
+    const trimmed = line.trim();
+    if (!trimmed) {
+        return false; // Empty lines are not comment lines
+    }
+    return commentMarkers.some(marker => trimmed.startsWith(marker));
+}
+
+function parseCSV(content: string, fileName: string, commentMarkers: string[] = ['#', '%', '//']): ParsedData {
     const lines = content.trim().split('\n');
     if (lines.length === 0) {
         throw new Error('File is empty');
     }
 
+    // Filter out comment lines
+    const nonCommentLines = lines.filter(line => !isCommentLine(line, commentMarkers));
+    
+    if (nonCommentLines.length === 0) {
+        throw new Error('File contains only comments or empty lines');
+    }
+
     // Parse CSV with basic comma separation (could be enhanced with proper CSV parser)
-    const headers = parseCSVLine(lines[0]);
+    const headers = parseCSVLine(nonCommentLines[0]);
     const rows: (string | number)[][] = [];
 
-    for (let i = 1; i < lines.length; i++) {
-        if (lines[i].trim()) {
-            const raw = parseCSVLine(lines[i]);
+    for (let i = 1; i < nonCommentLines.length; i++) {
+        if (nonCommentLines[i].trim()) {
+            const raw = parseCSVLine(nonCommentLines[i]);
             const coerced = raw.map(v => {
                 const n = Number(v);
                 return !Number.isNaN(n) && v !== '' ? n : v;
@@ -166,21 +200,30 @@ function parseJSON(content: string, fileName: string): ParsedData {
  * - Allows user override of delimiter via options parameter
  * - Fallback to comma delimiter if no multi-column delimiter detected
  * - Auto-detects headers vs numeric data in first line
+ * - Filters out comment lines based on configured markers
  * 
  * @param content - File content as string
  * @param fileName - Name of the file being parsed
  * @param fileType - Type of file (txt, dat, tsv, tab, out, data)
  * @param overrideDelimiter - Optional delimiter to use instead of auto-detection
+ * @param commentMarkers - Array of comment marker strings (default: ['#', '%', '//'])
  * @returns ParsedData object with headers, rows, and detected delimiter
  */
-function parseDelimited(content: string, fileName: string, fileType: 'txt' | 'dat' | 'tsv' | 'tab' | 'out' | 'data', overrideDelimiter?: string): ParsedData {
+function parseDelimited(content: string, fileName: string, fileType: 'txt' | 'dat' | 'tsv' | 'tab' | 'out' | 'data', overrideDelimiter?: string, commentMarkers: string[] = ['#', '%', '//']): ParsedData {
     const lines = content.trim().split('\n');
     if (lines.length === 0) {
         throw new Error('File is empty');
     }
 
+    // Filter out comment lines
+    const nonCommentLines = lines.filter(line => !isCommentLine(line, commentMarkers));
+    
+    if (nonCommentLines.length === 0) {
+        throw new Error('File contains only comments or empty lines');
+    }
+
     // Detect delimiter among common candidates unless override provided
-    const firstLine = lines[0];
+    const firstLine = nonCommentLines[0];
     let delimiter = overrideDelimiter ?? '';
     if (!delimiter) {
         // Candidates cover all common delimiters: comma, pipe, semicolon, colon, tab, space
@@ -195,8 +238,8 @@ function parseDelimited(content: string, fileName: string, fileType: 'txt' | 'da
             // Score by column count and consistency with next few lines
             let consistent = 0;
             const expected = parts.length;
-            for (let i = 1; i < Math.min(6, lines.length); i++) {
-                if (lines[i].split(cand).length === expected) {
+            for (let i = 1; i < Math.min(6, nonCommentLines.length); i++) {
+                if (nonCommentLines[i].split(cand).length === expected) {
                     consistent++;
                 }
             }
@@ -227,9 +270,9 @@ function parseDelimited(content: string, fileName: string, fileType: 'txt' | 'da
     }
 
     const rows: (string | number)[][] = [];
-    for (let i = dataStartIndex; i < lines.length; i++) {
-        if (lines[i].trim()) {
-            const rowData = lines[i].split(delimiter).map(item => {
+    for (let i = dataStartIndex; i < nonCommentLines.length; i++) {
+        if (nonCommentLines[i].trim()) {
+            const rowData = nonCommentLines[i].split(delimiter).map(item => {
                 const trimmed = item.trim();
                 // Try to convert to number if possible
                 const num = Number(trimmed);
