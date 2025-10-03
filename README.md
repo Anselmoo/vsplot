@@ -82,6 +82,13 @@ By default, VSPlot filters out lines starting with these comment markers:
 > [!IMPORTANT]
 > Sample data files demonstrating all features are available in `sample-data/` and `test-data/` directories. Run `bash scripts/setup-test-data.sh` to generate them.
 
+### Icon Theme Support
+For enhanced visual file type recognition in VS Code's Explorer, consider using an icon theme extension such as:
+- [**Material Icon Theme**](https://marketplace.visualstudio.com/items?itemName=PKief.material-icon-theme) - Provides beautiful Material Design icons for CSV, JSON, TXT, and other data file types supported by VSPlot
+
+> [!TIP]
+> Icon themes help you quickly identify different file types in your workspace. The Material Icon Theme automatically recognizes most file extensions supported by VSPlot (`.csv`, `.json`, `.txt`, `.dat`, `.tsv`, `.tab`, `.out`, `.data`) and displays appropriate icons in the Explorer and editor tabs.
+
 </details>
 
 ## Usage
