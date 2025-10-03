@@ -8,6 +8,9 @@ node_modules
 # Sample data (kept out of repository to avoid accidental publishing of private datasets)
 sample-data/
 
+# Test data generated during test runs
+test-data/
+
 # Environment files
 .env
 .env.*

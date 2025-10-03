@@ -165,9 +165,44 @@ Temperature Pressure Humidity
 EOF
 echo "✅ DATA test file created successfully"
 
+# Create test-data directory for delimiter detection tests
+TEST_DATA_DIR="test-data"
+mkdir -p "$TEST_DATA_DIR"
+
+echo "📊 Creating test delimiter fixtures..."
+cat > "$TEST_DATA_DIR/colon-delimited.txt" << 'EOF'
+name:age:city
+Alice:30:Seattle
+Bob:25:Portland
+Carol:35:San Francisco
+EOF
+
+cat > "$TEST_DATA_DIR/pipe-delimited.dat" << 'EOF'
+product|price|quantity
+Widget|19.99|5
+Gadget|29.99|3
+Thingamajig|9.99|12
+EOF
+
+cat > "$TEST_DATA_DIR/space-delimited.txt" << 'EOF'
+planet mass gravity
+Mercury 0.055 3.7
+Venus 0.815 8.87
+Earth 1.0 9.81
+EOF
+
+cat > "$TEST_DATA_DIR/single-column.txt" << 'EOF'
+value
+alpha
+beta
+gamma
+EOF
+echo "✅ Test delimiter fixtures created successfully"
+
 echo ""
 echo "🎉 All sample datasets downloaded and created successfully!"
 echo "📁 Data files are located in: $DATA_DIR"
+echo "📁 Test fixtures are located in: $TEST_DATA_DIR"
 echo ""
 echo "Available datasets:"
 echo "  - iris.csv: Classic flower classification dataset"
@@ -181,5 +216,9 @@ echo "  - test.tsv: TSV format test file"
 echo "  - test.tab: TAB format test file"
 echo "  - test.out: OUT format test file"
 echo "  - test.data: DATA format test file"
+echo "  - colon-delimited.txt: Colon-separated sample (delimiter tests)"
+echo "  - pipe-delimited.dat: Pipe-separated sample (delimiter tests)"
+echo "  - space-delimited.txt: Space-separated sample (delimiter tests)"
+echo "  - single-column.txt: Single column sample (delimiter fallback tests)"
 echo ""
 echo "🚀 Ready to test VSPlot extension with sample data!"
