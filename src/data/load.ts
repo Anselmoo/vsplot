@@ -91,18 +91,36 @@ function parseCSV(content: string, fileName: string, commentMarkers: string[] = 
         throw new Error('File is empty');
     }
 
-    // Filter out comment lines
-    const nonCommentLines = lines.filter(line => !isCommentLine(line, commentMarkers));
+    // Filter out comment lines and empty lines
+    const nonCommentLines = lines.filter(line => {
+        const trimmed = line.trim();
+        return trimmed && !isCommentLine(line, commentMarkers);
+    });
     
     if (nonCommentLines.length === 0) {
         throw new Error('File contains only comments or empty lines');
     }
 
     // Parse CSV with basic comma separation (could be enhanced with proper CSV parser)
-    const headers = parseCSVLine(nonCommentLines[0]);
+    const firstRowData = parseCSVLine(nonCommentLines[0]);
+    let headers: string[];
+    let dataStartIndex = 0;
+
+    // Check if first line looks like headers (non-numeric)
+    const hasHeaders = firstRowData.some(item => Number.isNaN(Number(item)) && item !== '');
+
+    if (hasHeaders) {
+        headers = firstRowData;
+        dataStartIndex = 1;
+    } else {
+        // All numeric - generate column headers
+        headers = firstRowData.map((_, index) => `Column ${index + 1}`);
+        dataStartIndex = 0;
+    }
+
     const rows: (string | number)[][] = [];
 
-    for (let i = 1; i < nonCommentLines.length; i++) {
+    for (let i = dataStartIndex; i < nonCommentLines.length; i++) {
         if (nonCommentLines[i].trim()) {
             const raw = parseCSVLine(nonCommentLines[i]);
             const coerced = raw.map(v => {
@@ -215,8 +233,11 @@ function parseDelimited(content: string, fileName: string, fileType: 'txt' | 'da
         throw new Error('File is empty');
     }
 
-    // Filter out comment lines
-    const nonCommentLines = lines.filter(line => !isCommentLine(line, commentMarkers));
+    // Filter out comment lines and empty lines
+    const nonCommentLines = lines.filter(line => {
+        const trimmed = line.trim();
+        return trimmed && !isCommentLine(line, commentMarkers);
+    });
     
     if (nonCommentLines.length === 0) {
         throw new Error('File contains only comments or empty lines');
