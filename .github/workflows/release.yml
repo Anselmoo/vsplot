@@ -43,7 +43,7 @@ jobs:
 
       - name: Prepare sample and test data
         if: always()
-        run: bash scripts/download-data.sh
+        run: bash scripts/setup-test-data.sh
 
       - name: Test
         run: xvfb-run -a npm test
