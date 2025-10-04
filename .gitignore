@@ -9,6 +9,7 @@ coverage/
 .nyc_output/
 .c8/
 *.lcov
+artifacts/
 
 # --- Local and sensitive files (do not commit) ---
 # Sample data (kept out of repository to avoid accidental publishing of private datasets)
@@ -35,7 +36,8 @@ id_rsa.pub
 __MACOSX/
 .AppleDouble
 .LSOverride
-Icon[]
+Icon[
+]
 
 # Thumbnails
 ._*

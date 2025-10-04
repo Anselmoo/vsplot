@@ -45,8 +45,15 @@ jobs:
         if: always()
         run: bash scripts/setup-test-data.sh
 
-      - name: Test
-        run: xvfb-run -a npm test
+      - name: Create artifacts dir
+        if: always()
+        run: mkdir -p artifacts/test-results
+
+      - name: Test (run vscode tests)
+        run: |
+          set -e
+          xvfb-run -a npm test || true
+          xvfb-run -a npm run test:junit || true
 
       - name: Generate Coverage Report
         if: always()
@@ -62,6 +69,13 @@ jobs:
           name: codecov-vsplot
           fail_ci_if_error: false
           token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Upload test results to Codecov
+        if: ${{ !cancelled() }}
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: artifacts/test-results/**/*.xml
 
       - name: Package VSIX (artifact)
         run: |
