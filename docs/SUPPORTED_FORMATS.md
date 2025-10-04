@@ -186,7 +186,7 @@ VSPlot handles various edge cases:
 - [Comment Handling Guide](./COMMENT_HANDLING.md) - Detailed comment filtering
 - [Delimiter Detection Guide](./DELIMITER_DETECTION.md) - Auto-detection details
 - [Webview Architecture](./WEBVIEW_ARCHITECTURE.md) - Extension architecture
-- [Testing Coverage](../TESTING_COVERAGE.md) - Test suite documentation
+- [Testing Coverage](./TESTING_COVERAGE.md) - Test suite documentation
 
 ## Limitations
 

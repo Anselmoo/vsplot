@@ -19,7 +19,7 @@
 
 ## Testing expectations
 
-- Automated tests run through `npm test` (vscode-test); `npm run test:coverage` adds c8 coverage reporting with thresholds defined in `TESTING_COVERAGE.md`.
+- Automated tests run through `npm test` (vscode-test); `npm run test:coverage` uses the `vscode-test` CLI with coverage thresholds enforced by `scripts/check-coverage.mjs` (see `docs/TESTING_COVERAGE.md`).
 - Parser and delimiter logic is extensively covered in `src/test/*.test.ts`; when altering parsing, update fixtures in `test-data/` via the setup script and keep message contracts intact.
 
 ## Coding conventions

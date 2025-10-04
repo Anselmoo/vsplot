@@ -7,7 +7,6 @@ node_modules
 # Coverage files
 coverage/
 .nyc_output/
-.c8/
 *.lcov
 artifacts/
 

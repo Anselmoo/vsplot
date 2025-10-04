@@ -107,7 +107,7 @@ Access commands via the Explorer context menu, the editor title bar, or the Comm
 - [Webview architecture](docs/WEBVIEW_ARCHITECTURE.md) — how providers load HTML templates and inject nonces.
 - [Delimiter detection](docs/DELIMITER_DETECTION.md) — scoring algorithm and override flow.
 - [Comment handling](docs/COMMENT_HANDLING.md) — default markers and API hooks.
-- [Testing coverage](TESTING_COVERAGE.md) — suites for parsing, edge cases, and extension automation.
+- [Testing coverage](docs/TESTING_COVERAGE.md) — suites for parsing, edge cases, and extension automation.
 
 Need help or have a request? [Open an issue](https://github.com/Anselmoo/vsplot/issues) or start a discussion in the repository.
 
