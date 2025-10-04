@@ -7,8 +7,8 @@ node_modules
 # Coverage files
 coverage/
 .nyc_output/
-.c8/
 *.lcov
+artifacts/
 
 # --- Local and sensitive files (do not commit) ---
 # Sample data (kept out of repository to avoid accidental publishing of private datasets)
@@ -29,3 +29,30 @@ id_rsa.pub
 
 # serena for mcp support
 .serena
+
+# General
+.DS_Store
+__MACOSX/
+.AppleDouble
+.LSOverride
+Icon[
+]
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
