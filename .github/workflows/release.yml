@@ -52,9 +52,9 @@ jobs:
       - name: Test (run vscode tests)
         run: |
           set -e
-          xvfb-run -a npm test || true
-          xvfb-run -a npm run test:junit || true
-
+          xvfb-run -a npm test
+          xvfb-run -a npm run test:junit
+        continue-on-error: true
       - name: Generate Coverage Report
         if: always()
         run: xvfb-run -a npm run test:coverage
