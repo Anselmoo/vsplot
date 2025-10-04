@@ -170,7 +170,7 @@
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
     "test": "vscode-test",
-    "test:junit": "node -e \"require('fs').mkdirSync('artifacts/test-results', { recursive: true });\" && cross-env MOCHA_FILE=artifacts/test-results/junit.xml vscode-test --reporter mocha-junit-reporter",
+    "test:junit": "mkdir -p artifacts/test-results && cross-env MOCHA_FILE=artifacts/test-results/junit.xml vscode-test --reporter mocha-junit-reporter",
     "test:coverage": "c8 --reporter=lcov --reporter=text --reporter=html vscode-test",
     "coverage": "npm run test:coverage"
   },
