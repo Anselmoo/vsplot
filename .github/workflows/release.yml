@@ -11,6 +11,12 @@ on:
     branches:
       - main
 
+  workflow_dispatch:
+
+concurrency:
+  group: vsplot-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   ci:
     name: CI (lint → build → test → package)
@@ -93,18 +99,32 @@ jobs:
     name: Publish (Marketplace)
     needs: ci
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: >-
+      startsWith(github.ref, 'refs/tags/v') &&
+      github.event_name != 'pull_request'
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
+          cache-dependency-path: package-lock.json
 
       - name: Install deps (for vsce)
         run: npm ci
+
+      - name: Ensure tag points to main
+        run: |
+          git fetch origin main --depth=1
+          if ! git merge-base --is-ancestor origin/main HEAD; then
+            echo "The release tag must point to the main branch." >&2
+            exit 1
+          fi
 
       - name: Download VSIX artifact
         uses: actions/download-artifact@v4
@@ -112,13 +132,44 @@ jobs:
           name: vsix
           path: .
 
-      - name: Publish to Marketplace
+      - name: Locate VSIX artifact
+        id: package
+        run: |
+          VSIX_FILE=$(ls *.vsix | head -n1 || true)
+          if [ -z "$VSIX_FILE" ]; then
+            echo "No VSIX package found in the workspace" >&2
+            exit 1
+          fi
+          echo "vsix=$VSIX_FILE" >> "$GITHUB_OUTPUT"
+
+      - name: Publish to VS Code Marketplace
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
         run: |
-          VSIX_FILE=$(ls *.vsix | head -n1 || true)
-          if [ -n "$VSIX_FILE" ]; then
-            npx vsce publish --packagePath "$VSIX_FILE" -p "$VSCE_PAT"
+          if [ -z "$VSCE_PAT" ]; then
+            echo "VSCE_PAT is not configured; aborting VS Code Marketplace publish." >&2
+            exit 1
+          fi
+          npx vsce publish --packagePath "${{ steps.package.outputs.vsix }}" -p "$VSCE_PAT"
+
+      - name: Create GitHub Release with gh
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          TAG_NAME="${GITHUB_REF#refs/tags/}"
+          ASSET_PATH="${{ steps.package.outputs.vsix }}"
+          if [ -z "$TAG_NAME" ]; then
+            echo "Unable to determine tag name from GITHUB_REF ($GITHUB_REF)." >&2
+            exit 1
+          fi
+
+          if gh release view "$TAG_NAME" >/dev/null 2>&1; then
+            echo "Release $TAG_NAME already exists. Updating assets..."
+            gh release upload "$TAG_NAME" "$ASSET_PATH" --clobber
           else
-            npx vsce publish -p "$VSCE_PAT"
+            echo "Creating release $TAG_NAME with VSIX asset..."
+            gh release create "$TAG_NAME" "$ASSET_PATH" \
+              --title "VSPlot $TAG_NAME" \
+              --generate-notes
           fi
