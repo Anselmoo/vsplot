@@ -96,6 +96,7 @@ window.addEventListener('message', event => {
                     y2: parseInt(document.getElementById('yAxis2').value),
                     legend: document.getElementById('legendToggle').checked,
                     dragZoom: document.getElementById('dragZoomToggle').checked,
+                    curveSmoothing: document.getElementById('curveToggle').checked,
                     color: document.getElementById('colorPicker').value,
                     agg: document.getElementById('aggFunc').value,
                     stylePreset: document.getElementById('stylePreset').value,
@@ -123,6 +124,7 @@ function applyConfig(cfg) {
     if (typeof cfg.y2 !== 'undefined') document.getElementById('yAxis2').value = String(cfg.y2);
     if (typeof cfg.legend === 'boolean') document.getElementById('legendToggle').checked = cfg.legend;
     if (typeof cfg.dragZoom === 'boolean') document.getElementById('dragZoomToggle').checked = cfg.dragZoom;
+    if (typeof cfg.curveSmoothing === 'boolean') document.getElementById('curveToggle').checked = cfg.curveSmoothing;
     if (cfg.color) document.getElementById('colorPicker').value = cfg.color;
     if (cfg.agg) document.getElementById('aggFunc').value = cfg.agg;
     if (cfg.stylePreset) { 
@@ -214,6 +216,9 @@ function initializeChart() {
                 showIcons = !!saved.showIcons; 
                 document.getElementById('iconsToggle').checked = showIcons; 
             }
+            if (typeof saved.curveSmoothing === 'boolean') {
+                document.getElementById('curveToggle').checked = saved.curveSmoothing;
+            }
             restored = true;
         } catch (e) {
             console.error('Error restoring state:', e);
@@ -295,6 +300,10 @@ function createChart() {
         const showAgg = (chartType === 'bar' && !xIsTime) || chartType === 'pie' || chartType === 'doughnut';
         aggGroup.style.display = showAgg ? 'flex' : 'none';
 
+        // Show/hide curve smoothing control (only for line charts)
+        const smoothGroup = document.getElementById('smoothGroup');
+        smoothGroup.style.display = chartType === 'line' ? 'flex' : 'none';
+
         // Reflect Y2 UI state
         updateY2ToggleUI();
 
@@ -310,11 +319,12 @@ function createChart() {
         const ctx = chartCanvas.getContext('2d');
 
         const dragEnabled = document.getElementById('dragZoomToggle').checked;
+        const curveSmoothing = chartType === 'line' ? document.getElementById('curveToggle').checked : true;
 
         chart = new Chart(ctx, {
             type: chartType,
             data: chartData,
-            options: getChartOptions(chartType, chartData.__xLabel, chartData.__yLabel, dragEnabled, !!chartData.__hasY2, chartData.__y2Label)
+            options: getChartOptions(chartType, chartData.__xLabel, chartData.__yLabel, dragEnabled, !!chartData.__hasY2, chartData.__y2Label, curveSmoothing)
         });
         
         // Apply compact class to cards
@@ -347,6 +357,7 @@ function createChart() {
                 y2: isNaN(yAxis2Index) ? -1 : yAxis2Index,
                 legend: document.getElementById('legendToggle').checked,
                 dragZoom: document.getElementById('dragZoomToggle').checked,
+                curveSmoothing: chartType === 'line' ? document.getElementById('curveToggle').checked : undefined,
                 color: document.getElementById('colorPicker').value,
                 agg: document.getElementById('aggFunc').value,
                 stylePreset,
@@ -557,9 +568,10 @@ function prepareChartData(chartType, xAxisIndex, yAxisIndex, yAxis2Index) {
  * @param {boolean} dragEnabled - Whether drag zoom is enabled
  * @param {boolean} hasY2 - Whether secondary Y axis is present
  * @param {string} y2Title - Y2 axis title
+ * @param {boolean} curveSmoothing - Whether to apply curve smoothing to line charts
  * @returns {Object} Chart.js options object
  */
-function getChartOptions(chartType, xAxisTitle, yAxisTitle, dragEnabled, hasY2, y2Title) {
+function getChartOptions(chartType, xAxisTitle, yAxisTitle, dragEnabled, hasY2, y2Title, curveSmoothing = true) {
     const fg = getComputedStyle(document.body).getPropertyValue('--vscode-foreground');
     const grid = getComputedStyle(document.body).getPropertyValue('--vscode-widget-border');
     const tooltipBg = getComputedStyle(document.body).getPropertyValue('--vscode-editorHoverWidget-background') || 'rgba(0,0,0,0.8)';
@@ -569,8 +581,8 @@ function getChartOptions(chartType, xAxisTitle, yAxisTitle, dragEnabled, hasY2, 
         maintainAspectRatio: false,
         elements: {
             line: {
-                tension: 0.3,
-                cubicInterpolationMode: 'monotone'
+                tension: curveSmoothing ? 0.3 : 0,
+                cubicInterpolationMode: curveSmoothing ? 'monotone' : 'default'
             },
             point: {
                 radius: 2,
@@ -851,6 +863,15 @@ document.getElementById('dragZoomToggle').addEventListener('change', () => {
         chart.options.plugins.zoom.drag.enabled = enabled;
         chart.update();
         setupManualDrag(enabled && !pluginAvailable);
+    }
+});
+
+document.getElementById('curveToggle').addEventListener('change', () => {
+    if (chart) {
+        const curveSmoothing = document.getElementById('curveToggle').checked;
+        chart.options.elements.line.tension = curveSmoothing ? 0.3 : 0;
+        chart.options.elements.line.cubicInterpolationMode = curveSmoothing ? 'monotone' : 'default';
+        chart.update();
     }
 });
 
