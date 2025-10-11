@@ -238,6 +238,7 @@ export interface ChartTestState {
 	y2: number;
 	legend: boolean;
 	dragZoom: boolean;
+	curveSmoothing: boolean;
 	color: string;
 	agg: string;
 	stylePreset: string;
@@ -255,6 +256,7 @@ export type ChartTestConfig = Partial<{
 	y2: number;
 	legend: boolean;
 	dragZoom: boolean;
+	curveSmoothing: boolean;
 	color: string;
 	agg: string;
 	stylePreset: string;
