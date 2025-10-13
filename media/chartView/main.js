@@ -930,13 +930,15 @@ document.getElementById('stylePreset').addEventListener('change', createChart);
 document.getElementById('decimals').addEventListener('change', () => {
     decimals = parseInt(document.getElementById('decimals').value) || 2;
     if (chart) { 
+        const curveSmoothing = chart.config.type === 'line' ? document.getElementById('curveToggle').checked : true;
         chart.options = getChartOptions(
             chart.config.type, 
             chart.options.scales?.x?.title?.text, 
             chart.options.scales?.y?.title?.text, 
             document.getElementById('dragZoomToggle').checked, 
             !!chart.options.scales?.y2, 
-            chart.options.scales?.y2?.title?.text
+            chart.options.scales?.y2?.title?.text,
+            curveSmoothing
         ); 
         chart.update(); 
     }
@@ -945,13 +947,15 @@ document.getElementById('decimals').addEventListener('change', () => {
 document.getElementById('thousands').addEventListener('change', () => {
     useThousands = document.getElementById('thousands').checked;
     if (chart) { 
+        const curveSmoothing = chart.config.type === 'line' ? document.getElementById('curveToggle').checked : true;
         chart.options = getChartOptions(
             chart.config.type, 
             chart.options.scales?.x?.title?.text, 
             chart.options.scales?.y?.title?.text, 
             document.getElementById('dragZoomToggle').checked, 
             !!chart.options.scales?.y2, 
-            chart.options.scales?.y2?.title?.text
+            chart.options.scales?.y2?.title?.text,
+            curveSmoothing
         ); 
         chart.update(); 
     }
