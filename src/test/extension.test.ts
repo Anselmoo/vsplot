@@ -185,6 +185,45 @@ suite("Extension Test Suite", () => {
 		assert.ok(state.datasetLens[0] === 3);
 	});
 
+	test("Line chart curve smoothing toggle", async function () {
+		this.timeout(20000);
+		const ext = vscode.extensions.getExtension(EXTENSION_ID);
+		assert.ok(ext);
+		const basePath = ext ? ext.extensionPath : "";
+		const uri = vscode.Uri.file(path.join(basePath, "sample-data", "iris.csv"));
+		const doc = await vscode.workspace.openTextDocument(uri);
+		await vscode.window.showTextDocument(doc);
+		await vscode.commands.executeCommand("vsplot.plotData", uri);
+		
+		// Test with curve smoothing enabled (default)
+		const cfgSmooth: ChartTestConfig = {
+			chartType: "line",
+			x: 0,
+			y: 1,
+			curveSmoothing: true,
+		};
+		await vscode.commands.executeCommand("vsplot.test.applyChartConfig", cfgSmooth);
+		const stateSmooth = (await vscode.commands.executeCommand(
+			"vsplot.test.requestChartState",
+		)) as ChartTestState;
+		assert.strictEqual(stateSmooth.chartType, "line");
+		assert.strictEqual(stateSmooth.curveSmoothing, true);
+		
+		// Test with curve smoothing disabled
+		const cfgLinear: ChartTestConfig = {
+			chartType: "line",
+			x: 0,
+			y: 1,
+			curveSmoothing: false,
+		};
+		await vscode.commands.executeCommand("vsplot.test.applyChartConfig", cfgLinear);
+		const stateLinear = (await vscode.commands.executeCommand(
+			"vsplot.test.requestChartState",
+		)) as ChartTestState;
+		assert.strictEqual(stateLinear.chartType, "line");
+		assert.strictEqual(stateLinear.curveSmoothing, false);
+	});
+
 	test("Chart uses config defaults for style/format on first open", async function () {
 		this.timeout(20000);
 		const ext = vscode.extensions.getExtension(EXTENSION_ID);
