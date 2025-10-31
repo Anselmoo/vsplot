@@ -48,14 +48,53 @@ This document describes the comprehensive test coverage for the VSPlot data pars
 - Multiple file format support (.csv, .json, .tsv, .tab, .out, .data)
 - Chart features (aggregation, multiple axes, etc.)
 
+### 5. Webview Utils Tests (`webviewUtils.test.ts`)
+
+- **5 tests** covering webview utility functions
+- getNonce() function testing (uniqueness, format)
+- loadHtmlTemplate() with single and multiple placeholders
+- Template placeholder replacement edge cases
+- Empty value handling
+
+### 6. JSON Parsing Tests (`json.test.ts`)
+
+- **9 tests** covering JSON data parsing
+- Array of primitives (strings, numbers, mixed types)
+- Single object parsing
+- Empty arrays
+- Null values in objects
+- Invalid JSON error handling
+- Primitive JSON values (not arrays/objects)
+
+### 7. CSV Parsing Edge Cases Tests (`csvParsing.test.ts`)
+
+- **10 tests** covering CSV parsing edge cases
+- Quoted fields containing commas
+- Empty quoted fields
+- Trailing commas
+- BOM (Byte Order Mark) handling
+- Header-only files
+- All-numeric data (auto-generated headers)
+- Mixed numeric/text headers
+- Leading/trailing empty lines
+- Trimming spaces around values
+
+### 8. Data Commands Tests (`dataCommands.test.ts`)
+
+- **8 tests** covering command execution and error handling
+- Unsupported file type handling
+- TSV, TAB, OUT, DATA file format support
+- JSON array of objects
+- Error handling in command layer
+
 ## Coverage Metrics
 
 ### Target Thresholds
 
-- **Lines**: 70%
-- **Functions**: 70%
-- **Branches**: 65%
-- **Statements**: 70%
+- **Lines**: 75%
+- **Functions**: 75%
+- **Branches**: 75%
+- **Statements**: 75%
 
 Thresholds are enforced by `scripts/check-coverage.mjs`, which fails `npm run test:coverage` if coverage drops below the required values.
 
