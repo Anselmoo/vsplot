@@ -126,9 +126,9 @@ suite("JSON Parsing Tests", () => {
 
 		const uri = vscode.Uri.file(tmpPath);
 		
-		// Empty array should result in error or gracefully handled
+		// Empty array is gracefully handled
 		const data = await parseDataFile(uri);
-		// Based on the code, empty array should give us headers: ['Value'] and rows: []
+		// Based on the code, empty array gives us headers: ['Value'] and rows: []
 		assert.ok(data, "Data should be parsed even for empty array");
 		assert.strictEqual(data?.rows.length, 0, "Should have 0 rows for empty array");
 

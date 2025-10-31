@@ -4,6 +4,10 @@ import * as fs from "fs";
 import * as path from "path";
 import { getNonce, loadHtmlTemplate } from "../providers/webviewUtils";
 
+// Keep the test in sync with package.json publisher + name
+const EXTENSION_ID = "AnselmHahn.vsplot";
+const TEST_DATA_DIR = "test-data";
+
 suite("Webview Utils Tests", () => {
 	test("getNonce should generate a 32-character string", () => {
 		const nonce = getNonce();
@@ -25,17 +29,17 @@ suite("Webview Utils Tests", () => {
 		this.timeout(10000);
 		
 		// Create a temporary template file
-		const tmpDir = path.join(__dirname, "../../test-data");
+		const tmpDir = path.join(__dirname, "../..", TEST_DATA_DIR);
 		await vscode.workspace.fs.createDirectory(vscode.Uri.file(tmpDir));
 		
-		const templatePath = "test-data/template-test.html";
+		const templatePath = `${TEST_DATA_DIR}/template-test.html`;
 		const fullPath = path.join(__dirname, "../..", templatePath);
 		const templateContent = "<html><body>{{MESSAGE}}</body></html>";
 		
 		await fs.promises.writeFile(fullPath, templateContent, "utf8");
 		
 		try {
-			const ext = vscode.extensions.getExtension("AnselmHahn.vsplot");
+			const ext = vscode.extensions.getExtension(EXTENSION_ID);
 			assert.ok(ext, "Extension should be available");
 			const extensionUri = vscode.Uri.file(ext!.extensionPath);
 			
@@ -57,17 +61,17 @@ suite("Webview Utils Tests", () => {
 	test("loadHtmlTemplate should replace multiple placeholders", async function () {
 		this.timeout(10000);
 		
-		const tmpDir = path.join(__dirname, "../../test-data");
+		const tmpDir = path.join(__dirname, "../..", TEST_DATA_DIR);
 		await vscode.workspace.fs.createDirectory(vscode.Uri.file(tmpDir));
 		
-		const templatePath = "test-data/template-multi.html";
+		const templatePath = `${TEST_DATA_DIR}/template-multi.html`;
 		const fullPath = path.join(__dirname, "../..", templatePath);
 		const templateContent = "<html><head><title>{{TITLE}}</title></head><body><h1>{{HEADING}}</h1><p>{{CONTENT}}</p></body></html>";
 		
 		await fs.promises.writeFile(fullPath, templateContent, "utf8");
 		
 		try {
-			const ext = vscode.extensions.getExtension("AnselmHahn.vsplot");
+			const ext = vscode.extensions.getExtension(EXTENSION_ID);
 			assert.ok(ext, "Extension should be available");
 			const extensionUri = vscode.Uri.file(ext!.extensionPath);
 			
@@ -95,17 +99,17 @@ suite("Webview Utils Tests", () => {
 	test("loadHtmlTemplate should handle repeated placeholders", async function () {
 		this.timeout(10000);
 		
-		const tmpDir = path.join(__dirname, "../../test-data");
+		const tmpDir = path.join(__dirname, "../..", TEST_DATA_DIR);
 		await vscode.workspace.fs.createDirectory(vscode.Uri.file(tmpDir));
 		
-		const templatePath = "test-data/template-repeated.html";
+		const templatePath = `${TEST_DATA_DIR}/template-repeated.html`;
 		const fullPath = path.join(__dirname, "../..", templatePath);
 		const templateContent = "<div>{{VALUE}}</div><div>{{VALUE}}</div><div>{{VALUE}}</div>";
 		
 		await fs.promises.writeFile(fullPath, templateContent, "utf8");
 		
 		try {
-			const ext = vscode.extensions.getExtension("AnselmHahn.vsplot");
+			const ext = vscode.extensions.getExtension(EXTENSION_ID);
 			assert.ok(ext, "Extension should be available");
 			const extensionUri = vscode.Uri.file(ext!.extensionPath);
 			
@@ -131,17 +135,17 @@ suite("Webview Utils Tests", () => {
 	test("loadHtmlTemplate should handle empty replacement value", async function () {
 		this.timeout(10000);
 		
-		const tmpDir = path.join(__dirname, "../../test-data");
+		const tmpDir = path.join(__dirname, "../..", TEST_DATA_DIR);
 		await vscode.workspace.fs.createDirectory(vscode.Uri.file(tmpDir));
 		
-		const templatePath = "test-data/template-empty.html";
+		const templatePath = `${TEST_DATA_DIR}/template-empty.html`;
 		const fullPath = path.join(__dirname, "../..", templatePath);
 		const templateContent = "<div>Before{{EMPTY}}After</div>";
 		
 		await fs.promises.writeFile(fullPath, templateContent, "utf8");
 		
 		try {
-			const ext = vscode.extensions.getExtension("AnselmHahn.vsplot");
+			const ext = vscode.extensions.getExtension(EXTENSION_ID);
 			assert.ok(ext, "Extension should be available");
 			const extensionUri = vscode.Uri.file(ext!.extensionPath);
 			
