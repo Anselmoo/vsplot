@@ -40,9 +40,27 @@ bash scripts/setup-test-data.sh
 - HTML/CSS/JS are in separate files under `media/` directories
 
 ## Release
-- Update `CHANGELOG.md`
+- Update `CHANGELOG.md` with the new version changes
 - Ensure `package.json` metadata points to `Anselmoo/vsplot`
-- Create a tag to trigger CI publish
+- Create a tag **from the main branch** to trigger CI publish:
+  ```bash
+  # Ensure you're on main and up to date
+  git checkout main
+  git pull origin main
+  
+  # Create and push the tag (e.g., v0.2.1)
+  git tag v0.2.1
+  git push origin v0.2.1
+  ```
+
+### Release Requirements
+The automated release workflow requires:
+1. **Tag from main**: The release tag must be created from the main branch
+2. **VSCE_PAT secret**: A Personal Access Token for VS Code Marketplace publishing
+   - Create at: https://dev.azure.com
+   - Required scope: `Marketplace (Manage)`
+   - Add to repository secrets as `VSCE_PAT`
+3. **Workflow permissions**: The repository must have workflow permissions to create releases (configured in workflow file)
 
 ## Communication
 - Open issues or PRs on GitHub: https://github.com/Anselmoo/vsplot

@@ -13,6 +13,11 @@ on:
 
   workflow_dispatch:
 
+# Required permissions for creating GitHub releases
+permissions:
+  contents: write
+  packages: write
+
 concurrency:
   group: vsplot-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -99,6 +104,11 @@ jobs:
     name: Publish (Marketplace)
     needs: ci
     runs-on: ubuntu-latest
+    # This job runs only for version tags (e.g., v1.0.0) and not for pull requests
+    # Requirements:
+    # 1. Tag must be created from the main branch
+    # 2. VSCE_PAT secret must be configured with marketplace publish permissions
+    # 3. Workflow must have 'contents: write' permission for creating releases
     if: >-
       startsWith(github.ref, 'refs/tags/v') &&
       github.event_name != 'pull_request'
@@ -120,11 +130,25 @@ jobs:
 
       - name: Ensure tag points to main
         run: |
+          # Fetch main branch to verify tag ancestry
           git fetch origin main --depth=1
-          if ! git merge-base --is-ancestor origin/main HEAD; then
-            echo "The release tag must point to the main branch." >&2
+          
+          # Check if the current tag (HEAD) is part of the main branch history
+          # This ensures the tag was created from a commit on main
+          if ! git merge-base --is-ancestor HEAD origin/main; then
+            echo "❌ ERROR: The release tag must point to the main branch." >&2
+            echo "" >&2
+            echo "To fix this:" >&2
+            echo "1. Checkout main: git checkout main" >&2
+            echo "2. Pull latest changes: git pull origin main" >&2
+            echo "3. Create tag from main: git tag vX.Y.Z" >&2
+            echo "4. Push tag: git push origin vX.Y.Z" >&2
+            echo "" >&2
+            echo "Current HEAD: $(git rev-parse HEAD)" >&2
+            echo "origin/main: $(git rev-parse origin/main)" >&2
             exit 1
           fi
+          echo "✅ Tag is correctly based on main branch"
 
       - name: Download VSIX artifact
         uses: actions/download-artifact@v4
@@ -135,21 +159,43 @@ jobs:
       - name: Locate VSIX artifact
         id: package
         run: |
+          # Find the VSIX package file
           VSIX_FILE=$(ls *.vsix | head -n1 || true)
+          
           if [ -z "$VSIX_FILE" ]; then
-            echo "No VSIX package found in the workspace" >&2
+            echo "❌ ERROR: No VSIX package found in the workspace" >&2
+            echo "" >&2
+            echo "Expected to find a .vsix file downloaded from the 'vsix' artifact." >&2
+            echo "Current directory contents:" >&2
+            ls -la >&2
+            echo "" >&2
+            echo "To fix this:" >&2
+            echo "1. Verify the 'ci' job successfully packages the VSIX" >&2
+            echo "2. Verify the artifact name matches in upload and download steps" >&2
+            echo "3. Check that the artifact upload succeeded in the CI job" >&2
             exit 1
           fi
+          
+          echo "✅ Found VSIX package: $VSIX_FILE"
           echo "vsix=$VSIX_FILE" >> "$GITHUB_OUTPUT"
 
       - name: Publish to VS Code Marketplace
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
         run: |
+          # Check if VSCE_PAT is configured
           if [ -z "$VSCE_PAT" ]; then
-            echo "VSCE_PAT is not configured; aborting VS Code Marketplace publish." >&2
+            echo "❌ ERROR: VSCE_PAT is not configured; aborting VS Code Marketplace publish." >&2
+            echo "" >&2
+            echo "To fix this:" >&2
+            echo "1. Create a Personal Access Token (PAT) at https://dev.azure.com" >&2
+            echo "2. The PAT needs 'Marketplace (Manage)' scope" >&2
+            echo "3. Add the PAT as a secret named 'VSCE_PAT' in your repository settings" >&2
+            echo "4. Go to: https://github.com/${{ github.repository }}/settings/secrets/actions" >&2
             exit 1
           fi
+          
+          echo "✅ Publishing to VS Code Marketplace..."
           npx vsce publish --packagePath "${{ steps.package.outputs.vsix }}" -p "$VSCE_PAT"
 
       - name: Create GitHub Release with gh
@@ -157,19 +203,28 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
+          
+          # Extract tag name from GITHUB_REF
           TAG_NAME="${GITHUB_REF#refs/tags/}"
           ASSET_PATH="${{ steps.package.outputs.vsix }}"
+          
           if [ -z "$TAG_NAME" ]; then
-            echo "Unable to determine tag name from GITHUB_REF ($GITHUB_REF)." >&2
+            echo "❌ ERROR: Unable to determine tag name from GITHUB_REF ($GITHUB_REF)." >&2
             exit 1
           fi
-
+          
+          echo "Creating GitHub Release for tag: $TAG_NAME"
+          echo "Asset path: $ASSET_PATH"
+          
+          # Check if release already exists
           if gh release view "$TAG_NAME" >/dev/null 2>&1; then
-            echo "Release $TAG_NAME already exists. Updating assets..."
+            echo "ℹ️  Release $TAG_NAME already exists. Updating assets..."
             gh release upload "$TAG_NAME" "$ASSET_PATH" --clobber
+            echo "✅ Updated release assets"
           else
-            echo "Creating release $TAG_NAME with VSIX asset..."
+            echo "Creating new release $TAG_NAME with VSIX asset..."
             gh release create "$TAG_NAME" "$ASSET_PATH" \
               --title "VSPlot $TAG_NAME" \
               --generate-notes
+            echo "✅ Successfully created GitHub release"
           fi
