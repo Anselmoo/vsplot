@@ -133,15 +133,16 @@ jobs:
           # Fetch main branch to verify tag ancestry
           git fetch origin main --depth=1
           
-          # Check if the current tag is an ancestor of main branch
-          if ! git merge-base --is-ancestor origin/main HEAD; then
+          # Check if the current tag (HEAD) is part of the main branch history
+          # This ensures the tag was created from a commit on main
+          if ! git merge-base --is-ancestor HEAD origin/main; then
             echo "❌ ERROR: The release tag must point to the main branch." >&2
             echo "" >&2
             echo "To fix this:" >&2
             echo "1. Checkout main: git checkout main" >&2
             echo "2. Pull latest changes: git pull origin main" >&2
-            echo "3. Create tag from main: git tag v1.0.0" >&2
-            echo "4. Push tag: git push origin v1.0.0" >&2
+            echo "3. Create tag from main: git tag vX.Y.Z" >&2
+            echo "4. Push tag: git push origin vX.Y.Z" >&2
             echo "" >&2
             echo "Current HEAD: $(git rev-parse HEAD)" >&2
             echo "origin/main: $(git rev-parse origin/main)" >&2
