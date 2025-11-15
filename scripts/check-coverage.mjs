@@ -4,10 +4,10 @@ import fs from "node:fs";
 import path from "node:path";
 
 const thresholds = {
-  lines: 75,
-  functions: 75,
-  branches: 75,
-  statements: 75,
+  lines: 80,
+  functions: 80,
+  branches: 80,
+  statements: 80,
 };
 
 const summaryPath = path.resolve(

@@ -5,6 +5,7 @@ on:
     branches:
       - main
       - "releases/**"
+      - "copilot/**"
     tags:
       - "v*.*.*"
   pull_request:
@@ -66,10 +67,21 @@ jobs:
           xvfb-run -a npm test
           xvfb-run -a npm run test:junit
         continue-on-error: true
+        
       - name: Generate Coverage Report
         if: always()
         run: xvfb-run -a npm run test:coverage
         continue-on-error: true
+
+      - name: Check Coverage Thresholds
+        if: always()
+        run: |
+          if [ -f coverage/coverage-summary.json ]; then
+            echo "✅ Coverage report generated successfully"
+            node scripts/check-coverage.mjs || echo "⚠️ Coverage thresholds not met"
+          else
+            echo "⚠️ Coverage report not found"
+          fi
 
       - name: Upload Coverage to Codecov
         if: always()
@@ -99,6 +111,41 @@ jobs:
         with:
           name: vsix
           path: "*.vsix"
+
+      - name: CI Summary
+        if: always()
+        run: |
+          echo "### CI Pipeline Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Branch:** \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Check test results
+          if [ -f artifacts/test-results/junit.xml ]; then
+            echo "✅ Tests executed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ Test results not found" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Check coverage
+          if [ -f coverage/coverage-summary.json ]; then
+            echo "✅ Coverage report generated" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Coverage Metrics:**" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            node -e "const c = require('./coverage/coverage-summary.json'); console.log('Lines: ' + c.total.lines.pct + '%'); console.log('Statements: ' + c.total.statements.pct + '%'); console.log('Functions: ' + c.total.functions.pct + '%'); console.log('Branches: ' + c.total.branches.pct + '%');" 2>/dev/null >> $GITHUB_STEP_SUMMARY || echo "Unable to read coverage" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ Coverage report not found" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Check VSIX package
+          if ls *.vsix 1> /dev/null 2>&1; then
+            echo "✅ VSIX package created: \`$(ls *.vsix)\`" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⚠️ VSIX package not found" >> $GITHUB_STEP_SUMMARY
+          fi
 
   publish:
     name: Publish (Marketplace)

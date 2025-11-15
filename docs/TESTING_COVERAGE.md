@@ -91,10 +91,10 @@ This document describes the comprehensive test coverage for the VSPlot data pars
 
 ### Target Thresholds
 
-- **Lines**: 75%
-- **Functions**: 75%
-- **Branches**: 75%
-- **Statements**: 75%
+- **Lines**: 80%
+- **Functions**: 80%
+- **Branches**: 80%
+- **Statements**: 80%
 
 Thresholds are enforced by `scripts/check-coverage.mjs`, which fails `npm run test:coverage` if coverage drops below the required values.
 
