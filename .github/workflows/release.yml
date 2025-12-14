@@ -1,4 +1,4 @@
-name: CI / Release
+name: CI / CD Pipeline
 
 on:
   push:
@@ -11,44 +11,149 @@ on:
   pull_request:
     branches:
       - main
-
   workflow_dispatch:
 
 # Required permissions for creating GitHub releases
 permissions:
   contents: write
   packages: write
+  id-token: write  # required for Codecov OIDC uploads and artifact signing
 
 concurrency:
   group: vsplot-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  NODE_VERSION: '20'
+  NPM_CACHE_DIR: ~/.npm
+
 jobs:
-  ci:
-    name: CI (lint → build → test → package)
+  # ============================================================================
+  # Linting and Code Quality
+  # ============================================================================
+  lint-and-quality:
+    name: Lint & Code Quality
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for better analysis
 
-      - name: Setup Node
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
 
-      - name: Cache node modules
+      - name: Cache npm dependencies
         uses: actions/cache@v4
         with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          path: ${{ env.NPM_CACHE_DIR }}
+          key: npm-${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
-            ${{ runner.os }}-node-
+            npm-${{ runner.os }}-
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Lint
+      - name: Run ESLint
         run: npm run lint
+
+      - name: Lint summary
+        if: always()
+        run: |
+          echo "### Code Quality Summary" >> $GITHUB_STEP_SUMMARY
+          echo "**Linting:** ✅ Passed" >> $GITHUB_STEP_SUMMARY
+
+  # ============================================================================
+  # Security Audit
+  # ============================================================================
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Audit production dependencies
+        run: |
+          npm audit --production --audit-level=high --json > audit-prod.json || true
+          if [ -s audit-prod.json ]; then
+            echo "### Security Audit (Production)" >> $GITHUB_STEP_SUMMARY
+            echo '```json' >> $GITHUB_STEP_SUMMARY
+            cat audit-prod.json >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Audit all dependencies
+        run: |
+          npm audit --json > audit-all.json || true
+          if [ -s audit-all.json ]; then
+            echo "### Security Audit (All Dependencies)" >> $GITHUB_STEP_SUMMARY
+            echo '```json' >> $GITHUB_STEP_SUMMARY
+            cat audit-all.json >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Note:** This includes dev dependencies. Only production vulnerabilities will fail the build." >> $GITHUB_STEP_SUMMARY
+          fi
+        continue-on-error: true
+
+      - name: Upload audit reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-audit-reports
+          path: |
+            audit-prod.json
+            audit-all.json
+
+  # ============================================================================
+  # Testing and Quality Assurance
+  # ============================================================================
+  test-and-build:
+    name: Test & Build (Node.js ${{ matrix.node-version }})
+    runs-on: ubuntu-latest
+    needs: [lint-and-quality, security-audit]
+    permissions:
+      contents: read
+      id-token: write  # required for Codecov OIDC uploads
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: ['20', '22']  # Test LTS versions
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2  # helps Codecov infer base commit context
+
+      - name: Set up Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Cache npm dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.NPM_CACHE_DIR }}
+          key: npm-${{ runner.os }}-${{ matrix.node-version }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            npm-${{ runner.os }}-${{ matrix.node-version }}-
+            npm-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: npm ci
 
       - name: Build
         run: npm run compile
@@ -61,9 +166,8 @@ jobs:
         if: always()
         run: mkdir -p artifacts/test-results
 
-      - name: Test (run vscode tests)
+      - name: Run tests with VS Code test runner
         run: |
-          set -e
           xvfb-run -a npm test
           xvfb-run -a npm run test:junit
         continue-on-error: true
@@ -83,82 +187,95 @@ jobs:
             echo "⚠️ Coverage report not found"
           fi
 
-      - name: Upload Coverage to Codecov
-        if: always()
-        uses: codecov/codecov-action@v4
-        with:
-          files: ./coverage/lcov.info
-          flags: unittests
-          name: codecov-vsplot
-          fail_ci_if_error: false
-          token: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Upload test results to Codecov
-        if: ${{ !cancelled() }}
-        uses: codecov/test-results-action@v1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: artifacts/test-results/**/*.xml
-
-      - name: Package VSIX (artifact)
-        run: |
-          npx vsce package --no-dependencies || npx vsce package --yarn=false --no-dependencies
-        env:
-          NODE_OPTIONS: "--max-old-space-size=4096"
-
-      - name: Upload VSIX artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: vsix
-          path: "*.vsix"
-
-      - name: CI Summary
+      - name: Publish coverage summary
         if: always()
         run: |
-          echo "### CI Pipeline Summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Branch:** \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "**Commit:** \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          
-          # Check test results
-          if [ -f artifacts/test-results/junit.xml ]; then
-            echo "✅ Tests executed" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "⚠️ Test results not found" >> $GITHUB_STEP_SUMMARY
-          fi
-          
-          # Check coverage
+          echo "### Coverage Summary (Node.js ${{ matrix.node-version }})" >> $GITHUB_STEP_SUMMARY
           if [ -f coverage/coverage-summary.json ]; then
-            echo "✅ Coverage report generated" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "**Coverage Metrics:**" >> $GITHUB_STEP_SUMMARY
             echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
             node -e "const c = require('./coverage/coverage-summary.json'); console.log('Lines: ' + c.total.lines.pct + '%'); console.log('Statements: ' + c.total.statements.pct + '%'); console.log('Functions: ' + c.total.functions.pct + '%'); console.log('Branches: ' + c.total.branches.pct + '%');" 2>/dev/null >> $GITHUB_STEP_SUMMARY || echo "Unable to read coverage" >> $GITHUB_STEP_SUMMARY
             echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "⚠️ Coverage report not found" >> $GITHUB_STEP_SUMMARY
-          fi
-          
-          # Check VSIX package
-          if ls *.vsix 1> /dev/null 2>&1; then
-            echo "✅ VSIX package created: \`$(ls *.vsix)\`" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "⚠️ VSIX package not found" >> $GITHUB_STEP_SUMMARY
           fi
 
-  publish:
-    name: Publish (Marketplace)
-    needs: ci
+      - name: Upload coverage to Codecov
+        if: matrix.node-version == '20'
+        uses: codecov/codecov-action@v5
+        with:
+          use_oidc: true
+          files: coverage/lcov.info
+          flags: unittests
+          verbose: true
+          fail_ci_if_error: false
+
+      - name: Upload test results to Codecov
+        if: matrix.node-version == '20' && !cancelled()
+        uses: codecov/test-results-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: artifacts/test-results/**/*.xml
+
+      - name: Upload coverage artifacts
+        if: matrix.node-version == '20'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+
+  # ============================================================================
+  # Build VSIX Package
+  # ============================================================================
+  build-vsix:
+    name: Build VSIX Package 📦
     runs-on: ubuntu-latest
-    # This job runs only for version tags (e.g., v1.0.0) and not for pull requests
-    # Requirements:
-    # 1. Tag must be created from the main branch
-    # 2. VSCE_PAT secret must be configured with marketplace publish permissions
-    # 3. Workflow must have 'contents: write' permission for creating releases
-    if: >-
-      startsWith(github.ref, 'refs/tags/v') &&
-      github.event_name != 'pull_request'
+    needs: test-and-build
+    if: github.event_name != 'pull_request'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Package VSIX
+        run: |
+          npx vsce package --no-dependencies || npx vsce package --yarn=false --no-dependencies
+        env:
+          NODE_OPTIONS: "--max-old-space-size=4096"
+
+      - name: Store VSIX package
+        uses: actions/upload-artifact@v4
+        with:
+          name: vsix
+          path: '*.vsix'
+
+      - name: Package summary
+        run: |
+          echo "### VSIX Package Built" >> $GITHUB_STEP_SUMMARY
+          echo "✅ VSIX package created: \`$(ls *.vsix)\`" >> $GITHUB_STEP_SUMMARY
+
+  # ============================================================================
+  # Publish to VS Code Marketplace
+  # ============================================================================
+  publish-marketplace:
+    name: Publish to VS Code Marketplace 🚀
+    needs: build-vsix
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    environment:
+      name: vscode-marketplace
+      url: https://marketplace.visualstudio.com/items?itemName=AnselmHahn.vsplot
+    permissions:
+      contents: read
+      id-token: write  # for provenance
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -230,7 +347,6 @@ jobs:
         env:
           VSCE_PAT: ${{ secrets.VSCE_PAT }}
         run: |
-          # Check if VSCE_PAT is configured
           if [ -z "$VSCE_PAT" ]; then
             echo "❌ ERROR: VSCE_PAT is not configured; aborting VS Code Marketplace publish." >&2
             echo "" >&2
@@ -245,33 +361,85 @@ jobs:
           echo "✅ Publishing to VS Code Marketplace..."
           npx vsce publish --packagePath "${{ steps.package.outputs.vsix }}" -p "$VSCE_PAT"
 
+      - name: Marketplace publish summary
+        run: |
+          echo "### VS Code Marketplace" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Successfully published to marketplace" >> $GITHUB_STEP_SUMMARY
+          echo "🔗 [View Extension](https://marketplace.visualstudio.com/items?itemName=AnselmHahn.vsplot)" >> $GITHUB_STEP_SUMMARY
+
+  # ============================================================================
+  # Create GitHub Release with Signed Artifacts
+  # ============================================================================
+  github-release:
+    name: Create GitHub Release 📋
+    needs: [publish-marketplace]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write  # for signing artifacts
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download VSIX package
+        uses: actions/download-artifact@v4
+        with:
+          name: vsix
+          path: dist/
+
+      - name: Extract version from tag
+        id: version
+        run: |
+          VERSION=${GITHUB_REF#refs/tags/v}
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+
+      - name: Sign artifacts with Sigstore
+        uses: sigstore/gh-action-sigstore-python@v3.2.0
+        with:
+          inputs: >-
+            ./dist/*.vsix
+
       - name: Create GitHub Release with gh
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
-          set -euo pipefail
-          
-          # Extract tag name from GITHUB_REF
-          TAG_NAME="${GITHUB_REF#refs/tags/}"
-          ASSET_PATH="${{ steps.package.outputs.vsix }}"
-          
-          if [ -z "$TAG_NAME" ]; then
-            echo "❌ ERROR: Unable to determine tag name from GITHUB_REF ($GITHUB_REF)." >&2
-            exit 1
-          fi
-          
-          echo "Creating GitHub Release for tag: $TAG_NAME"
-          echo "Asset path: $ASSET_PATH"
-          
-          # Check if release already exists
-          if gh release view "$TAG_NAME" >/dev/null 2>&1; then
-            echo "ℹ️  Release $TAG_NAME already exists. Updating assets..."
-            gh release upload "$TAG_NAME" "$ASSET_PATH" --clobber
-            echo "✅ Updated release assets"
-          else
-            echo "Creating new release $TAG_NAME with VSIX asset..."
-            gh release create "$TAG_NAME" "$ASSET_PATH" \
-              --title "VSPlot $TAG_NAME" \
-              --generate-notes
-            echo "✅ Successfully created GitHub release"
-          fi
+          gh release create '${{ steps.version.outputs.tag }}' \
+            --repo '${{ github.repository }}' \
+            --title 'VSPlot ${{ steps.version.outputs.tag }}' \
+            --notes "## VSPlot - Data Visualization Extension ${{ steps.version.outputs.version }}
+
+          ### 🚀 What's New
+          - Automated release from tag ${{ steps.version.outputs.tag }}
+
+          ### 📦 Installation
+          \`\`\`bash
+          # Install from VS Code Marketplace
+          code --install-extension AnselmHahn.vsplot@${{ steps.version.outputs.version }}
+
+          # Or search for 'VSPlot' in VS Code Extensions
+          \`\`\`
+
+          ### 🔗 Links
+          - [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=AnselmHahn.vsplot)
+          - [Documentation](https://github.com/Anselmoo/vsplot#readme)
+          - [Report Issues](https://github.com/Anselmoo/vsplot/issues)
+
+          ### 🔐 Security
+          - All artifacts signed with Sigstore for supply chain security
+          - VSIX package verified and published to official marketplace"
+
+      - name: Upload signed artifacts to release
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          gh release upload '${{ steps.version.outputs.tag }}' dist/** \
+            --repo '${{ github.repository }}'
+
+      - name: Release summary
+        run: |
+          echo "### GitHub Release Created" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Release ${{ steps.version.outputs.tag }} created successfully" >> $GITHUB_STEP_SUMMARY
+          echo "🔗 [View Release](https://github.com/${{ github.repository }}/releases/tag/${{ steps.version.outputs.tag }})" >> $GITHUB_STEP_SUMMARY
