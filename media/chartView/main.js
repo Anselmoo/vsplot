@@ -729,6 +729,14 @@ function isTimeColumn(rows, index) {
     for (let r = 0; r < Math.min(rows.length, 50); r++) {
         const v = rows[r][index];
         if (v == null || v === '') { total++; continue; }
+        
+        // Skip pure numbers - they should not be treated as dates
+        // (JavaScript Date() accepts numbers as milliseconds since epoch)
+        if (typeof v === 'number' || (typeof v === 'string' && /^-?\d+(\.\d+)?$/.test(v.trim()))) {
+            total++;
+            continue;
+        }
+        
         const d = new Date(v);
         if (!isNaN(d.getTime())) timeCount++;
         total++;
