@@ -732,7 +732,8 @@ function isTimeColumn(rows, index) {
         
         // Skip pure numbers - they should not be treated as dates
         // (JavaScript Date() accepts numbers as milliseconds since epoch)
-        if (typeof v === 'number' || (typeof v === 'string' && /^-?\d+(\.\d+)?$/.test(v.trim()))) {
+        // Handles regular numbers, decimals, and scientific notation (e.g., 1.5e-10, 3.2e8)
+        if (typeof v === 'number' || (typeof v === 'string' && /^-?\d+(\.\d+)?([eE][+-]?\d+)?$/.test(v.trim()))) {
             total++;
             continue;
         }

@@ -16,9 +16,10 @@ download_file() {
     local url="$1"
     local filename="$2"
     local description="$3"
+    local target_dir="${4:-$DATA_DIR}"  # Default to DATA_DIR if not specified
 
     echo "📊 Downloading $description..."
-    if curl -L --progress-bar -o "$DATA_DIR/$filename" "$url"; then
+    if curl -L --progress-bar -o "$target_dir/$filename" "$url"; then
         echo "✅ $description downloaded successfully as $filename"
     else
         echo "❌ Failed to download $description"
@@ -255,6 +256,14 @@ data1,data2,data3
 EOF
 echo "✅ Comment handling test fixtures created successfully"
 
+# Download scatter plot numeric regression test file (Issue #30)
+# This file tests that scatter plots with numeric X-axis don't collapse to a single point
+download_file \
+    "https://github.com/user-attachments/files/23616369/test1.csv" \
+    "scatter-numeric-regression.csv" \
+    "Scatter plot numeric regression test data" \
+    "$TEST_DATA_DIR"
+
 echo ""
 echo "🎉 All sample datasets downloaded and created successfully!"
 echo "📁 Data files are located in: $DATA_DIR"
@@ -281,5 +290,6 @@ echo "  - csv-with-comments.csv: CSV with comment lines (comment handling tests)
 echo "  - txt-with-comments.txt: TXT with hash comments (comment handling tests)"
 echo "  - dat-with-comments.dat: DAT with multiple comment markers (comment handling tests)"
 echo "  - custom-comment-markers.txt: File for custom comment marker tests"
+echo "  - scatter-numeric-regression.csv: Regression test for issue #30 (numeric X-axis scatter plots)"
 echo ""
 echo "🚀 Ready to test VSPlot extension with sample data!"
