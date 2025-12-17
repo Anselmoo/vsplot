@@ -177,8 +177,6 @@ export class ChartViewProvider implements vscode.WebviewViewProvider {
 			"useThousands",
 			false,
 		);
-		const compactCards = vsplotConfig.get<boolean>("compactStatsCards", false);
-		const showIcons = vsplotConfig.get<boolean>("showStatsIcons", true);
 
 		// Build URIs for external resources
 		const stylesUri = webview.asWebviewUri(
@@ -224,9 +222,7 @@ export class ChartViewProvider implements vscode.WebviewViewProvider {
 			DEFAULT_CHART_TYPE: defaultChartType,
 			DEFAULT_STYLE_PRESET: defaultStylePreset,
 			DEFAULT_DECIMALS: String(defaultDecimals),
-			DEFAULT_USE_THOUSANDS: String(defaultUseThousands),
-			COMPACT_CARDS: String(compactCards),
-			SHOW_ICONS: String(showIcons)
+			DEFAULT_USE_THOUSANDS: String(defaultUseThousands)
 		});
 	}
 }

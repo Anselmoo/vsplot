@@ -10,7 +10,7 @@
     <script nonce="{{NONCE}}" src="{{ZOOM_PLUGIN_URI}}"></script>
     <script nonce="{{NONCE}}" src="{{DATE_ADAPTER_URI}}"></script>
 </head>
-<body data-default-chart-type="{{DEFAULT_CHART_TYPE}}" data-default-style-preset="{{DEFAULT_STYLE_PRESET}}" data-default-decimals="{{DEFAULT_DECIMALS}}" data-default-use-thousands="{{DEFAULT_USE_THOUSANDS}}" data-compact-cards="{{COMPACT_CARDS}}" data-show-icons="{{SHOW_ICONS}}">
+<body data-default-chart-type="{{DEFAULT_CHART_TYPE}}" data-default-style-preset="{{DEFAULT_STYLE_PRESET}}" data-default-decimals="{{DEFAULT_DECIMALS}}" data-default-use-thousands="{{DEFAULT_USE_THOUSANDS}}">
     <div class="header">
         <h2 id="title">Chart View</h2>
     </div>
@@ -94,15 +94,6 @@
             <label style="display:flex;align-items:center;gap:4px;">
                 <input type="checkbox" id="thousands" /> 1,000s
             </label>
-        </div>
-
-        <div class="control-group">
-            <label for="compactCardsToggle">Cards:</label>
-            <input type="checkbox" id="compactCardsToggle" />
-            <span>Compact</span>
-            <span style="width:12px"></span>
-            <label for="iconsToggle">Icons:</label>
-            <input type="checkbox" id="iconsToggle" checked />
         </div>
 
         <button id="updateChart">Update Chart</button>

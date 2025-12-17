@@ -129,8 +129,6 @@ export class DataPreviewProvider implements vscode.WebviewViewProvider {
     private _getHtmlForWebview(webview: vscode.Webview) {
         const cfg = vscode.workspace.getConfiguration('vsplot');
         const rowsPerPage = cfg.get<number>('rowsPerPage', 150);
-        const compactCards = cfg.get<boolean>('compactStatsCards', false);
-        const showIconsDefault = cfg.get<boolean>('showStatsIcons', true);
 
         // Build URIs for external resources
         const stylesUri = webview.asWebviewUri(
@@ -151,12 +149,7 @@ export class DataPreviewProvider implements vscode.WebviewViewProvider {
             NONCE: nonce,
             STYLES_URI: stylesUri.toString(),
             SCRIPT_URI: scriptUri.toString(),
-            ROWS_PER_PAGE: String(rowsPerPage),
-            COMPACT_CARDS: String(compactCards),
-            SHOW_ICONS: String(showIconsDefault),
-            COMPACT_CLASS: compactCards ? 'compact' : '',
-            ICONS_CHECKED: showIconsDefault ? 'checked' : '',
-            COMPACT_CHECKED: compactCards ? 'checked' : ''
+            ROWS_PER_PAGE: String(rowsPerPage)
         });
     }
 }
