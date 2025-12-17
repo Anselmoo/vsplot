@@ -794,7 +794,7 @@ function updateChartStats() {
             <div class="stats-grid">
                 <div class="stat">
                     <span class="badge">
-                        <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+                        <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor" aria-label="Data points">
                             <path d="M14 2H2a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1zm0 11H2V3h12v10zM4 5h8v2H4V5zm0 3h6v2H4V8z"/>
                         </svg>
                     </span>
@@ -802,7 +802,7 @@ function updateChartStats() {
                 </div>
                 <div class="stat">
                     <span class="badge">
-                        <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+                        <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor" aria-label="Minimum value">
                             <path d="M8 2l-6 12h12L8 2zm0 3l3.5 7h-7L8 5z"/>
                         </svg>
                     </span>
@@ -810,7 +810,7 @@ function updateChartStats() {
                 </div>
                 <div class="stat">
                     <span class="badge">
-                        <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+                        <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor" aria-label="Maximum value">
                             <path d="M8 14l6-12H2l6 12zm0-3L4.5 4h7L8 11z"/>
                         </svg>
                     </span>
@@ -818,7 +818,7 @@ function updateChartStats() {
                 </div>
                 <div class="stat">
                     <span class="badge">
-                        <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+                        <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor" aria-label="Average value">
                             <path d="M1 8h14M1 4l7 4 7-4M1 12l7-4 7 4" stroke="currentColor" stroke-width="1.5" fill="none"/>
                         </svg>
                     </span>
@@ -826,7 +826,7 @@ function updateChartStats() {
                 </div>
                 <div class="stat">
                     <span class="badge">
-                        <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+                        <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor" aria-label="Median value">
                             <path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="1.5" fill="none"/>
                         </svg>
                     </span>
@@ -834,7 +834,7 @@ function updateChartStats() {
                 </div>
                 <div class="stat">
                     <span class="badge">
-                        <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+                        <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor" aria-label="Standard deviation">
                             <path d="M8 2L2 8l6 6 6-6-6-6zm0 2.8L11.2 8 8 11.2 4.8 8 8 4.8z"/>
                         </svg>
                     </span>
@@ -853,7 +853,7 @@ function updateChartStats() {
         <div class="stats-grid">
             <div class="stat">
                 <span class="badge">
-                    <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+                    <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor" aria-label="File name">
                         <path d="M13.5 1H3.5C2.67 1 2 1.67 2 2.5v11c0 .83.67 1.5 1.5 1.5h10c.83 0 1.5-.67 1.5-1.5v-11c0-.83-.67-1.5-1.5-1.5zM4 4h8v2H4V4zm0 3h8v2H4V7zm0 3h5v2H4v-2z"/>
                     </svg>
                 </span>
@@ -861,7 +861,7 @@ function updateChartStats() {
             </div>
             <div class="stat">
                 <span class="badge">
-                    <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+                    <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor" aria-label="Number of columns">
                         <path d="M2 2h2v12H2V2zm4 0h2v12H6V2zm4 0h2v12h-2V2z"/>
                     </svg>
                 </span>
@@ -869,7 +869,7 @@ function updateChartStats() {
             </div>
             <div class="stat">
                 <span class="badge">
-                    <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+                    <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor" aria-label="Number of rows">
                         <path d="M2 3h12v2H2V3zm0 4h12v2H2V7zm0 4h12v2H2v-2z"/>
                     </svg>
                 </span>
