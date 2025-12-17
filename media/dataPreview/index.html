@@ -7,7 +7,7 @@
     <meta http-equiv="Content-Security-Policy" content="{{CSP}}">
     <link rel="stylesheet" href="{{STYLES_URI}}">
 </head>
-<body data-rows-per-page="{{ROWS_PER_PAGE}}" data-compact-cards="{{COMPACT_CARDS}}" data-show-icons="{{SHOW_ICONS}}">
+<body data-rows-per-page="{{ROWS_PER_PAGE}}">
     <div class="header">
         <h2 id="title">Data Preview</h2>
         <div class="file-info" id="fileInfo"></div>
@@ -39,7 +39,7 @@
 
     <div class="pagination" id="pagination"></div>
 
-    <div class="stats-panel {{COMPACT_CLASS}}" id="previewStatsPanel">
+    <div class="stats-panel compact" id="previewStatsPanel">
         <div class="section-title">Statistics</div>
         <div class="stats-controls">
             <label for="statsColumn">Column</label>
@@ -48,16 +48,6 @@
                 <input type="checkbox" id="statsSelectedOnly" />
                 <span>Use selected rows only</span>
             </label>
-                <span style="flex:1"></span>
-            <label style="display:flex;align-items:center;gap:6px;">
-                <input type="checkbox" id="iconsToggle" {{ICONS_CHECKED}} />
-                <span>Icons</span>
-            </label>
-            <span style="width:8px"></span>
-                <label style="display:flex;align-items:center;gap:6px;">
-                    <input type="checkbox" id="compactCardsToggle" {{COMPACT_CHECKED}} />
-                    <span>Compact</span>
-                </label>
         </div>
         <div id="previewStats" class="stats-grid"></div>
     </div>
