@@ -21,11 +21,21 @@ export function getExtensionBasePath(): string {
 }
 
 /**
- * Test helper to create a temporary test file
+ * Test helper to create a temporary test file.
+ * Note: Assumes test-data directory exists (should be created by test setup scripts).
  */
 export async function createTempFile(fileName: string, content: string): Promise<vscode.Uri> {
 	const basePath = getExtensionBasePath();
-	const tmpPath = path.join(basePath, "test-data", fileName);
+	const testDataDir = path.join(basePath, "test-data");
+	const tmpPath = path.join(testDataDir, fileName);
+	
+	// Ensure test-data directory exists
+	try {
+		await vscode.workspace.fs.createDirectory(vscode.Uri.file(testDataDir));
+	} catch {
+		// Directory already exists, ignore
+	}
+	
 	await vscode.workspace.fs.writeFile(
 		vscode.Uri.file(tmpPath),
 		Buffer.from(content, "utf8")
@@ -41,7 +51,8 @@ export async function deleteTempFile(uri: vscode.Uri): Promise<void> {
 		await vscode.workspace.fs.delete(uri);
 	} catch (e) {
 		// Log cleanup errors for debugging, but don't fail the test
-		console.warn(`Failed to clean up temp file ${uri.fsPath}: ${e}`);
+		const errorMessage = e instanceof Error ? e.message : String(e);
+		console.warn(`Failed to clean up temp file ${uri.fsPath}: ${errorMessage}`);
 	}
 }
 
