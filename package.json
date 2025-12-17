@@ -2,7 +2,7 @@
   "name": "vsplot",
   "displayName": "VSPlot - Data Visualization Extension",
   "description": "Preview and visualize CSV, JSON, and other data files with interactive charts",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "publisher": "AnselmHahn",
   "engines": {
     "vscode": "^1.104.0"
@@ -169,9 +169,9 @@
     "screenshots": "bash scripts/capture-screenshots.sh",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
-    "test": "vscode-test",
-    "test:junit": "mkdir -p artifacts/test-results && cross-env MOCHA_FILE=artifacts/test-results/junit.xml vscode-test --reporter mocha-junit-reporter",
-    "test:coverage": "vscode-test --coverage --coverage-output coverage --coverage-reporter=lcov --coverage-reporter=text-summary --coverage-reporter=html --coverage-reporter=json-summary && node scripts/check-coverage.mjs",
+    "test": "vscode-test --label tests",
+    "test:junit": "mkdir -p artifacts/test-results && vscode-test --label junit",
+    "test:coverage": "vscode-test --label tests --coverage --coverage-output coverage --coverage-reporter=lcov --coverage-reporter=text-summary --coverage-reporter=html --coverage-reporter=json-summary && node scripts/check-coverage.mjs",
     "coverage": "npm run test:coverage"
   },
   "devDependencies": {

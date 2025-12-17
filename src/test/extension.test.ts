@@ -161,6 +161,27 @@ suite("Extension Test Suite", () => {
 		assert.ok(state.datasetLens[0] > 0 && state.datasetLens[1] > 0);
 	});
 
+	test("Scatter with numeric index column plots correctly (issue #30)", async function () {
+		this.timeout(20000);
+		const ext = vscode.extensions.getExtension(EXTENSION_ID);
+		assert.ok(ext);
+		const basePath = ext ? ext.extensionPath : "";
+		// Test data from @JerryJohnsonLee: index (0,1,2...), label (decimals), predictions (decimals)
+		const uri = vscode.Uri.file(path.join(basePath, "test-data", "scatter-numeric-regression.csv"));
+		const doc = await vscode.workspace.openTextDocument(uri);
+		await vscode.window.showTextDocument(doc);
+		await vscode.commands.executeCommand("vsplot.plotData", uri);
+		// Plot label (col 1) vs predictions (col 2)
+		const cfg: ChartTestConfig = { chartType: "scatter", x: 1, y: 2 };
+		await vscode.commands.executeCommand("vsplot.test.applyChartConfig", cfg);
+		const state = (await vscode.commands.executeCommand(
+			"vsplot.test.requestChartState",
+		)) as ChartTestState;
+		assert.strictEqual(state.chartType, "scatter");
+		assert.ok(state.datasetLens.length >= 1, "should have at least one dataset");
+		assert.ok(state.datasetLens[0] === 100, `expected 100 points, got ${state.datasetLens[0]}`);
+	});
+
 	test("Doughnut with count aggregation on species", async function () {
 		this.timeout(20000);
 		const ext = vscode.extensions.getExtension(EXTENSION_ID);
