@@ -184,7 +184,7 @@ function updatePagination() {
     const showNext = currentPage < totalPages;
     const startIndex = (currentPage - 1) * rowsPerPage;
     const endIndex = Math.min(startIndex + rowsPerPage, filteredData.rows.length);
-    const rowsOnPage = Math.max(0, endIndex - startIndex);
+    const rowsOnPage = endIndex - startIndex;
     
     pagination.innerHTML = `
         <span>Page ${currentPage} of ${totalPages} | Showing ${rowsOnPage} of ${filteredData.rows.length} rows</span>
