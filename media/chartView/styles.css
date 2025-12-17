@@ -138,7 +138,7 @@ button:hover {
     gap: 8px;
 }
 
-/* Badge/icon for stats */
+/* Badge container for SVG icons */
 .badge {
     display: inline-flex;
     align-items: center;
@@ -148,15 +148,15 @@ button:hover {
     border-radius: 4px;
     background: var(--vscode-input-background);
     color: var(--vscode-descriptionForeground);
-    font-size: 12px;
+    flex-shrink: 0;
 }
 
-/* Hide icons when no-icons class is applied */
-.no-icons .badge {
-    display: none;
+.badge svg {
+    width: 12px;
+    height: 12px;
 }
 
-/* Compact card layout */
+/* Compact stats cards - always enabled */
 .chart-stats.compact {
     padding: 10px 12px;
     border-radius: 6px;
@@ -169,7 +169,11 @@ button:hover {
 .chart-stats.compact .badge {
     width: 16px;
     height: 16px;
-    font-size: 11px;
+}
+
+.chart-stats.compact .badge svg {
+    width: 10px;
+    height: 10px;
 }
 
 /* Error message display */
@@ -181,3 +185,4 @@ button:hover {
     border-radius: 4px;
     margin-bottom: 16px;
 }
+

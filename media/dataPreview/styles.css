@@ -162,6 +162,7 @@ tr:hover {
     gap: 8px;
 }
 
+/* Badge container for SVG icons */
 .badge {
     display: inline-flex;
     align-items: center;
@@ -171,13 +172,15 @@ tr:hover {
     border-radius: 4px;
     background: var(--vscode-input-background);
     color: var(--vscode-descriptionForeground);
-    font-size: 12px;
+    flex-shrink: 0;
 }
 
-.no-icons .badge {
-    display: none;
+.badge svg {
+    width: 12px;
+    height: 12px;
 }
 
+/* Compact stats panel - always enabled */
 .stats-panel.compact {
     padding: 10px 12px;
     border-radius: 6px;
@@ -194,5 +197,9 @@ tr:hover {
 .stats-panel.compact .badge {
     width: 16px;
     height: 16px;
-    font-size: 11px;
+}
+
+.stats-panel.compact .badge svg {
+    width: 10px;
+    height: 10px;
 }

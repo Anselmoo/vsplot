@@ -13,8 +13,6 @@ const vscode = acquireVsCodeApi();
 
 // State variables
 let currentData = null;           // Original dataset from extension
-let compactCards = false;          // Compact mode for stats panel
-let previewIcons = true;           // Show icons in stats
 let filteredData = null;           // Currently filtered/searched dataset
 let selectedRows = new Set();      // Set of selected row indices
 let currentPage = 1;               // Current page number for pagination
@@ -26,8 +24,6 @@ let rowsPerPage = 150;             // Number of rows per page
 function initializeConfig() {
     const body = document.body;
     rowsPerPage = parseInt(body.getAttribute('data-rows-per-page') || '150');
-    compactCards = body.getAttribute('data-compact-cards') === 'true';
-    previewIcons = body.getAttribute('data-show-icons') === 'true';
 }
 
 /**
@@ -51,12 +47,6 @@ window.addEventListener('message', event => {
                 }
             }, 0);
             initializeStatsControls();
-            // apply compact from restored state or default
-            try {
-                const panel = document.getElementById('previewStatsPanel');
-                panel.classList.toggle('compact', !!compactCards);
-                panel.classList.toggle('no-icons', !previewIcons);
-            } catch {}
             displayData();
             break;
     }
@@ -188,13 +178,32 @@ function updatePagination() {
         pagination.innerHTML = `<span>Showing ${filteredData.rows.length} rows</span>`;
         return;
     }
+    
+    // Build pagination HTML without inline handlers (CSP compliant)
+    const showPrevious = currentPage > 1;
+    const showNext = currentPage < totalPages;
+    
     pagination.innerHTML = `
         <span>Page ${currentPage} of ${totalPages} | Showing ${Math.min(rowsPerPage, filteredData.rows.length)} of ${filteredData.rows.length} rows</span>
         <div>
-            <button onclick="previousPage()" ${currentPage === 1 ? 'disabled' : ''}>Previous</button>
-            <button onclick="nextPage()" ${currentPage === totalPages ? 'disabled' : ''}>Next</button>
+            ${showPrevious ? '<button id="prevPageBtn">Previous</button>' : ''}
+            ${showNext ? '<button id="nextPageBtn">Next</button>' : ''}
         </div>
     `;
+    
+    // Attach event listeners after buttons are created
+    if (showPrevious) {
+        const prevBtn = document.getElementById('prevPageBtn');
+        if (prevBtn) {
+            prevBtn.addEventListener('click', previousPage);
+        }
+    }
+    if (showNext) {
+        const nextBtn = document.getElementById('nextPageBtn');
+        if (nextBtn) {
+            nextBtn.addEventListener('click', nextPage);
+        }
+    }
 }
 
 function previousPage() {
@@ -279,28 +288,8 @@ function initializeStatsControls() {
     }
     const panelEl = document.getElementById('previewStatsPanel');
     panelEl.style.display = 'block';
-        // Restore per-file compact choice
-        try {
-            const state = vscode.getState && vscode.getState();
-            const byFile = state && state.byFile ? state.byFile : undefined;
-            const saved = byFile ? byFile[currentData.fileName] : undefined;
-            if (saved && typeof saved.previewCompact === 'boolean') {
-                compactCards = !!saved.previewCompact;
-                document.getElementById('compactCardsToggle').checked = compactCards;
-                panelEl.classList.toggle('compact', compactCards);
-            } else {
-                document.getElementById('compactCardsToggle').checked = compactCards;
-                panelEl.classList.toggle('compact', compactCards);
-            }
-            if (saved && typeof saved.previewIcons === 'boolean') {
-                previewIcons = !!saved.previewIcons;
-                document.getElementById('iconsToggle').checked = previewIcons;
-                panelEl.classList.toggle('no-icons', !previewIcons);
-            } else {
-                document.getElementById('iconsToggle').checked = previewIcons;
-                panelEl.classList.toggle('no-icons', !previewIcons);
-            }
-        } catch {}
+    // Always apply compact class
+    panelEl.classList.add('compact');
 }
 
 function updateStats() {
@@ -311,9 +300,7 @@ function updateStats() {
         return;
     }
     panel.style.display = 'block';
-    // ensure style reflects current toggle
-    try { panel.classList.toggle('compact', !!document.getElementById('compactCardsToggle').checked); } catch {}
-    try { panel.classList.toggle('no-icons', !document.getElementById('iconsToggle').checked); } catch {}
+    
     const col = parseInt(document.getElementById('statsColumn').value);
     const selectedOnly = document.getElementById('statsSelectedOnly').checked;
     const rows = selectedOnly && selectedRows.size > 0
@@ -343,45 +330,68 @@ function updateStats() {
     }
     const variance = varSum / (values.length > 1 ? (values.length - 1) : 1);
     const stddev = Math.sqrt(variance);
+    
+    // Use inline SVG icons for each stat
+    // SVG icons use currentColor for automatic theme adaptation
     out.innerHTML = `
-        <div class="stat"><span class="badge">col</span><div><strong>Column:</strong> ${filteredData.headers[col]}</div></div>
-        <div class="stat"><span class="badge">n</span><div><strong>Data points:</strong> ${count}</div></div>
-        <div class="stat"><span class="badge">min</span><div><strong>Min:</strong> ${min.toFixed(2)}</div></div>
-        <div class="stat"><span class="badge">max</span><div><strong>Max:</strong> ${max.toFixed(2)}</div></div>
-        <div class="stat"><span class="badge">avg</span><div><strong>Average:</strong> ${avg.toFixed(2)}</div></div>
-        <div class="stat"><span class="badge">med</span><div><strong>Median:</strong> ${median.toFixed(2)}</div></div>
-        <div class="stat"><span class="badge">sd</span><div><strong>Std Dev:</strong> ${stddev.toFixed(2)}</div></div>
+        <div class="stat">
+            <span class="badge">
+                <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+                    <path d="M2 2h2v12H2V2zm4 0h2v12H6V2zm4 0h2v12h-2V2z"/>
+                </svg>
+            </span>
+            <div><strong>Column:</strong> ${filteredData.headers[col]}</div>
+        </div>
+        <div class="stat">
+            <span class="badge">
+                <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+                    <path d="M14 2H2a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1zm0 11H2V3h12v10zM4 5h8v2H4V5zm0 3h6v2H4V8z"/>
+                </svg>
+            </span>
+            <div><strong>Data points:</strong> ${count}</div>
+        </div>
+        <div class="stat">
+            <span class="badge">
+                <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+                    <path d="M8 2l-6 12h12L8 2zm0 3l3.5 7h-7L8 5z"/>
+                </svg>
+            </span>
+            <div><strong>Min:</strong> ${min.toFixed(2)}</div>
+        </div>
+        <div class="stat">
+            <span class="badge">
+                <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+                    <path d="M8 14l6-12H2l6 12zm0-3L4.5 4h7L8 11z"/>
+                </svg>
+            </span>
+            <div><strong>Max:</strong> ${max.toFixed(2)}</div>
+        </div>
+        <div class="stat">
+            <span class="badge">
+                <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+                    <path d="M1 8h14M1 4l7 4 7-4M1 12l7-4 7 4" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                </svg>
+            </span>
+            <div><strong>Average:</strong> ${avg.toFixed(2)}</div>
+        </div>
+        <div class="stat">
+            <span class="badge">
+                <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+                    <path d="M8 1v14M1 8h14" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                </svg>
+            </span>
+            <div><strong>Median:</strong> ${median.toFixed(2)}</div>
+        </div>
+        <div class="stat">
+            <span class="badge">
+                <svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" fill="currentColor">
+                    <path d="M8 2L2 8l6 6 6-6-6-6zm0 2.8L11.2 8 8 11.2 4.8 8 8 4.8z"/>
+                </svg>
+            </span>
+            <div><strong>Std Dev:</strong> ${stddev.toFixed(2)}</div>
+        </div>
     `;
 }
-
-// Handle Compact toggle changes and persist per file
-document.addEventListener('change', (e) => {
-    const t = e.target;
-    if (t && t.id === 'compactCardsToggle') {
-        try {
-            const panel = document.getElementById('previewStatsPanel');
-            panel.classList.toggle('compact', !!t.checked);
-            const state = vscode.getState && vscode.getState();
-            const byFile = (state && state.byFile) ? state.byFile : {};
-            if (currentData && currentData.fileName) {
-                byFile[currentData.fileName] = Object.assign({}, byFile[currentData.fileName] || {}, { previewCompact: !!t.checked });
-                vscode.setState && vscode.setState({ byFile });
-            }
-        } catch {}
-    }
-    if (t && t.id === 'iconsToggle') {
-        try {
-            const panel = document.getElementById('previewStatsPanel');
-            panel.classList.toggle('no-icons', !t.checked);
-            const state = vscode.getState && vscode.getState();
-            const byFile = (state && state.byFile) ? state.byFile : {};
-            if (currentData && currentData.fileName) {
-                byFile[currentData.fileName] = Object.assign({}, byFile[currentData.fileName] || {}, { previewIcons: !!t.checked });
-                vscode.setState && vscode.setState({ byFile });
-            }
-        } catch {}
-    }
-});
 
 function getNumericColumnIndexes(rows) {
     if (!rows || rows.length === 0) return [];
