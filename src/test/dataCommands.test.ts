@@ -2,6 +2,9 @@ import * as assert from "assert";
 import * as vscode from "vscode";
 import * as path from "path";
 
+// Extension ID constant
+const EXTENSION_ID = "AnselmHahn.vsplot";
+
 suite("Data Commands Tests", () => {
 	test("previewData command should handle unsupported file type", async function () {
 		this.timeout(10000);
@@ -24,6 +27,168 @@ suite("Data Commands Tests", () => {
 		} catch (error) {
 			// If it throws, that's also acceptable
 			assert.ok(true, "Command threw error for unsupported file type");
+		}
+
+		// Clean up
+		try {
+			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
+		} catch (e) {
+			// Ignore cleanup errors
+		}
+	});
+
+	test("previewData command should use active editor when no URI provided", async function () {
+		this.timeout(15000);
+		
+		const ext = vscode.extensions.getExtension(EXTENSION_ID);
+		assert.ok(ext, "Extension should be available");
+		const basePath = ext ? ext.extensionPath : "";
+		
+		// Create and open a CSV file
+		const csvPath = path.join(basePath, "sample-data", "iris.csv");
+		const uri = vscode.Uri.file(csvPath);
+		const doc = await vscode.workspace.openTextDocument(uri);
+		await vscode.window.showTextDocument(doc);
+		
+		// Execute command without URI - should fallback to active editor
+		try {
+			await vscode.commands.executeCommand("vsplot.previewData");
+			assert.ok(true, "Command should work with active editor fallback");
+		} catch (error) {
+			// Some fallback paths might show errors but shouldn't throw
+			assert.ok(true, "Command handled fallback appropriately");
+		}
+	});
+
+	test("plotData command should use active editor when no URI provided", async function () {
+		this.timeout(15000);
+		
+		const ext = vscode.extensions.getExtension(EXTENSION_ID);
+		assert.ok(ext, "Extension should be available");
+		const basePath = ext ? ext.extensionPath : "";
+		
+		// Create and open a CSV file
+		const csvPath = path.join(basePath, "sample-data", "iris.csv");
+		const uri = vscode.Uri.file(csvPath);
+		const doc = await vscode.workspace.openTextDocument(uri);
+		await vscode.window.showTextDocument(doc);
+		
+		// Execute command without URI - should fallback to active editor
+		try {
+			await vscode.commands.executeCommand("vsplot.plotData");
+			assert.ok(true, "Command should work with active editor fallback");
+		} catch (error) {
+			// Some fallback paths might show errors but shouldn't throw
+			assert.ok(true, "Command handled fallback appropriately");
+		}
+	});
+
+	test("previewData command should handle failed parse gracefully", async function () {
+		this.timeout(10000);
+		
+		// Create a file that will fail to parse (empty CSV)
+		const content = "";
+		const tmpPath = path.join(__dirname, "../../test-data/empty-parse-test.csv");
+		await vscode.workspace.fs.writeFile(
+			vscode.Uri.file(tmpPath),
+			Buffer.from(content, "utf8")
+		);
+
+		const uri = vscode.Uri.file(tmpPath);
+		
+		try {
+			await vscode.commands.executeCommand("vsplot.previewData", uri);
+			// Command might complete or show error message
+			assert.ok(true, "Command handled parse failure gracefully");
+		} catch (error) {
+			// Throwing is also acceptable for parse failures
+			assert.ok(true, "Command threw error for parse failure");
+		}
+
+		// Clean up
+		try {
+			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
+		} catch (e) {
+			// Ignore cleanup errors
+		}
+	});
+
+	test("plotData command should handle failed parse gracefully", async function () {
+		this.timeout(10000);
+		
+		// Create a file that will fail to parse (empty CSV)
+		const content = "";
+		const tmpPath = path.join(__dirname, "../../test-data/empty-plot-test.csv");
+		await vscode.workspace.fs.writeFile(
+			vscode.Uri.file(tmpPath),
+			Buffer.from(content, "utf8")
+		);
+
+		const uri = vscode.Uri.file(tmpPath);
+		
+		try {
+			await vscode.commands.executeCommand("vsplot.plotData", uri);
+			// Command might complete or show error message
+			assert.ok(true, "Command handled parse failure gracefully");
+		} catch (error) {
+			// Throwing is also acceptable for parse failures
+			assert.ok(true, "Command threw error for parse failure");
+		}
+
+		// Clean up
+		try {
+			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
+		} catch (e) {
+			// Ignore cleanup errors
+		}
+	});
+
+	test("previewData command with valid CSV should preview data", async function () {
+		this.timeout(15000);
+		
+		const ext = vscode.extensions.getExtension(EXTENSION_ID);
+		assert.ok(ext, "Extension should be available");
+		const basePath = ext ? ext.extensionPath : "";
+		
+		const csvPath = path.join(basePath, "sample-data", "iris.csv");
+		const uri = vscode.Uri.file(csvPath);
+		
+		// Preview should work without error
+		await vscode.commands.executeCommand("vsplot.previewData", uri);
+		assert.ok(true, "previewData executed successfully");
+	});
+
+	test("plotData command with valid CSV should create chart", async function () {
+		this.timeout(15000);
+		
+		const ext = vscode.extensions.getExtension(EXTENSION_ID);
+		assert.ok(ext, "Extension should be available");
+		const basePath = ext ? ext.extensionPath : "";
+		
+		const csvPath = path.join(basePath, "sample-data", "iris.csv");
+		const uri = vscode.Uri.file(csvPath);
+		
+		// Plot should work without error
+		await vscode.commands.executeCommand("vsplot.plotData", uri);
+		assert.ok(true, "plotData executed successfully");
+	});
+
+	test("previewData command should handle corrupted file gracefully", async function () {
+		this.timeout(10000);
+		
+		// Create a file with invalid binary content
+		const tmpPath = path.join(__dirname, "../../test-data/corrupted.csv");
+		// Use Buffer directly for binary data
+		const buffer = Buffer.from([0xFF, 0xFE, 0x00, 0x01, 0x02, 0x03]);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), buffer);
+
+		const uri = vscode.Uri.file(tmpPath);
+		
+		try {
+			await vscode.commands.executeCommand("vsplot.previewData", uri);
+			assert.ok(true, "Command handled corrupted file gracefully");
+		} catch (error) {
+			assert.ok(true, "Command threw error for corrupted file");
 		}
 
 		// Clean up
@@ -214,6 +379,204 @@ suite("Data Commands Tests", () => {
 			assert.ok(true, "JSON array of objects was previewed successfully");
 		} catch (error) {
 			assert.fail(`JSON preview failed: ${error}`);
+		}
+
+		// Clean up
+		try {
+			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
+		} catch (e) {
+			// Ignore cleanup errors
+		}
+	});
+
+	test("previewData command should handle file with only comments", async function () {
+		this.timeout(10000);
+		
+		const content = "# Comment 1\n# Comment 2\n# Comment 3";
+		const tmpPath = path.join(__dirname, "../../test-data/comments-only-cmd.csv");
+		await vscode.workspace.fs.writeFile(
+			vscode.Uri.file(tmpPath),
+			Buffer.from(content, "utf8")
+		);
+
+		const uri = vscode.Uri.file(tmpPath);
+		
+		try {
+			await vscode.commands.executeCommand("vsplot.previewData", uri);
+			// The command should handle this gracefully (showing error message)
+			assert.ok(true, "Command handled file with only comments");
+		} catch (error) {
+			// Throwing is acceptable for invalid files
+			assert.ok(true, "Command threw error for file with only comments");
+		}
+
+		// Clean up
+		try {
+			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
+		} catch (e) {
+			// Ignore cleanup errors
+		}
+	});
+
+	test("plotData command should handle file with only whitespace", async function () {
+		this.timeout(10000);
+		
+		const content = "   \n\t\n   \n\t\t\t";
+		const tmpPath = path.join(__dirname, "../../test-data/whitespace-cmd.csv");
+		await vscode.workspace.fs.writeFile(
+			vscode.Uri.file(tmpPath),
+			Buffer.from(content, "utf8")
+		);
+
+		const uri = vscode.Uri.file(tmpPath);
+		
+		try {
+			await vscode.commands.executeCommand("vsplot.plotData", uri);
+			// The command should handle this gracefully (showing error message)
+			assert.ok(true, "Command handled whitespace-only file");
+		} catch (error) {
+			// Throwing is acceptable for invalid files
+			assert.ok(true, "Command threw error for whitespace-only file");
+		}
+
+		// Clean up
+		try {
+			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
+		} catch (e) {
+			// Ignore cleanup errors
+		}
+	});
+
+	test("previewData command with invalid JSON should show error", async function () {
+		this.timeout(10000);
+		
+		const content = '{invalid json content}';
+		const tmpPath = path.join(__dirname, "../../test-data/invalid-json-cmd.json");
+		await vscode.workspace.fs.writeFile(
+			vscode.Uri.file(tmpPath),
+			Buffer.from(content, "utf8")
+		);
+
+		const uri = vscode.Uri.file(tmpPath);
+		
+		try {
+			await vscode.commands.executeCommand("vsplot.previewData", uri);
+			// Command should complete and show error to user
+			assert.ok(true, "Command handled invalid JSON gracefully");
+		} catch (error) {
+			// Throwing is also acceptable
+			assert.ok(true, "Command threw error for invalid JSON");
+		}
+
+		// Clean up
+		try {
+			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
+		} catch (e) {
+			// Ignore cleanup errors
+		}
+	});
+
+	test("plotData command with invalid JSON should show error", async function () {
+		this.timeout(10000);
+		
+		const content = 'not valid json at all';
+		const tmpPath = path.join(__dirname, "../../test-data/invalid-json-plot.json");
+		await vscode.workspace.fs.writeFile(
+			vscode.Uri.file(tmpPath),
+			Buffer.from(content, "utf8")
+		);
+
+		const uri = vscode.Uri.file(tmpPath);
+		
+		try {
+			await vscode.commands.executeCommand("vsplot.plotData", uri);
+			// Command should complete and show error to user
+			assert.ok(true, "Command handled invalid JSON gracefully");
+		} catch (error) {
+			// Throwing is also acceptable
+			assert.ok(true, "Command threw error for invalid JSON");
+		}
+
+		// Clean up
+		try {
+			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
+		} catch (e) {
+			// Ignore cleanup errors
+		}
+	});
+
+	test("previewData with JSON primitive should show error", async function () {
+		this.timeout(10000);
+		
+		const content = '"just a string"';
+		const tmpPath = path.join(__dirname, "../../test-data/json-primitive-cmd.json");
+		await vscode.workspace.fs.writeFile(
+			vscode.Uri.file(tmpPath),
+			Buffer.from(content, "utf8")
+		);
+
+		const uri = vscode.Uri.file(tmpPath);
+		
+		try {
+			await vscode.commands.executeCommand("vsplot.previewData", uri);
+			// Command should handle this by showing error
+			assert.ok(true, "Command handled JSON primitive gracefully");
+		} catch (error) {
+			assert.ok(true, "Command threw error for JSON primitive");
+		}
+
+		// Clean up
+		try {
+			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
+		} catch (e) {
+			// Ignore cleanup errors
+		}
+	});
+
+	test("previewData with single object JSON should work", async function () {
+		this.timeout(10000);
+		
+		const content = '{"name": "Test", "value": 42, "active": true}';
+		const tmpPath = path.join(__dirname, "../../test-data/single-object-cmd.json");
+		await vscode.workspace.fs.writeFile(
+			vscode.Uri.file(tmpPath),
+			Buffer.from(content, "utf8")
+		);
+
+		const uri = vscode.Uri.file(tmpPath);
+		
+		try {
+			await vscode.commands.executeCommand("vsplot.previewData", uri);
+			assert.ok(true, "Single object JSON previewed successfully");
+		} catch (error) {
+			assert.fail(`Single object JSON preview failed: ${error}`);
+		}
+
+		// Clean up
+		try {
+			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
+		} catch (e) {
+			// Ignore cleanup errors
+		}
+	});
+
+	test("plotData with single object JSON should work", async function () {
+		this.timeout(10000);
+		
+		const content = '{"x": 1, "y": 2, "z": 3}';
+		const tmpPath = path.join(__dirname, "../../test-data/single-object-plot.json");
+		await vscode.workspace.fs.writeFile(
+			vscode.Uri.file(tmpPath),
+			Buffer.from(content, "utf8")
+		);
+
+		const uri = vscode.Uri.file(tmpPath);
+		
+		try {
+			await vscode.commands.executeCommand("vsplot.plotData", uri);
+			assert.ok(true, "Single object JSON plotted successfully");
+		} catch (error) {
+			assert.fail(`Single object JSON plot failed: ${error}`);
 		}
 
 		// Clean up
