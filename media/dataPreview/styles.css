@@ -172,7 +172,7 @@ tr:hover {
     background: var(--vscode-input-background);
     color: var(--vscode-descriptionForeground);
     font-size: 12px;
-    flex-shrink: 0;
+    flex-shrink: 0; /* Prevent badge from shrinking when parent uses flexbox */
 }
 
 .badge svg {

@@ -331,7 +331,10 @@ function updateStats() {
     const variance = varSum / (values.length > 1 ? (values.length - 1) : 1);
     const stddev = Math.sqrt(variance);
     
-    // Use SVG icons for each stat
+    // Use inline SVG icons for each stat
+    // Note: Inline SVG is used here instead of external files or CSS background images
+    // because it allows theme-aware coloring via currentColor and works reliably
+    // within the webview's CSP constraints. Each icon is small and simple (16x16 viewBox).
     out.innerHTML = `
         <div class="stat">
             <span class="badge">
