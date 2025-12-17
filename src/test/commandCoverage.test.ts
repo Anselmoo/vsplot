@@ -5,49 +5,15 @@ import type {
 	ChartTestConfig,
 	ChartTestState,
 } from "../providers/chartViewProvider";
-
-// Extension ID constant
-const EXTENSION_ID = "AnselmHahn.vsplot";
-
-// Valid configuration constants
-const VALID_CHART_TYPES = ["line", "bar", "scatter", "pie", "doughnut"] as const;
-const VALID_STYLE_PRESETS = ["clean", "soft", "vibrant"] as const;
-const VALID_AGGREGATION_TYPES = ["none", "sum", "avg", "count", "min", "max"] as const;
-
-/**
- * Test helper to get extension base path
- */
-function getExtensionBasePath(): string {
-	const ext = vscode.extensions.getExtension(EXTENSION_ID);
-	if (!ext) {
-		throw new Error("Extension not found");
-	}
-	return ext.extensionPath;
-}
-
-/**
- * Test helper to create a temporary test file
- */
-async function createTempFile(fileName: string, content: string): Promise<vscode.Uri> {
-	const basePath = getExtensionBasePath();
-	const tmpPath = path.join(basePath, "test-data", fileName);
-	await vscode.workspace.fs.writeFile(
-		vscode.Uri.file(tmpPath),
-		Buffer.from(content, "utf8")
-	);
-	return vscode.Uri.file(tmpPath);
-}
-
-/**
- * Test helper to delete a temporary test file
- */
-async function deleteTempFile(uri: vscode.Uri): Promise<void> {
-	try {
-		await vscode.workspace.fs.delete(uri);
-	} catch (e) {
-		// Ignore cleanup errors
-	}
-}
+import {
+	getExtensionBasePath,
+	createTempFile,
+	deleteTempFile,
+	closeAllEditors,
+	VALID_CHART_TYPES,
+	VALID_STYLE_PRESETS,
+	VALID_AGGREGATION_TYPES,
+} from "./testUtils";
 
 suite("Command Coverage Tests", () => {
 	/**
@@ -71,21 +37,25 @@ suite("Command Coverage Tests", () => {
 			const csvPath = path.join(basePath, "sample-data", "iris.csv");
 			const uri = vscode.Uri.file(csvPath);
 
-			// Open file in editor
-			const doc = await vscode.workspace.openTextDocument(uri);
-			await vscode.window.showTextDocument(doc);
+			try {
+				// Open file in editor
+				const doc = await vscode.workspace.openTextDocument(uri);
+				await vscode.window.showTextDocument(doc);
 
-			// Verify active editor is set
-			assert.ok(vscode.window.activeTextEditor, "Active editor should be set");
-			assert.strictEqual(
-				vscode.window.activeTextEditor?.document.uri.fsPath,
-				uri.fsPath,
-				"Active editor should have the correct file"
-			);
+				// Verify active editor is set
+				assert.ok(vscode.window.activeTextEditor, "Active editor should be set");
+				assert.strictEqual(
+					vscode.window.activeTextEditor?.document.uri.fsPath,
+					uri.fsPath,
+					"Active editor should have the correct file"
+				);
 
-			// Execute without URI - should use active editor fallback
-			await vscode.commands.executeCommand("vsplot.previewData", undefined);
-			assert.ok(true, "previewData completed with fallback to active editor");
+				// Execute without URI - should use active editor fallback
+				await vscode.commands.executeCommand("vsplot.previewData", undefined);
+				assert.ok(true, "previewData completed with fallback to active editor");
+			} finally {
+				await closeAllEditors();
+			}
 		});
 
 		test("should handle parse failure and show error message", async function () {
@@ -141,16 +111,20 @@ suite("Command Coverage Tests", () => {
 			const csvPath = path.join(basePath, "sample-data", "iris.csv");
 			const uri = vscode.Uri.file(csvPath);
 
-			// Open file in editor
-			const doc = await vscode.workspace.openTextDocument(uri);
-			await vscode.window.showTextDocument(doc);
+			try {
+				// Open file in editor
+				const doc = await vscode.workspace.openTextDocument(uri);
+				await vscode.window.showTextDocument(doc);
 
-			// Verify active editor is set
-			assert.ok(vscode.window.activeTextEditor, "Active editor should be set");
+				// Verify active editor is set
+				assert.ok(vscode.window.activeTextEditor, "Active editor should be set");
 
-			// Execute without URI - should use active editor fallback
-			await vscode.commands.executeCommand("vsplot.plotData", undefined);
-			assert.ok(true, "plotData completed with fallback to active editor");
+				// Execute without URI - should use active editor fallback
+				await vscode.commands.executeCommand("vsplot.plotData", undefined);
+				assert.ok(true, "plotData completed with fallback to active editor");
+			} finally {
+				await closeAllEditors();
+			}
 		});
 
 		test("should handle parse failure gracefully", async function () {

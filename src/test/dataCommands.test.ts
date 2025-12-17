@@ -1,6 +1,7 @@
 import * as assert from "assert";
 import * as vscode from "vscode";
 import * as path from "path";
+import { closeAllEditors } from "./testUtils";
 
 // Extension ID constant
 const EXTENSION_ID = "AnselmHahn.vsplot";
@@ -40,53 +41,61 @@ suite("Data Commands Tests", () => {
 	test("previewData command should use active editor when no URI provided", async function () {
 		this.timeout(15000);
 		
-		const ext = vscode.extensions.getExtension(EXTENSION_ID);
-		assert.ok(ext, "Extension should be available");
-		const basePath = ext ? ext.extensionPath : "";
-		
-		// Create and open a CSV file
-		const csvPath = path.join(basePath, "sample-data", "iris.csv");
-		const uri = vscode.Uri.file(csvPath);
-		const doc = await vscode.workspace.openTextDocument(uri);
-		await vscode.window.showTextDocument(doc);
-		
-		// Verify active editor is set to the expected file
-		assert.ok(vscode.window.activeTextEditor, "Active editor should be set");
-		assert.strictEqual(
-			vscode.window.activeTextEditor?.document.uri.fsPath,
-			uri.fsPath,
-			"Active editor should be the iris.csv file"
-		);
-		
-		// Execute command without URI - should fallback to active editor
-		await vscode.commands.executeCommand("vsplot.previewData");
-		assert.ok(true, "Command should work with active editor fallback");
+		try {
+			const ext = vscode.extensions.getExtension(EXTENSION_ID);
+			assert.ok(ext, "Extension should be available");
+			const basePath = ext ? ext.extensionPath : "";
+			
+			// Create and open a CSV file
+			const csvPath = path.join(basePath, "sample-data", "iris.csv");
+			const uri = vscode.Uri.file(csvPath);
+			const doc = await vscode.workspace.openTextDocument(uri);
+			await vscode.window.showTextDocument(doc);
+			
+			// Verify active editor is set to the expected file
+			assert.ok(vscode.window.activeTextEditor, "Active editor should be set");
+			assert.strictEqual(
+				vscode.window.activeTextEditor?.document.uri.fsPath,
+				uri.fsPath,
+				"Active editor should be the iris.csv file"
+			);
+			
+			// Execute command without URI - should fallback to active editor
+			await vscode.commands.executeCommand("vsplot.previewData");
+			assert.ok(true, "Command should work with active editor fallback");
+		} finally {
+			await closeAllEditors();
+		}
 	});
 
 	test("plotData command should use active editor when no URI provided", async function () {
 		this.timeout(15000);
 		
-		const ext = vscode.extensions.getExtension(EXTENSION_ID);
-		assert.ok(ext, "Extension should be available");
-		const basePath = ext ? ext.extensionPath : "";
-		
-		// Create and open a CSV file
-		const csvPath = path.join(basePath, "sample-data", "iris.csv");
-		const uri = vscode.Uri.file(csvPath);
-		const doc = await vscode.workspace.openTextDocument(uri);
-		await vscode.window.showTextDocument(doc);
-		
-		// Verify active editor is set to the expected file
-		assert.ok(vscode.window.activeTextEditor, "Active editor should be set");
-		assert.strictEqual(
-			vscode.window.activeTextEditor?.document.uri.fsPath,
-			uri.fsPath,
-			"Active editor should be the iris.csv file"
-		);
-		
-		// Execute command without URI - should fallback to active editor
-		await vscode.commands.executeCommand("vsplot.plotData");
-		assert.ok(true, "Command should work with active editor fallback");
+		try {
+			const ext = vscode.extensions.getExtension(EXTENSION_ID);
+			assert.ok(ext, "Extension should be available");
+			const basePath = ext ? ext.extensionPath : "";
+			
+			// Create and open a CSV file
+			const csvPath = path.join(basePath, "sample-data", "iris.csv");
+			const uri = vscode.Uri.file(csvPath);
+			const doc = await vscode.workspace.openTextDocument(uri);
+			await vscode.window.showTextDocument(doc);
+			
+			// Verify active editor is set to the expected file
+			assert.ok(vscode.window.activeTextEditor, "Active editor should be set");
+			assert.strictEqual(
+				vscode.window.activeTextEditor?.document.uri.fsPath,
+				uri.fsPath,
+				"Active editor should be the iris.csv file"
+			);
+			
+			// Execute command without URI - should fallback to active editor
+			await vscode.commands.executeCommand("vsplot.plotData");
+			assert.ok(true, "Command should work with active editor fallback");
+		} finally {
+			await closeAllEditors();
+		}
 	});
 
 	test("previewData command should handle failed parse gracefully", async function () {

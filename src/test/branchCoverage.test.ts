@@ -5,6 +5,7 @@ import type {
 	ChartTestConfig,
 	ChartTestState,
 } from "../providers/chartViewProvider";
+import { closeAllEditors } from "./testUtils";
 
 // Extension ID constant
 const EXTENSION_ID = "AnselmHahn.vsplot";
@@ -17,53 +18,57 @@ suite("Branch Coverage Tests", () => {
 		test("chart state should include all expected properties with correct types", async function () {
 			this.timeout(20000);
 			
-			const ext = vscode.extensions.getExtension(EXTENSION_ID);
-			assert.ok(ext, "Extension should be available");
-			const basePath = ext ? ext.extensionPath : "";
-			
-			const csvPath = path.join(basePath, "sample-data", "iris.csv");
-			const uri = vscode.Uri.file(csvPath);
-			const doc = await vscode.workspace.openTextDocument(uri);
-			await vscode.window.showTextDocument(doc);
-			
-			await vscode.commands.executeCommand("vsplot.plotData", uri);
-			
-			const state = await vscode.commands.executeCommand(
-				"vsplot.test.requestChartState"
-			) as ChartTestState;
-			
-			// Verify all state properties exist with correct types
-			assert.strictEqual(typeof state.chartType, "string", "chartType should be string");
-			assert.strictEqual(typeof state.x, "number", "x should be number");
-			assert.strictEqual(typeof state.y, "number", "y should be number");
-			assert.strictEqual(typeof state.y2, "number", "y2 should be number");
-			assert.strictEqual(typeof state.legend, "boolean", "legend should be boolean");
-			assert.strictEqual(typeof state.dragZoom, "boolean", "dragZoom should be boolean");
-			assert.strictEqual(typeof state.curveSmoothing, "boolean", "curveSmoothing should be boolean");
-			assert.strictEqual(typeof state.color, "string", "color should be string");
-			assert.strictEqual(typeof state.agg, "string", "agg should be string");
-			assert.strictEqual(typeof state.stylePreset, "string", "stylePreset should be string");
-			assert.strictEqual(typeof state.decimals, "number", "decimals should be number");
-			assert.strictEqual(typeof state.thousands, "boolean", "thousands should be boolean");
-			assert.strictEqual(typeof state.labelsCount, "number", "labelsCount should be number");
-			assert.ok(Array.isArray(state.datasetLens), "datasetLens should be array");
-			
-			// Verify value ranges
-			const validChartTypes = ["line", "bar", "scatter", "pie", "doughnut"];
-			assert.ok(
-				validChartTypes.includes(state.chartType),
-				`chartType '${state.chartType}' should be one of ${validChartTypes.join(", ")}`
-			);
-			
-			const validPresets = ["clean", "soft", "vibrant"];
-			assert.ok(
-				validPresets.includes(state.stylePreset),
-				`stylePreset '${state.stylePreset}' should be one of ${validPresets.join(", ")}`
-			);
-			
-			assert.ok(state.x >= 0, "x should be non-negative");
-			assert.ok(state.y >= 0, "y should be non-negative");
-			assert.ok(state.decimals >= 0 && state.decimals <= 2, "decimals should be 0, 1, or 2");
+			try {
+				const ext = vscode.extensions.getExtension(EXTENSION_ID);
+				assert.ok(ext, "Extension should be available");
+				const basePath = ext ? ext.extensionPath : "";
+				
+				const csvPath = path.join(basePath, "sample-data", "iris.csv");
+				const uri = vscode.Uri.file(csvPath);
+				const doc = await vscode.workspace.openTextDocument(uri);
+				await vscode.window.showTextDocument(doc);
+				
+				await vscode.commands.executeCommand("vsplot.plotData", uri);
+				
+				const state = await vscode.commands.executeCommand(
+					"vsplot.test.requestChartState"
+				) as ChartTestState;
+				
+				// Verify all state properties exist with correct types
+				assert.strictEqual(typeof state.chartType, "string", "chartType should be string");
+				assert.strictEqual(typeof state.x, "number", "x should be number");
+				assert.strictEqual(typeof state.y, "number", "y should be number");
+				assert.strictEqual(typeof state.y2, "number", "y2 should be number");
+				assert.strictEqual(typeof state.legend, "boolean", "legend should be boolean");
+				assert.strictEqual(typeof state.dragZoom, "boolean", "dragZoom should be boolean");
+				assert.strictEqual(typeof state.curveSmoothing, "boolean", "curveSmoothing should be boolean");
+				assert.strictEqual(typeof state.color, "string", "color should be string");
+				assert.strictEqual(typeof state.agg, "string", "agg should be string");
+				assert.strictEqual(typeof state.stylePreset, "string", "stylePreset should be string");
+				assert.strictEqual(typeof state.decimals, "number", "decimals should be number");
+				assert.strictEqual(typeof state.thousands, "boolean", "thousands should be boolean");
+				assert.strictEqual(typeof state.labelsCount, "number", "labelsCount should be number");
+				assert.ok(Array.isArray(state.datasetLens), "datasetLens should be array");
+				
+				// Verify value ranges
+				const validChartTypes = ["line", "bar", "scatter", "pie", "doughnut"];
+				assert.ok(
+					validChartTypes.includes(state.chartType),
+					`chartType '${state.chartType}' should be one of ${validChartTypes.join(", ")}`
+				);
+				
+				const validPresets = ["clean", "soft", "vibrant"];
+				assert.ok(
+					validPresets.includes(state.stylePreset),
+					`stylePreset '${state.stylePreset}' should be one of ${validPresets.join(", ")}`
+				);
+				
+				assert.ok(state.x >= 0, "x should be non-negative");
+				assert.ok(state.y >= 0, "y should be non-negative");
+				assert.ok(state.decimals >= 0 && state.decimals <= 2, "decimals should be 0, 1, or 2");
+			} finally {
+				await closeAllEditors();
+			}
 		});
 	});
 
@@ -74,104 +79,116 @@ suite("Branch Coverage Tests", () => {
 		test("chart should use default configuration values", async function () {
 			this.timeout(20000);
 			
-			const ext = vscode.extensions.getExtension(EXTENSION_ID);
-			assert.ok(ext, "Extension should be available");
-			const basePath = ext ? ext.extensionPath : "";
-			
-			const csvPath = path.join(basePath, "sample-data", "iris.csv");
-			const uri = vscode.Uri.file(csvPath);
-			const doc = await vscode.workspace.openTextDocument(uri);
-			await vscode.window.showTextDocument(doc);
-			
-			await vscode.commands.executeCommand("vsplot.plotData", uri);
-			
-			const state = await vscode.commands.executeCommand(
-				"vsplot.test.requestChartState"
-			) as ChartTestState;
-			
-			// Check defaults match expected values from package.json
-			assert.ok(
-				["line", "bar", "scatter", "pie"].includes(state.chartType),
-				"Chart type should be a valid type"
-			);
-			assert.ok(
-				["clean", "soft", "vibrant"].includes(state.stylePreset),
-				"Style preset should be valid"
-			);
-			assert.ok(
-				[0, 1, 2].includes(state.decimals),
-				"Decimals should be 0, 1, or 2"
-			);
-			assert.ok(
-				typeof state.thousands === "boolean",
-				"Thousands should be boolean"
-			);
+			try {
+				const ext = vscode.extensions.getExtension(EXTENSION_ID);
+				assert.ok(ext, "Extension should be available");
+				const basePath = ext ? ext.extensionPath : "";
+				
+				const csvPath = path.join(basePath, "sample-data", "iris.csv");
+				const uri = vscode.Uri.file(csvPath);
+				const doc = await vscode.workspace.openTextDocument(uri);
+				await vscode.window.showTextDocument(doc);
+				
+				await vscode.commands.executeCommand("vsplot.plotData", uri);
+				
+				const state = await vscode.commands.executeCommand(
+					"vsplot.test.requestChartState"
+				) as ChartTestState;
+				
+				// Check defaults match expected values from package.json
+				assert.ok(
+					["line", "bar", "scatter", "pie"].includes(state.chartType),
+					"Chart type should be a valid type"
+				);
+				assert.ok(
+					["clean", "soft", "vibrant"].includes(state.stylePreset),
+					"Style preset should be valid"
+				);
+				assert.ok(
+					[0, 1, 2].includes(state.decimals),
+					"Decimals should be 0, 1, or 2"
+				);
+				assert.ok(
+					typeof state.thousands === "boolean",
+					"Thousands should be boolean"
+				);
+			} finally {
+				await closeAllEditors();
+			}
 		});
 
 		test("chart should apply partial configuration", async function () {
 			this.timeout(20000);
 			
-			const ext = vscode.extensions.getExtension(EXTENSION_ID);
-			assert.ok(ext, "Extension should be available");
-			const basePath = ext ? ext.extensionPath : "";
-			
-			const csvPath = path.join(basePath, "sample-data", "iris.csv");
-			const uri = vscode.Uri.file(csvPath);
-			const doc = await vscode.workspace.openTextDocument(uri);
-			await vscode.window.showTextDocument(doc);
-			
-			await vscode.commands.executeCommand("vsplot.plotData", uri);
-			
-			// Apply only partial config (just chartType)
-			const config: ChartTestConfig = {
-				chartType: "scatter",
-			};
-			
-			await vscode.commands.executeCommand("vsplot.test.applyChartConfig", config);
-			
-			const state = await vscode.commands.executeCommand(
-				"vsplot.test.requestChartState"
-			) as ChartTestState;
-			
-			assert.strictEqual(state.chartType, "scatter", "Chart type should be updated");
-			// Other values should remain at their defaults
-			assert.ok(typeof state.legend === "boolean", "Legend should still be set");
+			try {
+				const ext = vscode.extensions.getExtension(EXTENSION_ID);
+				assert.ok(ext, "Extension should be available");
+				const basePath = ext ? ext.extensionPath : "";
+				
+				const csvPath = path.join(basePath, "sample-data", "iris.csv");
+				const uri = vscode.Uri.file(csvPath);
+				const doc = await vscode.workspace.openTextDocument(uri);
+				await vscode.window.showTextDocument(doc);
+				
+				await vscode.commands.executeCommand("vsplot.plotData", uri);
+				
+				// Apply only partial config (just chartType)
+				const config: ChartTestConfig = {
+					chartType: "scatter",
+				};
+				
+				await vscode.commands.executeCommand("vsplot.test.applyChartConfig", config);
+				
+				const state = await vscode.commands.executeCommand(
+					"vsplot.test.requestChartState"
+				) as ChartTestState;
+				
+				assert.strictEqual(state.chartType, "scatter", "Chart type should be updated");
+				// Other values should remain at their defaults
+				assert.ok(typeof state.legend === "boolean", "Legend should still be set");
+			} finally {
+				await closeAllEditors();
+			}
 		});
 
 		test("chart should handle empty configuration object", async function () {
 			this.timeout(20000);
 			
-			const ext = vscode.extensions.getExtension(EXTENSION_ID);
-			assert.ok(ext, "Extension should be available");
-			const basePath = ext ? ext.extensionPath : "";
-			
-			const csvPath = path.join(basePath, "sample-data", "iris.csv");
-			const uri = vscode.Uri.file(csvPath);
-			const doc = await vscode.workspace.openTextDocument(uri);
-			await vscode.window.showTextDocument(doc);
-			
-			await vscode.commands.executeCommand("vsplot.plotData", uri);
-			
-			// Get initial state
-			const initialState = await vscode.commands.executeCommand(
-				"vsplot.test.requestChartState"
-			) as ChartTestState;
-			
-			// Apply empty config
-			const config: ChartTestConfig = {};
-			
-			await vscode.commands.executeCommand("vsplot.test.applyChartConfig", config);
-			
-			const finalState = await vscode.commands.executeCommand(
-				"vsplot.test.requestChartState"
-			) as ChartTestState;
-			
-			// State should be unchanged
-			assert.strictEqual(
-				finalState.chartType,
-				initialState.chartType,
-				"Chart type should be unchanged"
-			);
+			try {
+				const ext = vscode.extensions.getExtension(EXTENSION_ID);
+				assert.ok(ext, "Extension should be available");
+				const basePath = ext ? ext.extensionPath : "";
+				
+				const csvPath = path.join(basePath, "sample-data", "iris.csv");
+				const uri = vscode.Uri.file(csvPath);
+				const doc = await vscode.workspace.openTextDocument(uri);
+				await vscode.window.showTextDocument(doc);
+				
+				await vscode.commands.executeCommand("vsplot.plotData", uri);
+				
+				// Get initial state
+				const initialState = await vscode.commands.executeCommand(
+					"vsplot.test.requestChartState"
+				) as ChartTestState;
+				
+				// Apply empty config
+				const config: ChartTestConfig = {};
+				
+				await vscode.commands.executeCommand("vsplot.test.applyChartConfig", config);
+				
+				const finalState = await vscode.commands.executeCommand(
+					"vsplot.test.requestChartState"
+				) as ChartTestState;
+				
+				// State should be unchanged
+				assert.strictEqual(
+					finalState.chartType,
+					initialState.chartType,
+					"Chart type should be unchanged"
+				);
+			} finally {
+				await closeAllEditors();
+			}
 		});
 	});
 

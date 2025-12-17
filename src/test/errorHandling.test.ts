@@ -227,13 +227,10 @@ suite("Error Handling and Edge Case Tests", () => {
 
 			const uri = vscode.Uri.file(tmpPath);
 			
-			try {
-				await vscode.commands.executeCommand("vsplot.previewData", uri);
-				assert.ok(true, "Preview handled nested JSON");
-			} catch (error) {
-				// Nested JSON might not display perfectly but should not crash
-				assert.ok(true, "Preview handled nested JSON with warning");
-			}
+			// Nested JSON should be handled gracefully - either success or a controlled error
+			// We expect the command to complete without throwing an unhandled exception
+			await vscode.commands.executeCommand("vsplot.previewData", uri);
+			assert.ok(true, "Preview handled nested JSON without crashing");
 
 			// Clean up
 			try {

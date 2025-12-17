@@ -5,49 +5,14 @@ import type {
 	ChartTestConfig,
 	ChartTestState,
 } from "../providers/chartViewProvider";
-
-// Extension ID constant
-const EXTENSION_ID = "AnselmHahn.vsplot";
-
-// Valid configuration constants
-const VALID_CHART_TYPES = ["line", "bar", "scatter", "pie", "doughnut"] as const;
-const VALID_STYLE_PRESETS = ["clean", "soft", "vibrant"] as const;
-const VALID_AGGREGATION_TYPES = ["sum", "avg", "count", "min", "max"] as const;
-
-/**
- * Test helper to get extension base path
- */
-function getExtensionBasePath(): string {
-	const ext = vscode.extensions.getExtension(EXTENSION_ID);
-	if (!ext) {
-		throw new Error("Extension not found");
-	}
-	return ext.extensionPath;
-}
-
-/**
- * Test helper to create a temporary test file
- */
-async function createTempFile(fileName: string, content: string): Promise<vscode.Uri> {
-	const basePath = getExtensionBasePath();
-	const tmpPath = path.join(basePath, "test-data", fileName);
-	await vscode.workspace.fs.writeFile(
-		vscode.Uri.file(tmpPath),
-		Buffer.from(content, "utf8")
-	);
-	return vscode.Uri.file(tmpPath);
-}
-
-/**
- * Test helper to delete a temporary test file
- */
-async function deleteTempFile(uri: vscode.Uri): Promise<void> {
-	try {
-		await vscode.workspace.fs.delete(uri);
-	} catch (e) {
-		// Ignore cleanup errors
-	}
-}
+import {
+	getExtensionBasePath,
+	createTempFile,
+	deleteTempFile,
+	VALID_CHART_TYPES,
+	VALID_STYLE_PRESETS,
+	VALID_AGGREGATION_TYPES,
+} from "./testUtils";
 
 suite("Provider Coverage Tests", () => {
 	/**
