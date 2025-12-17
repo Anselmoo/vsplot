@@ -86,12 +86,12 @@ suite("Provider Integration Tests", () => {
 		test("showPreview should handle large datasets", async function () {
 			this.timeout(20000);
 			
-			// Generate a moderately large dataset
-			const header = "id,value1,value2,value3\n";
+			// Generate a moderately large dataset efficiently using Array.join
+			const header = "id,value1,value2,value3";
 			const rows = Array.from({ length: 5000 }, (_, i) => 
 				`${i},${Math.random()},${Math.random()},${Math.random()}`
-			).join("\n");
-			const content = header + rows;
+			);
+			const content = [header, ...rows].join("\n");
 			
 			const tmpPath = path.join(__dirname, "../../test-data/large-provider.csv");
 			await vscode.workspace.fs.writeFile(
@@ -339,84 +339,99 @@ suite("Provider Integration Tests", () => {
 		test("preview then plot should work sequentially", async function () {
 			this.timeout(20000);
 			
-			const ext = vscode.extensions.getExtension(EXTENSION_ID);
-			assert.ok(ext, "Extension should be available");
-			const basePath = ext ? ext.extensionPath : "";
-			
-			const csvPath = path.join(basePath, "sample-data", "iris.csv");
-			const uri = vscode.Uri.file(csvPath);
-			
-			// First preview
-			await vscode.commands.executeCommand("vsplot.previewData", uri);
-			
-			// Then plot
-			await vscode.commands.executeCommand("vsplot.plotData", uri);
-			
-			// Verify chart state is available
-			const state = await vscode.commands.executeCommand(
-				"vsplot.test.requestChartState"
-			) as ChartTestState;
-			
-			assert.ok(state, "Chart state should be available after workflow");
+			try {
+				const ext = vscode.extensions.getExtension(EXTENSION_ID);
+				assert.ok(ext, "Extension should be available");
+				const basePath = ext ? ext.extensionPath : "";
+				
+				const csvPath = path.join(basePath, "sample-data", "iris.csv");
+				const uri = vscode.Uri.file(csvPath);
+				
+				// First preview
+				await vscode.commands.executeCommand("vsplot.previewData", uri);
+				
+				// Then plot
+				await vscode.commands.executeCommand("vsplot.plotData", uri);
+				
+				// Verify chart state is available
+				const state = await vscode.commands.executeCommand(
+					"vsplot.test.requestChartState"
+				) as ChartTestState;
+				
+				assert.ok(state, "Chart state should be available after workflow");
+			} finally {
+				// Ensure any opened editors/webviews are closed after the test
+				await vscode.commands.executeCommand("workbench.action.closeAllEditors");
+			}
 		});
 
 		test("multiple plot commands should work correctly", async function () {
 			this.timeout(25000);
 			
-			const ext = vscode.extensions.getExtension(EXTENSION_ID);
-			assert.ok(ext, "Extension should be available");
-			const basePath = ext ? ext.extensionPath : "";
-			
-			const csvPath = path.join(basePath, "sample-data", "iris.csv");
-			const uri = vscode.Uri.file(csvPath);
-			
-			// Plot multiple times
-			await vscode.commands.executeCommand("vsplot.plotData", uri);
-			await vscode.commands.executeCommand("vsplot.plotData", uri);
-			await vscode.commands.executeCommand("vsplot.plotData", uri);
-			
-			// Verify final state
-			const state = await vscode.commands.executeCommand(
-				"vsplot.test.requestChartState"
-			) as ChartTestState;
-			
-			assert.ok(state, "Chart state should be available after multiple plots");
+			try {
+				const ext = vscode.extensions.getExtension(EXTENSION_ID);
+				assert.ok(ext, "Extension should be available");
+				const basePath = ext ? ext.extensionPath : "";
+				
+				const csvPath = path.join(basePath, "sample-data", "iris.csv");
+				const uri = vscode.Uri.file(csvPath);
+				
+				// Plot multiple times
+				await vscode.commands.executeCommand("vsplot.plotData", uri);
+				await vscode.commands.executeCommand("vsplot.plotData", uri);
+				await vscode.commands.executeCommand("vsplot.plotData", uri);
+				
+				// Verify final state
+				const state = await vscode.commands.executeCommand(
+					"vsplot.test.requestChartState"
+				) as ChartTestState;
+				
+				assert.ok(state, "Chart state should be available after multiple plots");
+			} finally {
+				// Ensure any opened editors/webviews are closed after the test
+				await vscode.commands.executeCommand("workbench.action.closeAllEditors");
+			}
 		});
 
 		test("switching between different file types should work", async function () {
 			this.timeout(25000);
 			
-			const ext = vscode.extensions.getExtension(EXTENSION_ID);
-			assert.ok(ext, "Extension should be available");
-			const basePath = ext ? ext.extensionPath : "";
-			
-			// Create a TSV file
-			const tsvContent = "A\tB\tC\n1\t2\t3\n4\t5\t6";
-			const tsvPath = path.join(__dirname, "../../test-data/workflow-test.tsv");
-			await vscode.workspace.fs.writeFile(
-				vscode.Uri.file(tsvPath),
-				Buffer.from(tsvContent, "utf8")
-			);
-			
-			// Plot CSV first
-			const csvPath = path.join(basePath, "sample-data", "iris.csv");
-			await vscode.commands.executeCommand("vsplot.plotData", vscode.Uri.file(csvPath));
-			
-			// Then plot TSV
-			await vscode.commands.executeCommand("vsplot.plotData", vscode.Uri.file(tsvPath));
-			
-			// Verify state
-			const state = await vscode.commands.executeCommand(
-				"vsplot.test.requestChartState"
-			) as ChartTestState;
-			
-			assert.ok(state, "Chart state should be available after switching files");
-			
-			// Clean up
 			try {
-				await vscode.workspace.fs.delete(vscode.Uri.file(tsvPath));
-			} catch (e) {
-				// Ignore cleanup errors
+				const ext = vscode.extensions.getExtension(EXTENSION_ID);
+				assert.ok(ext, "Extension should be available");
+				const basePath = ext ? ext.extensionPath : "";
+				
+				// Create a TSV file
+				const tsvContent = "A\tB\tC\n1\t2\t3\n4\t5\t6";
+				const tsvPath = path.join(__dirname, "../../test-data/workflow-test.tsv");
+				await vscode.workspace.fs.writeFile(
+					vscode.Uri.file(tsvPath),
+					Buffer.from(tsvContent, "utf8")
+				);
+				
+				// Plot CSV first
+				const csvPath = path.join(basePath, "sample-data", "iris.csv");
+				await vscode.commands.executeCommand("vsplot.plotData", vscode.Uri.file(csvPath));
+				
+				// Then plot TSV
+				await vscode.commands.executeCommand("vsplot.plotData", vscode.Uri.file(tsvPath));
+				
+				// Verify state
+				const state = await vscode.commands.executeCommand(
+					"vsplot.test.requestChartState"
+				) as ChartTestState;
+				
+				assert.ok(state, "Chart state should be available after switching files");
+				
+				// Clean up TSV file
+				try {
+					await vscode.workspace.fs.delete(vscode.Uri.file(tsvPath));
+				} catch (e) {
+					// Ignore cleanup errors
+				}
+			} finally {
+				// Ensure any opened editors/webviews are closed after the test
+				await vscode.commands.executeCommand("workbench.action.closeAllEditors");
 			}
 		});
 	});

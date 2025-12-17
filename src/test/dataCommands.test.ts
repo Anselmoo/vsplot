@@ -50,14 +50,17 @@ suite("Data Commands Tests", () => {
 		const doc = await vscode.workspace.openTextDocument(uri);
 		await vscode.window.showTextDocument(doc);
 		
+		// Verify active editor is set to the expected file
+		assert.ok(vscode.window.activeTextEditor, "Active editor should be set");
+		assert.strictEqual(
+			vscode.window.activeTextEditor?.document.uri.fsPath,
+			uri.fsPath,
+			"Active editor should be the iris.csv file"
+		);
+		
 		// Execute command without URI - should fallback to active editor
-		try {
-			await vscode.commands.executeCommand("vsplot.previewData");
-			assert.ok(true, "Command should work with active editor fallback");
-		} catch (error) {
-			// Some fallback paths might show errors but shouldn't throw
-			assert.ok(true, "Command handled fallback appropriately");
-		}
+		await vscode.commands.executeCommand("vsplot.previewData");
+		assert.ok(true, "Command should work with active editor fallback");
 	});
 
 	test("plotData command should use active editor when no URI provided", async function () {
@@ -73,14 +76,17 @@ suite("Data Commands Tests", () => {
 		const doc = await vscode.workspace.openTextDocument(uri);
 		await vscode.window.showTextDocument(doc);
 		
+		// Verify active editor is set to the expected file
+		assert.ok(vscode.window.activeTextEditor, "Active editor should be set");
+		assert.strictEqual(
+			vscode.window.activeTextEditor?.document.uri.fsPath,
+			uri.fsPath,
+			"Active editor should be the iris.csv file"
+		);
+		
 		// Execute command without URI - should fallback to active editor
-		try {
-			await vscode.commands.executeCommand("vsplot.plotData");
-			assert.ok(true, "Command should work with active editor fallback");
-		} catch (error) {
-			// Some fallback paths might show errors but shouldn't throw
-			assert.ok(true, "Command handled fallback appropriately");
-		}
+		await vscode.commands.executeCommand("vsplot.plotData");
+		assert.ok(true, "Command should work with active editor fallback");
 	});
 
 	test("previewData command should handle failed parse gracefully", async function () {
@@ -141,36 +147,6 @@ suite("Data Commands Tests", () => {
 		} catch (e) {
 			// Ignore cleanup errors
 		}
-	});
-
-	test("previewData command with valid CSV should preview data", async function () {
-		this.timeout(15000);
-		
-		const ext = vscode.extensions.getExtension(EXTENSION_ID);
-		assert.ok(ext, "Extension should be available");
-		const basePath = ext ? ext.extensionPath : "";
-		
-		const csvPath = path.join(basePath, "sample-data", "iris.csv");
-		const uri = vscode.Uri.file(csvPath);
-		
-		// Preview should work without error
-		await vscode.commands.executeCommand("vsplot.previewData", uri);
-		assert.ok(true, "previewData executed successfully");
-	});
-
-	test("plotData command with valid CSV should create chart", async function () {
-		this.timeout(15000);
-		
-		const ext = vscode.extensions.getExtension(EXTENSION_ID);
-		assert.ok(ext, "Extension should be available");
-		const basePath = ext ? ext.extensionPath : "";
-		
-		const csvPath = path.join(basePath, "sample-data", "iris.csv");
-		const uri = vscode.Uri.file(csvPath);
-		
-		// Plot should work without error
-		await vscode.commands.executeCommand("vsplot.plotData", uri);
-		assert.ok(true, "plotData executed successfully");
 	});
 
 	test("previewData command should handle corrupted file gracefully", async function () {

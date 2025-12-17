@@ -19,14 +19,10 @@ suite("Error Handling and Edge Case Tests", () => {
 			
 			const uri = vscode.Uri.file("/non/existent/path/file.csv");
 			
-			try {
-				await vscode.commands.executeCommand("vsplot.previewData", uri);
-				// Command may complete by showing error message
-				assert.ok(true, "Command handled non-existent file");
-			} catch (error) {
-				// Throwing is acceptable for non-existent files
-				assert.ok(true, "Command threw error for non-existent file");
-			}
+			// Command should not throw - error should be shown to user via showErrorMessage
+			// The command internally catches errors and shows them via VS Code API
+			await vscode.commands.executeCommand("vsplot.previewData", uri);
+			assert.ok(true, "Command handled non-existent file gracefully");
 		});
 
 		test("plotData should handle non-existent file gracefully", async function () {
@@ -34,21 +30,16 @@ suite("Error Handling and Edge Case Tests", () => {
 			
 			const uri = vscode.Uri.file("/non/existent/path/data.json");
 			
-			try {
-				await vscode.commands.executeCommand("vsplot.plotData", uri);
-				// Command may complete by showing error message
-				assert.ok(true, "Command handled non-existent file");
-			} catch (error) {
-				// Throwing is acceptable for non-existent files
-				assert.ok(true, "Command threw error for non-existent file");
-			}
+			// Command should not throw - error should be shown to user via showErrorMessage
+			await vscode.commands.executeCommand("vsplot.plotData", uri);
+			assert.ok(true, "Command handled non-existent file gracefully");
 		});
 
-		test("commands should handle file read errors", async function () {
+		test("commands should handle readable file successfully", async function () {
 			this.timeout(10000);
 			
-			// Create a file that will have read issues (permissions)
-			const tmpPath = path.join(__dirname, "../../test-data/read-error-test.csv");
+			// Create a valid file that can be read
+			const tmpPath = path.join(__dirname, "../../test-data/read-test.csv");
 			await vscode.workspace.fs.writeFile(
 				vscode.Uri.file(tmpPath),
 				Buffer.from("Name,Value\nTest,123", "utf8")
@@ -56,12 +47,9 @@ suite("Error Handling and Edge Case Tests", () => {
 			
 			const uri = vscode.Uri.file(tmpPath);
 			
-			try {
-				await vscode.commands.executeCommand("vsplot.previewData", uri);
-				assert.ok(true, "Command completed");
-			} catch (error) {
-				assert.ok(true, "Command handled error");
-			}
+			// Command should complete successfully for readable file
+			await vscode.commands.executeCommand("vsplot.previewData", uri);
+			assert.ok(true, "Command completed successfully for readable file");
 
 			// Clean up
 			try {
@@ -76,34 +64,32 @@ suite("Error Handling and Edge Case Tests", () => {
 	 * Test test command error handling
 	 */
 	suite("Test Command Error Handling", () => {
-		test("applyChartConfig should handle error when no webview is available", async function () {
+		test("applyChartConfig should work after plotting", async function () {
 			this.timeout(15000);
-			
-			// Close any existing webviews first by trying to get state before plotting
-			// This tests the error path when trying to apply config without a webview
 			
 			const ext = vscode.extensions.getExtension(EXTENSION_ID);
 			assert.ok(ext, "Extension should be available");
 			
-			// Now plot data to create a webview and test successful case
+			// First plot data to create a webview
 			const basePath = ext ? ext.extensionPath : "";
 			const csvPath = path.join(basePath, "sample-data", "iris.csv");
 			const uri = vscode.Uri.file(csvPath);
 			
 			await vscode.commands.executeCommand("vsplot.plotData", uri);
 			
-			// This should succeed now
+			// Now apply config - should succeed with the webview available
 			const config: ChartTestConfig = {
 				chartType: "bar",
 			};
 			
-			try {
-				await vscode.commands.executeCommand("vsplot.test.applyChartConfig", config);
-				assert.ok(true, "Config applied successfully");
-			} catch (error) {
-				// Error is acceptable if webview is not ready
-				assert.ok(true, "Command handled error");
-			}
+			await vscode.commands.executeCommand("vsplot.test.applyChartConfig", config);
+			
+			// Verify the config was applied
+			const state = await vscode.commands.executeCommand(
+				"vsplot.test.requestChartState"
+			) as ChartTestState;
+			
+			assert.strictEqual(state.chartType, "bar", "Chart type should be bar");
 		});
 	});
 
@@ -123,13 +109,9 @@ suite("Error Handling and Edge Case Tests", () => {
 
 			const uri = vscode.Uri.file(tmpPath);
 			
-			try {
-				await vscode.commands.executeCommand("vsplot.previewData", uri);
-				assert.ok(true, "Preview handled empty rows");
-			} catch (error) {
-				// Some handling is acceptable
-				assert.ok(true, "Preview handled with error");
-			}
+			// Preview should complete - empty data rows are filtered out
+			await vscode.commands.executeCommand("vsplot.previewData", uri);
+			assert.ok(true, "Preview completed for CSV with empty rows");
 
 			// Clean up
 			try {
@@ -426,15 +408,16 @@ suite("Error Handling and Edge Case Tests", () => {
 			
 			await vscode.commands.executeCommand("vsplot.plotData", uri);
 			
-			// Test each aggregation type
-			const aggTypes = ["sum", "avg", "count", "min", "max"];
+			// Valid aggregation types supported by the chart view
+			// These correspond to the aggregation options available in the chart configuration
+			const VALID_AGGREGATION_TYPES = ["sum", "avg", "count", "min", "max"] as const;
 			
-			for (const agg of aggTypes) {
+			for (const aggType of VALID_AGGREGATION_TYPES) {
 				const config: ChartTestConfig = {
 					chartType: "bar",
-					x: 4,  // species
-					y: 0,  // sepal_length
-					agg: agg,
+					x: 4,  // species column (categorical)
+					y: 0,  // sepal_length column (numeric)
+					agg: aggType,
 				};
 				
 				await vscode.commands.executeCommand("vsplot.test.applyChartConfig", config);
@@ -443,7 +426,7 @@ suite("Error Handling and Edge Case Tests", () => {
 					"vsplot.test.requestChartState"
 				) as ChartTestState;
 				
-				assert.strictEqual(state.agg, agg, `Aggregation should be ${agg}`);
+				assert.strictEqual(state.agg, aggType, `Aggregation should be ${aggType}`);
 			}
 		});
 	});

@@ -14,7 +14,7 @@ suite("Branch Coverage Tests", () => {
 	 * Test branches in message validation
 	 */
 	suite("Message Validation Branches", () => {
-		test("chart state should include all expected properties", async function () {
+		test("chart state should include all expected properties with correct types", async function () {
 			this.timeout(20000);
 			
 			const ext = vscode.extensions.getExtension(EXTENSION_ID);
@@ -32,21 +32,38 @@ suite("Branch Coverage Tests", () => {
 				"vsplot.test.requestChartState"
 			) as ChartTestState;
 			
-			// Verify all state properties exist
-			assert.ok("chartType" in state, "State should have chartType");
-			assert.ok("x" in state, "State should have x");
-			assert.ok("y" in state, "State should have y");
-			assert.ok("y2" in state, "State should have y2");
-			assert.ok("legend" in state, "State should have legend");
-			assert.ok("dragZoom" in state, "State should have dragZoom");
-			assert.ok("curveSmoothing" in state, "State should have curveSmoothing");
-			assert.ok("color" in state, "State should have color");
-			assert.ok("agg" in state, "State should have agg");
-			assert.ok("stylePreset" in state, "State should have stylePreset");
-			assert.ok("decimals" in state, "State should have decimals");
-			assert.ok("thousands" in state, "State should have thousands");
-			assert.ok("labelsCount" in state, "State should have labelsCount");
-			assert.ok("datasetLens" in state, "State should have datasetLens");
+			// Verify all state properties exist with correct types
+			assert.strictEqual(typeof state.chartType, "string", "chartType should be string");
+			assert.strictEqual(typeof state.x, "number", "x should be number");
+			assert.strictEqual(typeof state.y, "number", "y should be number");
+			assert.strictEqual(typeof state.y2, "number", "y2 should be number");
+			assert.strictEqual(typeof state.legend, "boolean", "legend should be boolean");
+			assert.strictEqual(typeof state.dragZoom, "boolean", "dragZoom should be boolean");
+			assert.strictEqual(typeof state.curveSmoothing, "boolean", "curveSmoothing should be boolean");
+			assert.strictEqual(typeof state.color, "string", "color should be string");
+			assert.strictEqual(typeof state.agg, "string", "agg should be string");
+			assert.strictEqual(typeof state.stylePreset, "string", "stylePreset should be string");
+			assert.strictEqual(typeof state.decimals, "number", "decimals should be number");
+			assert.strictEqual(typeof state.thousands, "boolean", "thousands should be boolean");
+			assert.strictEqual(typeof state.labelsCount, "number", "labelsCount should be number");
+			assert.ok(Array.isArray(state.datasetLens), "datasetLens should be array");
+			
+			// Verify value ranges
+			const validChartTypes = ["line", "bar", "scatter", "pie", "doughnut"];
+			assert.ok(
+				validChartTypes.includes(state.chartType),
+				`chartType '${state.chartType}' should be one of ${validChartTypes.join(", ")}`
+			);
+			
+			const validPresets = ["clean", "soft", "vibrant"];
+			assert.ok(
+				validPresets.includes(state.stylePreset),
+				`stylePreset '${state.stylePreset}' should be one of ${validPresets.join(", ")}`
+			);
+			
+			assert.ok(state.x >= 0, "x should be non-negative");
+			assert.ok(state.y >= 0, "y should be non-negative");
+			assert.ok(state.decimals >= 0 && state.decimals <= 2, "decimals should be 0, 1, or 2");
 		});
 	});
 
@@ -200,7 +217,6 @@ suite("Branch Coverage Tests", () => {
 			
 			const ext = vscode.extensions.getExtension(EXTENSION_ID);
 			assert.ok(ext, "Extension should be available");
-			const basePath = ext ? ext.extensionPath : "";
 			
 			// Create a new CSV file
 			const content = "Name,Value\nTest,123";
