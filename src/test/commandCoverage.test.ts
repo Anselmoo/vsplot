@@ -9,6 +9,11 @@ import type {
 // Extension ID constant
 const EXTENSION_ID = "AnselmHahn.vsplot";
 
+// Valid configuration constants
+const VALID_CHART_TYPES = ["line", "bar", "scatter", "pie", "doughnut"] as const;
+const VALID_STYLE_PRESETS = ["clean", "soft", "vibrant"] as const;
+const VALID_AGGREGATION_TYPES = ["none", "sum", "avg", "count", "min", "max"] as const;
+
 /**
  * Test helper to get extension base path
  */
@@ -268,10 +273,9 @@ suite("Command Coverage Tests", () => {
 				"vsplot.test.requestChartState"
 			) as ChartTestState;
 
-			const validChartTypes = ["line", "bar", "scatter", "pie", "doughnut"];
 			assert.ok(
-				validChartTypes.includes(state.chartType),
-				`chartType '${state.chartType}' should be one of ${validChartTypes.join(", ")}`
+				VALID_CHART_TYPES.includes(state.chartType as typeof VALID_CHART_TYPES[number]),
+				`chartType '${state.chartType}' should be one of ${VALID_CHART_TYPES.join(", ")}`
 			);
 		});
 
@@ -287,10 +291,9 @@ suite("Command Coverage Tests", () => {
 				"vsplot.test.requestChartState"
 			) as ChartTestState;
 
-			const validPresets = ["clean", "soft", "vibrant"];
 			assert.ok(
-				validPresets.includes(state.stylePreset),
-				`stylePreset '${state.stylePreset}' should be one of ${validPresets.join(", ")}`
+				VALID_STYLE_PRESETS.includes(state.stylePreset as typeof VALID_STYLE_PRESETS[number]),
+				`stylePreset '${state.stylePreset}' should be one of ${VALID_STYLE_PRESETS.join(", ")}`
 			);
 		});
 
@@ -306,10 +309,9 @@ suite("Command Coverage Tests", () => {
 				"vsplot.test.requestChartState"
 			) as ChartTestState;
 
-			const validAggTypes = ["none", "sum", "avg", "count", "min", "max"];
 			assert.ok(
-				validAggTypes.includes(state.agg),
-				`agg '${state.agg}' should be one of ${validAggTypes.join(", ")}`
+				VALID_AGGREGATION_TYPES.includes(state.agg as typeof VALID_AGGREGATION_TYPES[number]),
+				`agg '${state.agg}' should be one of ${VALID_AGGREGATION_TYPES.join(", ")}`
 			);
 		});
 	});

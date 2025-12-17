@@ -9,6 +9,11 @@ import type {
 // Extension ID constant
 const EXTENSION_ID = "AnselmHahn.vsplot";
 
+// Valid configuration constants
+const VALID_CHART_TYPES = ["line", "bar", "scatter", "pie", "doughnut"] as const;
+const VALID_STYLE_PRESETS = ["clean", "soft", "vibrant"] as const;
+const VALID_AGGREGATION_TYPES = ["sum", "avg", "count", "min", "max"] as const;
+
 /**
  * Test helper to get extension base path
  */
@@ -198,10 +203,8 @@ suite("Provider Coverage Tests", () => {
 			const uri = vscode.Uri.file(csvPath);
 
 			await vscode.commands.executeCommand("vsplot.plotData", uri);
-
-			const chartTypes = ["line", "bar", "scatter", "pie", "doughnut"];
 			
-			for (const chartType of chartTypes) {
+			for (const chartType of VALID_CHART_TYPES) {
 				const config: ChartTestConfig = { chartType };
 				await vscode.commands.executeCommand("vsplot.test.applyChartConfig", config);
 				
@@ -224,10 +227,8 @@ suite("Provider Coverage Tests", () => {
 			const uri = vscode.Uri.file(csvPath);
 
 			await vscode.commands.executeCommand("vsplot.plotData", uri);
-
-			const stylePresets = ["clean", "soft", "vibrant"];
 			
-			for (const stylePreset of stylePresets) {
+			for (const stylePreset of VALID_STYLE_PRESETS) {
 				const config: ChartTestConfig = { stylePreset };
 				await vscode.commands.executeCommand("vsplot.test.applyChartConfig", config);
 				
@@ -252,14 +253,12 @@ suite("Provider Coverage Tests", () => {
 			await vscode.commands.executeCommand("vsplot.plotData", uri);
 
 			// Use categorical X (species column = 4) with numeric Y (sepal_length = 0)
-			const aggTypes = ["sum", "avg", "count", "min", "max"];
-			
-			for (const agg of aggTypes) {
+			for (const aggType of VALID_AGGREGATION_TYPES) {
 				const config: ChartTestConfig = {
 					chartType: "bar",
 					x: 4,  // species (categorical)
 					y: 0,  // sepal_length (numeric)
-					agg,
+					agg: aggType,
 				};
 				await vscode.commands.executeCommand("vsplot.test.applyChartConfig", config);
 				
@@ -267,7 +266,7 @@ suite("Provider Coverage Tests", () => {
 					"vsplot.test.requestChartState"
 				) as ChartTestState;
 				
-				assert.strictEqual(state.agg, agg, `Aggregation should be ${agg}`);
+				assert.strictEqual(state.agg, aggType, `Aggregation should be ${aggType}`);
 			}
 		});
 
