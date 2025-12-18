@@ -5,9 +5,7 @@ import type {
 	ChartTestConfig,
 	ChartTestState,
 } from "../providers/chartViewProvider";
-
-// Extension ID constant
-const EXTENSION_ID = "AnselmHahn.vsplot";
+import { EXTENSION_ID, VALID_AGGREGATION_TYPES } from "./testUtils";
 
 suite("Error Handling and Edge Case Tests", () => {
 	/**
@@ -405,10 +403,7 @@ suite("Error Handling and Edge Case Tests", () => {
 			
 			await vscode.commands.executeCommand("vsplot.plotData", uri);
 			
-			// Valid aggregation types supported by the chart view
-			// These correspond to the aggregation options available in the chart configuration
-			const VALID_AGGREGATION_TYPES = ["sum", "avg", "count", "min", "max"] as const;
-			
+			// Use imported VALID_AGGREGATION_TYPES from testUtils.ts for consistency
 			for (const aggType of VALID_AGGREGATION_TYPES) {
 				const config: ChartTestConfig = {
 					chartType: "bar",

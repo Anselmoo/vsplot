@@ -36,7 +36,7 @@ export const coverageConfig = defineConfig({
     exclude: [
       "out/test/**",
       "**/test/**",
-      "**/testUtils*",
+      "**/test/testUtils*",  // More specific pattern to avoid matching non-test testUtils files
       "**/*.d.ts",
       "node_modules/**",
       "out/extension.js",

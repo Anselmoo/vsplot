@@ -10,10 +10,15 @@ const thresholds = {
   statements: 87,
 };
 
-// Note: codecov.yml targets 90% but ~2% is inherently untestable:
-// - resolveWebviewView methods require VS Code webview context
-// - Inline arrow functions in dependency factories
-// - Some panel creation else branches have instrumentation issues
+// Note: codecov.yml targets 90% but ~2-3% is effectively untestable:
+// - resolveWebviewView methods in src/providers/DataPreviewProvider.ts and
+//   src/providers/ChartViewProvider.ts require a live VS Code webview context
+// - Inline arrow functions used as dependency factories in src/extension.ts and
+//   src/commands/dataCommands.ts are only invoked by VS Code at runtime
+// - Some panel creation "else" branches in src/providers/DataPreviewProvider.ts and
+//   src/providers/ChartViewProvider.ts are not hit by vscode-test due to coverage
+//   instrumentation quirks
+// For a detailed breakdown of these exclusions, see docs/TESTING_COVERAGE.md.
 
 const summaryPath = path.resolve(
   process.cwd(),

@@ -304,4 +304,134 @@ suite("Command Logic Unit Tests", () => {
             assert.ok(findCallCount >= 2, "Should search multiple patterns");
         });
     });
+
+    suite("Exception Handling", () => {
+        test("executePreviewData should propagate exception from showPreview", async () => {
+            const uri = vscode.Uri.file("/test/file.csv");
+            const mockData = createMockParsedData();
+
+            const deps = createMockDeps({
+                parseDataFile: async () => mockData,
+            });
+            const mockProvider = {
+                showPreview: async () => {
+                    throw new Error("Preview panel creation failed");
+                },
+            };
+
+            // The function should throw when showPreview throws
+            try {
+                await executePreviewData(uri, deps, mockProvider);
+                assert.fail("Should have thrown an error");
+            } catch (error) {
+                assert.ok(error instanceof Error);
+                assert.strictEqual(error.message, "Preview panel creation failed");
+            }
+        });
+
+        test("executePlotData should propagate exception from showChart", async () => {
+            const uri = vscode.Uri.file("/test/file.csv");
+            const mockData = createMockParsedData();
+
+            const deps = createMockDeps({
+                parseDataFile: async () => mockData,
+            });
+            const mockProvider = {
+                showChart: async () => {
+                    throw new Error("Chart creation failed");
+                },
+            };
+
+            // The function should throw when showChart throws
+            try {
+                await executePlotData(uri, deps, mockProvider);
+                assert.fail("Should have thrown an error");
+            } catch (error) {
+                assert.ok(error instanceof Error);
+                assert.strictEqual(error.message, "Chart creation failed");
+            }
+        });
+
+        test("executeOpenDataViewer should propagate exception from showPreview", async () => {
+            const fileUri = vscode.Uri.file("/workspace/test.csv");
+            const mockData = createMockParsedData();
+
+            const deps = createMockDeps({
+                getWorkspaceFolders: () => [{ uri: vscode.Uri.file("/workspace"), name: "test", index: 0 }],
+                findWorkspaceFiles: async () => [fileUri],
+                showQuickPick: async () => ({ label: "test.csv", description: fileUri.fsPath, uri: fileUri }),
+                parseDataFile: async () => mockData,
+            });
+            const mockProvider = {
+                showPreview: async () => {
+                    throw new Error("Preview panel creation failed");
+                },
+            };
+
+            // The function should throw when showPreview throws
+            try {
+                await executeOpenDataViewer(deps, mockProvider);
+                assert.fail("Should have thrown an error");
+            } catch (error) {
+                assert.ok(error instanceof Error);
+                assert.strictEqual(error.message, "Preview panel creation failed");
+            }
+        });
+
+        test("executePreviewData should propagate exception from parseDataFile", async () => {
+            const uri = vscode.Uri.file("/test/file.csv");
+
+            const deps = createMockDeps({
+                parseDataFile: async () => {
+                    throw new Error("File read failed");
+                },
+            });
+            const mockProvider = { showPreview: async () => {} };
+
+            try {
+                await executePreviewData(uri, deps, mockProvider);
+                assert.fail("Should have thrown an error");
+            } catch (error) {
+                assert.ok(error instanceof Error);
+                assert.strictEqual(error.message, "File read failed");
+            }
+        });
+
+        test("executePlotData should propagate exception from parseDataFile", async () => {
+            const uri = vscode.Uri.file("/test/file.csv");
+
+            const deps = createMockDeps({
+                parseDataFile: async () => {
+                    throw new Error("File read failed");
+                },
+            });
+            const mockProvider = { showChart: async () => {} };
+
+            try {
+                await executePlotData(uri, deps, mockProvider);
+                assert.fail("Should have thrown an error");
+            } catch (error) {
+                assert.ok(error instanceof Error);
+                assert.strictEqual(error.message, "File read failed");
+            }
+        });
+
+        test("executeOpenDataViewer should propagate exception from findWorkspaceFiles", async () => {
+            const deps = createMockDeps({
+                getWorkspaceFolders: () => [{ uri: vscode.Uri.file("/workspace"), name: "test", index: 0 }],
+                findWorkspaceFiles: async () => {
+                    throw new Error("Workspace search failed");
+                },
+            });
+            const mockProvider = { showPreview: async () => {} };
+
+            try {
+                await executeOpenDataViewer(deps, mockProvider);
+                assert.fail("Should have thrown an error");
+            } catch (error) {
+                assert.ok(error instanceof Error);
+                assert.strictEqual(error.message, "Workspace search failed");
+            }
+        });
+    });
 });
