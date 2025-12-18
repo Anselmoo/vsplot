@@ -4,10 +4,10 @@ import fs from "node:fs";
 import path from "node:path";
 
 const thresholds = {
-  lines: 85,
+  lines: 87,
   functions: 80,  // Lower due to untestable inline arrow functions and resolveWebviewView
-  branches: 85,
-  statements: 85,
+  branches: 87,
+  statements: 87,
 };
 
 const summaryPath = path.resolve(

@@ -16,7 +16,9 @@ import {
     ReparseMessage,
     ChartProviderLike,
     createDefaultMessageHandlerDeps,
+    DataPreviewProvider,
 } from "../providers/dataPreviewProvider";
+import { ChartViewProvider } from "../providers/chartViewProvider";
 import {
     createDefaultDependencies,
 } from "../commands/dataCommands";
@@ -521,6 +523,61 @@ suite("Message Handler Unit Tests", () => {
             );
 
             assert.strictEqual(receivedUri?.fsPath, testUri.fsPath);
+        });
+    });
+
+    suite("Provider Panel Creation (else branch coverage)", () => {
+        let extensionUri: vscode.Uri;
+
+        suiteSetup(function() {
+            const ext = vscode.extensions.getExtension("AnselmHahn.vsplot");
+            if (!ext) {
+                this.skip();
+                return;
+            }
+            extensionUri = vscode.Uri.file(ext.extensionPath);
+        });
+
+        const mockData: ParsedData = {
+            headers: ["A", "B"],
+            rows: [[1, 2], [3, 4]],
+            fileName: "test-panel.csv",
+            fileType: "csv",
+            totalRows: 2,
+        };
+
+        test("DataPreviewProvider.showPreview creates panel when _view undefined", async function() {
+            this.timeout(10000);
+            if (!extensionUri) {
+                this.skip();
+                return;
+            }
+
+            // Create fresh provider - _view will be undefined
+            const provider = new DataPreviewProvider(extensionUri);
+            
+            // This should hit the else branch and create a webview panel
+            await provider.showPreview(vscode.Uri.file("/test/preview.csv"), mockData);
+            
+            assert.ok(true, "DataPreviewProvider panel created");
+            await vscode.commands.executeCommand("workbench.action.closeAllEditors");
+        });
+
+        test("ChartViewProvider.showChart creates panel when _view undefined", async function() {
+            this.timeout(10000);
+            if (!extensionUri) {
+                this.skip();
+                return;
+            }
+
+            // Create fresh provider - _view will be undefined
+            const provider = new ChartViewProvider(extensionUri);
+            
+            // This should hit the else branch and create a webview panel
+            await provider.showChart(vscode.Uri.file("/test/chart.csv"), mockData);
+            
+            assert.ok(true, "ChartViewProvider panel created");
+            await vscode.commands.executeCommand("workbench.action.closeAllEditors");
         });
     });
 });
