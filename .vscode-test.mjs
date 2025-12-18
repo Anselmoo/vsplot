@@ -35,7 +35,8 @@ export const coverageConfig = defineConfig({
     include: ["out/src/**/*.js"],
     exclude: [
       "out/test/**",
-      "out/src/test/**",
+      "**/test/**",
+      "**/testUtils*",
       "**/*.d.ts",
       "node_modules/**",
       "out/extension.js",
