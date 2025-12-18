@@ -166,7 +166,8 @@ suite("Extension Test Suite", () => {
 		const ext = vscode.extensions.getExtension(EXTENSION_ID);
 		assert.ok(ext);
 		const basePath = ext ? ext.extensionPath : "";
-		// Test data from @JerryJohnsonLee: index (0,1,2...), label (decimals), predictions (decimals)
+		// Regression test for issue #30: https://github.com/Anselmoo/vsplot/issues/30
+		// Test data contributed by @JerryJohnsonLee: index (0,1,2...), label (decimals), predictions (decimals)
 		// Downloaded by scripts/setup-test-data.sh to avoid license issues with committed test data
 		const uri = vscode.Uri.file(path.join(basePath, "test-data", "scatter-numeric-regression.csv"));
 		const doc = await vscode.workspace.openTextDocument(uri);

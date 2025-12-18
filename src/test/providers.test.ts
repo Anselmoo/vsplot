@@ -52,7 +52,9 @@ suite("Provider Integration Tests", () => {
 			try {
 				await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
 			} catch (e) {
-				// Ignore cleanup errors
+				// Log cleanup errors for debugging but don't fail the test
+				const errorMessage = e instanceof Error ? e.message : String(e);
+				console.warn(`Cleanup warning: ${errorMessage}`);
 			}
 		});
 
@@ -79,7 +81,9 @@ suite("Provider Integration Tests", () => {
 			try {
 				await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
 			} catch (e) {
-				// Ignore cleanup errors
+				// Log cleanup errors for debugging but don't fail the test
+				const errorMessage = e instanceof Error ? e.message : String(e);
+				console.warn(`Cleanup warning: ${errorMessage}`);
 			}
 		});
 
@@ -112,7 +116,9 @@ suite("Provider Integration Tests", () => {
 			try {
 				await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
 			} catch (e) {
-				// Ignore cleanup errors
+				// Log cleanup errors for debugging but don't fail the test
+				const errorMessage = e instanceof Error ? e.message : String(e);
+				console.warn(`Cleanup warning: ${errorMessage}`);
 			}
 		});
 	});
@@ -427,7 +433,9 @@ suite("Provider Integration Tests", () => {
 				try {
 					await vscode.workspace.fs.delete(vscode.Uri.file(tsvPath));
 				} catch (e) {
-					// Ignore cleanup errors
+					// Log cleanup errors for debugging but don't fail the test
+					const errorMessage = e instanceof Error ? e.message : String(e);
+					console.warn(`Cleanup warning: ${errorMessage}`);
 				}
 			} finally {
 				// Ensure any opened editors/webviews are closed after the test

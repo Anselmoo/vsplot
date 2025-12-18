@@ -11,7 +11,6 @@ import {
     executePlotData,
     executeOpenDataViewer,
     CommandDependencies,
-    CommandResult,
 } from "../commands/dataCommands";
 import type { ParsedData } from "../data/load";
 
@@ -50,23 +49,29 @@ suite("Command Logic Unit Tests", () => {
             const uri = vscode.Uri.file("/test/file.csv");
             const result = resolveUri(uri, () => undefined);
 
-            assert.strictEqual(result.uri?.fsPath, uri.fsPath);
-            assert.strictEqual(result.error, undefined);
+            assert.strictEqual(result.success, true);
+            if (result.success) {
+                assert.strictEqual(result.uri.fsPath, uri.fsPath);
+            }
         });
 
         test("should fallback to active editor URI when no URI provided", () => {
             const activeUri = vscode.Uri.file("/active/editor.csv");
             const result = resolveUri(undefined, () => activeUri);
 
-            assert.strictEqual(result.uri?.fsPath, activeUri.fsPath);
-            assert.strictEqual(result.error, undefined);
+            assert.strictEqual(result.success, true);
+            if (result.success) {
+                assert.strictEqual(result.uri.fsPath, activeUri.fsPath);
+            }
         });
 
         test("should return error when no URI and no active editor", () => {
             const result = resolveUri(undefined, () => undefined);
 
-            assert.strictEqual(result.uri, undefined);
-            assert.strictEqual(result.error, "No file selected.");
+            assert.strictEqual(result.success, false);
+            if (!result.success) {
+                assert.strictEqual(result.error, "No file selected.");
+            }
         });
     });
 

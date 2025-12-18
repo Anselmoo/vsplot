@@ -86,8 +86,8 @@ suite("Message Handler Unit Tests", () => {
             // These return undefined/empty in test context but shouldn't throw
             const uri = deps.getActiveEditorUri();
             assert.strictEqual(uri, undefined);
-            const folders = deps.getWorkspaceFolders();
-            // May or may not have folders in test workspace
+            // Verify getWorkspaceFolders returns without error (may or may not have folders in test workspace)
+            deps.getWorkspaceFolders();
             deps.showErrorMessage("test");
             deps.showInfoMessage("test");
         });

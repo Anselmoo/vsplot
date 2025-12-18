@@ -55,25 +55,33 @@ export interface CommandResult {
 }
 
 /**
+ * Tagged union type for URI resolution result.
+ * Ensures type safety - callers must check success before accessing uri.
+ */
+export type ResolveUriResult = 
+    | { success: true; uri: vscode.Uri }
+    | { success: false; error: string };
+
+/**
  * Resolves URI from provided value or falls back to active editor.
  * This is a pure function that can be unit tested.
  * 
  * @param providedUri - URI passed to command, may be undefined
  * @param getActiveEditorUri - Function to get active editor URI
- * @returns Object with uri if resolved, or error message if not
+ * @returns Tagged union with uri if resolved, or error message if not
  */
 export function resolveUri(
     providedUri: vscode.Uri | undefined,
     getActiveEditorUri: () => vscode.Uri | undefined
-): { uri?: vscode.Uri; error?: string } {
+): ResolveUriResult {
     if (providedUri) {
-        return { uri: providedUri };
+        return { success: true, uri: providedUri };
     }
     const activeUri = getActiveEditorUri();
     if (!activeUri) {
-        return { error: 'No file selected.' };
+        return { success: false, error: 'No file selected.' };
     }
-    return { uri: activeUri };
+    return { success: true, uri: activeUri };
 }
 
 /**
@@ -90,16 +98,16 @@ export async function executePreviewData(
     previewProvider: { showPreview: (uri: vscode.Uri, data: ParsedData) => Promise<void> }
 ): Promise<CommandResult> {
     const resolved = resolveUri(uri, deps.getActiveEditorUri);
-    if (resolved.error) {
+    if (!resolved.success) {
         return { success: false, error: resolved.error };
     }
 
-    const data = await deps.parseDataFile(resolved.uri!);
+    const data = await deps.parseDataFile(resolved.uri);
     if (!data) {
         return { success: false, error: 'Failed to parse data file' };
     }
 
-    await previewProvider.showPreview(resolved.uri!, data);
+    await previewProvider.showPreview(resolved.uri, data);
     return { success: true };
 }
 
@@ -117,16 +125,16 @@ export async function executePlotData(
     chartProvider: { showChart: (uri: vscode.Uri, data: ParsedData) => Promise<void> }
 ): Promise<CommandResult> {
     const resolved = resolveUri(uri, deps.getActiveEditorUri);
-    if (resolved.error) {
+    if (!resolved.success) {
         return { success: false, error: resolved.error };
     }
 
-    const data = await deps.parseDataFile(resolved.uri!);
+    const data = await deps.parseDataFile(resolved.uri);
     if (!data) {
         return { success: false, error: 'Failed to parse data file' };
     }
 
-    await chartProvider.showChart(resolved.uri!, data);
+    await chartProvider.showChart(resolved.uri, data);
     return { success: true };
 }
 
