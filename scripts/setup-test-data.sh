@@ -256,13 +256,8 @@ data1,data2,data3
 EOF
 echo "✅ Comment handling test fixtures created successfully"
 
-# Download scatter plot numeric regression test file (Issue #30)
-# This file tests that scatter plots with numeric X-axis don't collapse to a single point
-download_file \
-    "https://github.com/user-attachments/files/23616369/test1.csv" \
-    "scatter-numeric-regression.csv" \
-    "Scatter plot numeric regression test data" \
-    "$TEST_DATA_DIR"
+# Note: scatter-numeric-regression test data (Issue #30) is now in sample-data/test1.csv
+# No need to download - it's committed to the repository
 
 echo ""
 echo "🎉 All sample datasets downloaded and created successfully!"
@@ -290,6 +285,6 @@ echo "  - csv-with-comments.csv: CSV with comment lines (comment handling tests)
 echo "  - txt-with-comments.txt: TXT with hash comments (comment handling tests)"
 echo "  - dat-with-comments.dat: DAT with multiple comment markers (comment handling tests)"
 echo "  - custom-comment-markers.txt: File for custom comment marker tests"
-echo "  - scatter-numeric-regression.csv: Regression test for issue #30 (numeric X-axis scatter plots)"
+echo "  - test1.csv (sample-data): Regression test for issue #30 (numeric X-axis scatter plots)"
 echo ""
 echo "🚀 Ready to test VSPlot extension with sample data!"

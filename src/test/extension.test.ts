@@ -167,7 +167,8 @@ suite("Extension Test Suite", () => {
 		assert.ok(ext);
 		const basePath = ext ? ext.extensionPath : "";
 		// Test data from @JerryJohnsonLee: index (0,1,2...), label (decimals), predictions (decimals)
-		const uri = vscode.Uri.file(path.join(basePath, "test-data", "scatter-numeric-regression.csv"));
+		// Uses committed sample-data/test1.csv instead of downloaded test-data file
+		const uri = vscode.Uri.file(path.join(basePath, "sample-data", "test1.csv"));
 		const doc = await vscode.workspace.openTextDocument(uri);
 		await vscode.window.showTextDocument(doc);
 		await vscode.commands.executeCommand("vsplot.plotData", uri);
