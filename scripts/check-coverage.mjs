@@ -10,6 +10,11 @@ const thresholds = {
   statements: 87,
 };
 
+// Note: codecov.yml targets 90% but ~2% is inherently untestable:
+// - resolveWebviewView methods require VS Code webview context
+// - Inline arrow functions in dependency factories
+// - Some panel creation else branches have instrumentation issues
+
 const summaryPath = path.resolve(
   process.cwd(),
   "coverage",
