@@ -73,6 +73,24 @@ cat > "$DATA_DIR/3d-sample.json" << 'EOF'
 EOF
 echo "✅ 3D sample data created successfully"
 
+# Create a list of dictionaries JSON file (array of objects without wrapper)
+echo "📊 Creating list of dictionaries sample data..."
+cat > "$DATA_DIR/list-of-dict.json" << 'EOF'
+[
+    {"x": 1.2, "y": 2.3, "z": 3.1, "category": "A", "value": 10},
+    {"x": 2.1, "y": 1.8, "z": 2.9, "category": "A", "value": 15},
+    {"x": 3.4, "y": 4.2, "z": 1.8, "category": "B", "value": 8},
+    {"x": 1.8, "y": 3.6, "z": 4.2, "category": "B", "value": 12},
+    {"x": 4.1, "y": 2.1, "z": 3.8, "category": "C", "value": 20},
+    {"x": 2.8, "y": 3.9, "z": 2.2, "category": "C", "value": 18},
+    {"x": 3.7, "y": 1.4, "z": 4.5, "category": "A", "value": 14},
+    {"x": 1.5, "y": 4.8, "z": 2.7, "category": "B", "value": 9},
+    {"x": 4.3, "y": 3.2, "z": 3.3, "category": "C", "value": 22},
+    {"x": 2.6, "y": 2.7, "z": 4.1, "category": "A", "value": 16}
+]
+EOF
+echo "✅ List of dictionaries sample data created successfully"
+
 # Create a sample time series dataset
 echo "📊 Creating time series sample data..."
 cat > "$DATA_DIR/timeseries-sample.csv" << 'EOF'
@@ -258,6 +276,7 @@ echo "✅ Comment handling test fixtures created successfully"
 
 # Download scatter plot numeric regression test file (Issue #30)
 # This file tests that scatter plots with numeric X-axis don't collapse to a single point
+# Downloaded to avoid license issues with committed test data
 download_file \
     "https://github.com/user-attachments/files/23616369/test1.csv" \
     "scatter-numeric-regression.csv" \
@@ -275,6 +294,7 @@ echo "  - titanic.csv: Passenger survival data"
 echo "  - boston_housing.csv: Real estate prices"
 echo "  - weather.csv: US airport traffic sample"
 echo "  - 3d-sample.json: 3D scatter plot data"
+echo "  - list-of-dict.json: JSON array of objects (list of dictionaries)"
 echo "  - timeseries-sample.csv: Time series data"
 echo "  - sales-sample.dat: Categorical sales data"
 echo "  - test.tsv: TSV format test file"
@@ -291,5 +311,8 @@ echo "  - txt-with-comments.txt: TXT with hash comments (comment handling tests)
 echo "  - dat-with-comments.dat: DAT with multiple comment markers (comment handling tests)"
 echo "  - custom-comment-markers.txt: File for custom comment marker tests"
 echo "  - scatter-numeric-regression.csv: Regression test for issue #30 (numeric X-axis scatter plots)"
+echo ""
+echo "⚠️  IMPORTANT: Run this script before running tests locally!"
+echo "    Test data is downloaded (not committed) to avoid license issues."
 echo ""
 echo "🚀 Ready to test VSPlot extension with sample data!"

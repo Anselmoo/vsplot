@@ -235,4 +235,31 @@ suite("JSON Parsing Tests", () => {
 			// Ignore cleanup errors
 		}
 	});
+
+	test("JSON list of dictionaries (array of objects) should parse", async function () {
+		this.timeout(10000);
+		// Use the sample-data file created by setup-test-data.sh
+		const ext = vscode.extensions.getExtension("AnselmHahn.vsplot");
+		assert.ok(ext, "Extension should be available");
+		const basePath = ext ? ext.extensionPath : "";
+		const jsonPath = path.join(basePath, "sample-data", "list-of-dict.json");
+		
+		const uri = vscode.Uri.file(jsonPath);
+		const data = await parseDataFile(uri);
+
+		assert.ok(data, "Data should be parsed");
+		// Should have headers from object keys: x, y, z, category, value
+		assert.strictEqual(data?.headers.length, 5, "Should have 5 columns");
+		assert.ok(data?.headers.includes("x"), "Should have 'x' header");
+		assert.ok(data?.headers.includes("y"), "Should have 'y' header");
+		assert.ok(data?.headers.includes("z"), "Should have 'z' header");
+		assert.ok(data?.headers.includes("category"), "Should have 'category' header");
+		assert.ok(data?.headers.includes("value"), "Should have 'value' header");
+		assert.strictEqual(data?.rows.length, 10, "Should have 10 rows");
+		// First row should have: x=1.2, y=2.3, z=3.1, category="A", value=10
+		const xIdx = data?.headers.indexOf("x") ?? 0;
+		const categoryIdx = data?.headers.indexOf("category") ?? 0;
+		assert.strictEqual(data?.rows[0][xIdx], 1.2, "First row x should be 1.2");
+		assert.strictEqual(data?.rows[0][categoryIdx], "A", "First row category should be 'A'");
+	});
 });

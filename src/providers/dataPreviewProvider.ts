@@ -1,16 +1,188 @@
 import * as vscode from 'vscode';
-import type { ParsedData } from '../data/load.js';
+import type { ParsedData, ParseOptions } from '../data/load.js';
 import { parseDataFile } from '../data/load.js';
 import { loadHtmlTemplate, getNonce } from './webviewUtils';
+
+// --- Dependency Injection for Message Handlers ---
+
+/**
+ * Dependencies that can be injected for testing message handler logic.
+ */
+export interface MessageHandlerDependencies {
+    showSaveDialog: (options: vscode.SaveDialogOptions) => Thenable<vscode.Uri | undefined>;
+    writeFile: (uri: vscode.Uri, content: Uint8Array) => Thenable<void>;
+    showInfoMessage: (msg: string) => void;
+    showErrorMessage: (msg: string) => void;
+    parseDataFile: (uri: vscode.Uri, options?: ParseOptions) => Promise<ParsedData | null>;
+}
+
+/**
+ * Create default dependencies using real VS Code APIs
+ */
+export function createDefaultMessageHandlerDeps(): MessageHandlerDependencies {
+    return {
+        showSaveDialog: (options) => vscode.window.showSaveDialog(options),
+        writeFile: (uri, content) => vscode.workspace.fs.writeFile(uri, content),
+        showInfoMessage: (msg) => { vscode.window.showInformationMessage(msg); },
+        showErrorMessage: (msg) => { vscode.window.showErrorMessage(msg); },
+        parseDataFile: parseDataFile,
+    };
+}
+
+// --- Message Types ---
+
+export interface ExportDataMessage {
+    type: 'exportData';
+    data: { headers: string[]; rows: (string | number)[][] };
+}
+
+export interface CreateChartMessage {
+    type: 'createChart';
+    data: ParsedData & { fileName?: string };
+}
+
+export interface ReparseMessage {
+    type: 'reparse';
+    delimiter: string | 'auto';
+}
+
+export type WebviewMessage = ExportDataMessage | CreateChartMessage | ReparseMessage;
+
+// --- Result Type ---
+
+export interface MessageHandlerResult {
+    success: boolean;
+    error?: string;
+}
+
+// --- Extracted Testable Message Handler Functions ---
+
+/**
+ * Handle exportData message - exports filtered data to CSV.
+ * Fully testable with dependency injection.
+ */
+export async function handleExportData(
+    message: ExportDataMessage,
+    deps: MessageHandlerDependencies
+): Promise<MessageHandlerResult> {
+    try {
+        const uri = await deps.showSaveDialog({
+            saveLabel: 'Export Filtered Data',
+            filters: { 'CSV': ['csv'] },
+            defaultUri: vscode.Uri.file('filtered_data.csv')
+        });
+
+        if (!uri) {
+            return { success: true }; // User cancelled - not an error
+        }
+
+        const csv = toCSV(message.data.headers, message.data.rows);
+        await deps.writeFile(uri, Buffer.from(csv, 'utf8'));
+        deps.showInfoMessage('Filtered data exported.');
+        return { success: true };
+    } catch (e) {
+        const errorMsg = 'Failed to export data: ' + (e instanceof Error ? e.message : String(e));
+        deps.showErrorMessage(errorMsg);
+        return { success: false, error: errorMsg };
+    }
+}
+
+/**
+ * Handle createChart message - creates a chart from preview data.
+ * Fully testable with dependency injection.
+ */
+export async function handleCreateChart(
+    message: CreateChartMessage,
+    currentUri: vscode.Uri | undefined,
+    chartProvider: ChartProviderLike | undefined,
+    deps: MessageHandlerDependencies
+): Promise<MessageHandlerResult> {
+    try {
+        if (!chartProvider) {
+            deps.showErrorMessage('Chart provider not available');
+            return { success: false, error: 'Chart provider not available' };
+        }
+
+        const uri = currentUri ?? vscode.Uri.file(message.data.fileName || 'preview');
+        await chartProvider.showChart(uri, message.data);
+        return { success: true };
+    } catch (e) {
+        const errorMsg = 'Failed to create chart: ' + (e instanceof Error ? e.message : String(e));
+        deps.showErrorMessage(errorMsg);
+        return { success: false, error: errorMsg };
+    }
+}
+
+/**
+ * Handle reparse message - re-parses data with a different delimiter.
+ * Fully testable with dependency injection.
+ */
+export async function handleReparse(
+    message: ReparseMessage,
+    currentUri: vscode.Uri | undefined,
+    postMessage: (msg: unknown) => Thenable<boolean>,
+    deps: MessageHandlerDependencies
+): Promise<MessageHandlerResult> {
+    try {
+        if (!currentUri) {
+            deps.showErrorMessage('Cannot reparse without a backing file URI.');
+            return { success: false, error: 'Cannot reparse without a backing file URI.' };
+        }
+
+        const delim = message.delimiter === 'auto' ? undefined : message.delimiter;
+        const data = await deps.parseDataFile(currentUri, { delimiter: delim });
+
+        if (data) {
+            await postMessage({ type: 'showData', data });
+        }
+        return { success: true };
+    } catch (e) {
+        const errorMsg = 'Failed to reparse: ' + (e instanceof Error ? e.message : String(e));
+        deps.showErrorMessage(errorMsg);
+        return { success: false, error: errorMsg };
+    }
+}
+
+// --- CSV Helper (exported for testing) ---
+
+/**
+ * Convert headers and rows to CSV string.
+ * Properly escapes values containing commas, quotes, or newlines.
+ */
+export function toCSV(headers: string[], rows: (string | number)[][]): string {
+    const esc = (v: unknown) => {
+        if (v === null || v === undefined) {
+            return '';
+        }
+        const s = String(v);
+        if (/[",\n]/.test(s)) {
+            return '"' + s.replace(/"/g, '""') + '"';
+        }
+        return s;
+    };
+    return [headers.map(esc).join(','), ...rows.map(r => r.map(esc).join(','))].join('\n');
+}
+
+// --- DataPreviewProvider Class ---
+
+export interface ChartProviderLike {
+    showChart(uri: vscode.Uri, data: ParsedData): Promise<void>;
+}
 
 export class DataPreviewProvider implements vscode.WebviewViewProvider {
     public static readonly viewType = 'vsplot.dataPreview';
     private _view?: vscode.WebviewView;
-    private _chartProvider?: { showChart: (uri: vscode.Uri, data: ParsedData) => Promise<void> };
+    private _chartProvider?: ChartProviderLike;
     private _currentUri?: vscode.Uri;
+    private _deps: MessageHandlerDependencies;
 
-    constructor(private readonly _extensionUri: vscode.Uri, chartProvider?: { showChart: (uri: vscode.Uri, data: ParsedData) => Promise<void> }) {
+    constructor(
+        private readonly _extensionUri: vscode.Uri,
+        chartProvider?: ChartProviderLike,
+        deps?: MessageHandlerDependencies
+    ) {
         this._chartProvider = chartProvider;
+        this._deps = deps ?? createDefaultMessageHandlerDeps();
     }
 
     public resolveWebviewView(
@@ -65,52 +237,29 @@ export class DataPreviewProvider implements vscode.WebviewViewProvider {
             if (!message || typeof message !== 'object') {
                 return;
             }
+
             if (message.type === 'exportData') {
-                try {
-                    const uri = await vscode.window.showSaveDialog({
-                        saveLabel: 'Export Filtered Data',
-                        filters: { 'CSV': ['csv'] },
-                        defaultUri: vscode.Uri.file('filtered_data.csv')
-                    });
-                    if (!uri) {
-                        return;
-                    }
-                    const { data } = message;
-                    const csv = toCSV(data.headers, data.rows);
-                    await vscode.workspace.fs.writeFile(uri, Buffer.from(csv, 'utf8'));
-                    vscode.window.showInformationMessage('Filtered data exported.');
-                } catch (e) {
-                    vscode.window.showErrorMessage('Failed to export data: ' + (e instanceof Error ? e.message : String(e)));
-                }
+                await handleExportData(message as ExportDataMessage, this._deps);
                 return;
             }
+
             if (message.type === 'createChart') {
-                try {
-                    const { data } = message;
-                    if (this._chartProvider) {
-                        await this._chartProvider.showChart(this._currentUri ?? vscode.Uri.file(data.fileName || 'preview'), data);
-                    } else {
-                        vscode.window.showErrorMessage('Chart provider not available');
-                    }
-                } catch (e) {
-                    vscode.window.showErrorMessage('Failed to create chart: ' + (e instanceof Error ? e.message : String(e)));
-                }
+                await handleCreateChart(
+                    message as CreateChartMessage,
+                    this._currentUri,
+                    this._chartProvider,
+                    this._deps
+                );
                 return;
             }
+
             if (message.type === 'reparse' && message.delimiter !== undefined) {
-                try {
-                    if (!this._currentUri) {
-                        vscode.window.showErrorMessage('Cannot reparse without a backing file URI.');
-                        return;
-                    }
-                    const delim = message.delimiter === 'auto' ? undefined : message.delimiter;
-                    const data = await parseDataFile(this._currentUri, { delimiter: delim });
-                    if (data) {
-                        webview.postMessage({ type: 'showData', data });
-                    }
-                } catch (e) {
-                    vscode.window.showErrorMessage('Failed to reparse: ' + (e instanceof Error ? e.message : String(e)));
-                }
+                await handleReparse(
+                    message as ReparseMessage,
+                    this._currentUri,
+                    (msg) => webview.postMessage(msg),
+                    this._deps
+                );
                 return;
             }
         });
@@ -118,13 +267,6 @@ export class DataPreviewProvider implements vscode.WebviewViewProvider {
 
     /**
      * Generate HTML for the webview
-     * 
-     * This method loads an external HTML template from media/dataPreview/index.html
-     * and replaces placeholders with actual values to keep the provider code 
-     * clean and maintainable.
-     * 
-     * @param webview - The webview to generate HTML for
-     * @returns HTML string with references to external resources
      */
     private _getHtmlForWebview(webview: vscode.Webview) {
         const cfg = vscode.workspace.getConfiguration('vsplot');
@@ -142,7 +284,7 @@ export class DataPreviewProvider implements vscode.WebviewViewProvider {
 
         // Build HTML with external resources
         const csp = `default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}' ${webview.cspSource};`;
-        
+
         // Load HTML template and replace placeholders
         return loadHtmlTemplate(this._extensionUri, 'media/dataPreview/index.html', {
             CSP: csp,
@@ -152,20 +294,4 @@ export class DataPreviewProvider implements vscode.WebviewViewProvider {
             ROWS_PER_PAGE: String(rowsPerPage)
         });
     }
-}
-
-export interface ChartProviderLike { showChart(uri: vscode.Uri, data: ParsedData): Promise<void>; }
-
-function toCSV(headers: string[], rows: (string|number)[][]): string {
-    const esc = (v: unknown) => {
-        if (v === null || v === undefined) {
-            return '';
-        }
-        const s = String(v);
-        if (/[",\n]/.test(s)) {
-            return '"' + s.replace(/"/g, '""') + '"';
-        }
-        return s;
-    };
-    return [headers.map(esc).join(','), ...rows.map(r => r.map(esc).join(','))].join('\n');
 }
