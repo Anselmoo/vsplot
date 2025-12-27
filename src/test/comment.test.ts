@@ -1,14 +1,12 @@
 import * as assert from "assert";
-import * as vscode from "vscode";
 import * as path from "path";
+import * as vscode from "vscode";
 import { parseDataFile } from "../data/load";
 
 suite("Comment Line Handling Tests", () => {
 	test("CSV with hash comments should skip comment lines", async function () {
 		this.timeout(10000);
-		const uri = vscode.Uri.file(
-			path.join(__dirname, "../../test-data/csv-with-comments.csv")
-		);
+		const uri = vscode.Uri.file(path.join(__dirname, "../../test-data/csv-with-comments.csv"));
 		const data = await parseDataFile(uri);
 
 		assert.ok(data, "Data should be parsed");
@@ -25,9 +23,7 @@ suite("Comment Line Handling Tests", () => {
 
 	test("TXT with hash comments should skip comment lines", async function () {
 		this.timeout(10000);
-		const uri = vscode.Uri.file(
-			path.join(__dirname, "../../test-data/txt-with-comments.txt")
-		);
+		const uri = vscode.Uri.file(path.join(__dirname, "../../test-data/txt-with-comments.txt"));
 		const data = await parseDataFile(uri);
 
 		assert.ok(data, "Data should be parsed");
@@ -40,9 +36,7 @@ suite("Comment Line Handling Tests", () => {
 
 	test("DAT with multiple comment markers should skip all comment lines", async function () {
 		this.timeout(10000);
-		const uri = vscode.Uri.file(
-			path.join(__dirname, "../../test-data/dat-with-comments.dat")
-		);
+		const uri = vscode.Uri.file(path.join(__dirname, "../../test-data/dat-with-comments.dat"));
 		const data = await parseDataFile(uri);
 
 		assert.ok(data, "Data should be parsed");
@@ -54,9 +48,7 @@ suite("Comment Line Handling Tests", () => {
 
 	test("User can configure custom comment markers", async function () {
 		this.timeout(10000);
-		const uri = vscode.Uri.file(
-			path.join(__dirname, "../../test-data/custom-comment-markers.txt")
-		);
+		const uri = vscode.Uri.file(path.join(__dirname, "../../test-data/custom-comment-markers.txt"));
 
 		// Parse with default comment markers (should not skip ## and !)
 		const dataDefault = await parseDataFile(uri);
@@ -76,9 +68,7 @@ suite("Comment Line Handling Tests", () => {
 
 	test("Empty comment markers should not filter any lines", async function () {
 		this.timeout(10000);
-		const uri = vscode.Uri.file(
-			path.join(__dirname, "../../test-data/csv-with-comments.csv")
-		);
+		const uri = vscode.Uri.file(path.join(__dirname, "../../test-data/csv-with-comments.csv"));
 
 		// Parse with empty comment markers array
 		const data = await parseDataFile(uri, { commentMarkers: [] });
@@ -93,13 +83,10 @@ suite("Comment Line Handling Tests", () => {
 		// Create a file with only comments
 		const content = "# Comment 1\n% Comment 2\n// Comment 3\n";
 		const tmpPath = path.join(__dirname, "../../test-data/only-comments.csv");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8")
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
-		
+
 		try {
 			await parseDataFile(uri);
 			assert.fail("Should have thrown an error for file with only comments");
@@ -119,12 +106,10 @@ suite("Comment Line Handling Tests", () => {
 	test("Mixed comment markers in same file should all be filtered", async function () {
 		this.timeout(10000);
 		// Create a file with mixed comment markers
-		const content = "# Hash comment\nName,Age\n% Percent comment\nAlice,25\n// Slash comment\nBob,30\n";
+		const content =
+			"# Hash comment\nName,Age\n% Percent comment\nAlice,25\n// Slash comment\nBob,30\n";
 		const tmpPath = path.join(__dirname, "../../test-data/mixed-comments.csv");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8")
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 		const data = await parseDataFile(uri);
@@ -145,9 +130,7 @@ suite("Comment Line Handling Tests", () => {
 
 	test("Comments in middle of file should not affect data integrity", async function () {
 		this.timeout(10000);
-		const uri = vscode.Uri.file(
-			path.join(__dirname, "../../test-data/csv-with-comments.csv")
-		);
+		const uri = vscode.Uri.file(path.join(__dirname, "../../test-data/csv-with-comments.csv"));
 		const data = await parseDataFile(uri);
 
 		assert.ok(data, "Data should be parsed");

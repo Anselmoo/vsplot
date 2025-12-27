@@ -1,6 +1,6 @@
 import * as assert from "assert";
-import * as vscode from "vscode";
 import * as path from "path";
+import * as vscode from "vscode";
 import { parseDataFile } from "../data/load";
 
 suite("JSON Parsing Tests", () => {
@@ -8,10 +8,7 @@ suite("JSON Parsing Tests", () => {
 		this.timeout(10000);
 		const content = '["apple", "banana", "cherry"]';
 		const tmpPath = path.join(__dirname, "../../test-data/json-string-array.json");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8")
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 		const data = await parseDataFile(uri);
@@ -34,12 +31,9 @@ suite("JSON Parsing Tests", () => {
 
 	test("JSON array of primitives (numbers) should parse", async function () {
 		this.timeout(10000);
-		const content = '[1, 2, 3, 4, 5]';
+		const content = "[1, 2, 3, 4, 5]";
 		const tmpPath = path.join(__dirname, "../../test-data/json-number-array.json");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8")
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 		const data = await parseDataFile(uri);
@@ -62,10 +56,7 @@ suite("JSON Parsing Tests", () => {
 		this.timeout(10000);
 		const content = '["text", 42, true, null, 3.14]';
 		const tmpPath = path.join(__dirname, "../../test-data/json-mixed-array.json");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8")
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 		const data = await parseDataFile(uri);
@@ -91,10 +82,7 @@ suite("JSON Parsing Tests", () => {
 		this.timeout(10000);
 		const content = '{"name": "John", "age": 30, "city": "NYC"}';
 		const tmpPath = path.join(__dirname, "../../test-data/json-single-object.json");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8")
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 		const data = await parseDataFile(uri);
@@ -117,15 +105,12 @@ suite("JSON Parsing Tests", () => {
 
 	test("JSON empty array should throw error", async function () {
 		this.timeout(10000);
-		const content = '[]';
+		const content = "[]";
 		const tmpPath = path.join(__dirname, "../../test-data/json-empty-array.json");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8")
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
-		
+
 		// Empty array is gracefully handled
 		const data = await parseDataFile(uri);
 		// Based on the code, empty array gives us headers: ['Value'] and rows: []
@@ -142,12 +127,10 @@ suite("JSON Parsing Tests", () => {
 
 	test("JSON array of objects with null values should parse", async function () {
 		this.timeout(10000);
-		const content = '[{"name": "Alice", "age": 25}, {"name": "Bob", "age": null}, {"name": null, "age": 35}]';
+		const content =
+			'[{"name": "Alice", "age": 25}, {"name": "Bob", "age": null}, {"name": null, "age": 35}]';
 		const tmpPath = path.join(__dirname, "../../test-data/json-null-values.json");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8")
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 		const data = await parseDataFile(uri);
@@ -169,16 +152,13 @@ suite("JSON Parsing Tests", () => {
 
 	test("Invalid JSON should throw error", async function () {
 		this.timeout(10000);
-		const content = '{invalid json}';
+		const content = "{invalid json}";
 		const tmpPath = path.join(__dirname, "../../test-data/json-invalid.json");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8")
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 		const data = await parseDataFile(uri);
-		
+
 		// Invalid JSON should return null (error is shown to user)
 		assert.strictEqual(data, null, "Invalid JSON should return null");
 
@@ -194,14 +174,11 @@ suite("JSON Parsing Tests", () => {
 		this.timeout(10000);
 		const content = '"just a string"';
 		const tmpPath = path.join(__dirname, "../../test-data/json-primitive.json");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8")
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 		const data = await parseDataFile(uri);
-		
+
 		// Primitive JSON should return null
 		assert.strictEqual(data, null, "Primitive JSON should return null");
 
@@ -215,16 +192,13 @@ suite("JSON Parsing Tests", () => {
 
 	test("JSON number primitive should throw error", async function () {
 		this.timeout(10000);
-		const content = '42';
+		const content = "42";
 		const tmpPath = path.join(__dirname, "../../test-data/json-number-primitive.json");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8")
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 		const data = await parseDataFile(uri);
-		
+
 		// Primitive JSON should return null
 		assert.strictEqual(data, null, "Number primitive should return null");
 
@@ -243,7 +217,7 @@ suite("JSON Parsing Tests", () => {
 		assert.ok(ext, "Extension should be available");
 		const basePath = ext ? ext.extensionPath : "";
 		const jsonPath = path.join(basePath, "sample-data", "list-of-dict.json");
-		
+
 		const uri = vscode.Uri.file(jsonPath);
 		const data = await parseDataFile(uri);
 

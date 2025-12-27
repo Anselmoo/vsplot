@@ -1,9 +1,9 @@
 /**
  * Data Preview Webview Styles
- * 
+ *
  * This stylesheet provides VSCode-themed styling for the data preview panel.
  * It uses CSS custom properties (variables) from VSCode to match the editor theme.
- * 
+ *
  * Key sections:
  * - Base layout (body, header, controls)
  * - Table styling (responsive with sticky headers)
@@ -13,193 +13,199 @@
  */
 
 body {
-    font-family: var(--vscode-font-family);
-    color: var(--vscode-foreground);
-    background-color: var(--vscode-editor-background);
-    padding: 16px;
-    margin: 0;
+	font-family: var(--vscode-font-family);
+	color: var(--vscode-foreground);
+	background-color: var(--vscode-editor-background);
+	padding: 16px;
+	margin: 0;
 }
 
 .header {
-    margin-bottom: 16px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid var(--vscode-widget-border);
+	margin-bottom: 16px;
+	padding-bottom: 8px;
+	border-bottom: 1px solid var(--vscode-widget-border);
 }
 
 .file-info {
-    font-size: 0.9em;
-    color: var(--vscode-descriptionForeground);
-    margin-bottom: 8px;
+	font-size: 0.9em;
+	color: var(--vscode-descriptionForeground);
+	margin-bottom: 8px;
 }
 
 .controls {
-    margin-bottom: 16px;
-    display: flex;
-    gap: 8px;
-    align-items: center;
+	margin-bottom: 16px;
+	display: flex;
+	gap: 8px;
+	align-items: center;
 }
 
 button {
-    background: var(--vscode-button-background);
-    color: var(--vscode-button-foreground);
-    border: none;
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.9em;
-    box-shadow: 0 1px 0 rgba(0,0,0,0.1);
-    transition: background 0.15s ease, box-shadow 0.15s ease;
+	background: var(--vscode-button-background);
+	color: var(--vscode-button-foreground);
+	border: none;
+	padding: 6px 12px;
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: 0.9em;
+	box-shadow: 0 1px 0 rgba(0, 0, 0, 0.1);
+	transition:
+		background 0.15s ease,
+		box-shadow 0.15s ease;
 }
 
 button:hover {
-    background: var(--vscode-button-hoverBackground);
+	background: var(--vscode-button-hoverBackground);
 }
 
-input[type="text"], select {
-    background: var(--vscode-input-background);
-    color: var(--vscode-input-foreground);
-    border: 1px solid var(--vscode-input-border);
-    padding: 6px 10px;
-    border-radius: 4px;
-    font-size: 0.9em;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+input[type="text"],
+select {
+	background: var(--vscode-input-background);
+	color: var(--vscode-input-foreground);
+	border: 1px solid var(--vscode-input-border);
+	padding: 6px 10px;
+	border-radius: 4px;
+	font-size: 0.9em;
+	transition:
+		border-color 0.15s ease,
+		box-shadow 0.15s ease;
 }
 
 .table-container {
-    overflow: auto;
-    max-height: 600px;
-    border: 1px solid var(--vscode-widget-border);
-    border-radius: 2px;
+	overflow: auto;
+	max-height: 600px;
+	border: 1px solid var(--vscode-widget-border);
+	border-radius: 2px;
 }
 
 table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.85em;
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 0.85em;
 }
 
-th, td {
-    padding: 6px 8px;
-    text-align: left;
-    border-bottom: 1px solid var(--vscode-widget-border);
-    border-right: 1px solid var(--vscode-widget-border);
+th,
+td {
+	padding: 6px 8px;
+	text-align: left;
+	border-bottom: 1px solid var(--vscode-widget-border);
+	border-right: 1px solid var(--vscode-widget-border);
 }
 
 th {
-    background: var(--vscode-editor-selectionBackground);
-    font-weight: 600;
-    position: sticky;
-    top: 0;
-    z-index: 1;
+	background: var(--vscode-editor-selectionBackground);
+	font-weight: 600;
+	position: sticky;
+	top: 0;
+	z-index: 1;
 }
 
 tr:hover {
-    background: var(--vscode-list-hoverBackground);
+	background: var(--vscode-list-hoverBackground);
 }
 
 .row-selected {
-    background: var(--vscode-list-activeSelectionBackground) !important;
-    color: var(--vscode-list-activeSelectionForeground);
+	background: var(--vscode-list-activeSelectionBackground) !important;
+	color: var(--vscode-list-activeSelectionForeground);
 }
 
 .pagination {
-    margin-top: 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.9em;
-    color: var(--vscode-descriptionForeground);
+	margin-top: 16px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	font-size: 0.9em;
+	color: var(--vscode-descriptionForeground);
 }
 
 .no-data {
-    text-align: center;
-    padding: 32px;
-    color: var(--vscode-descriptionForeground);
+	text-align: center;
+	padding: 32px;
+	color: var(--vscode-descriptionForeground);
 }
 
 .stats-panel {
-    margin-top: 16px;
-    padding: 14px 16px;
-    background: var(--vscode-editorWidget-background);
-    border: 1px solid var(--vscode-widget-border);
-    border-radius: 8px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.12);
-    font-size: 0.9em;
-    color: var(--vscode-foreground);
-    display: none;
+	margin-top: 16px;
+	padding: 14px 16px;
+	background: var(--vscode-editorWidget-background);
+	border: 1px solid var(--vscode-widget-border);
+	border-radius: 8px;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+	font-size: 0.9em;
+	color: var(--vscode-foreground);
+	display: none;
 }
 
 .stats-panel .section-title {
-    font-weight: 600;
-    color: var(--vscode-descriptionForeground);
-    margin-bottom: 10px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+	font-weight: 600;
+	color: var(--vscode-descriptionForeground);
+	margin-bottom: 10px;
+	display: flex;
+	align-items: center;
+	gap: 8px;
 }
 
 .stats-controls {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    background: var(--vscode-input-background);
-    border: 1px solid var(--vscode-input-border);
-    border-radius: 6px;
-    padding: 6px 8px;
-    margin-bottom: 12px;
+	display: flex;
+	gap: 10px;
+	align-items: center;
+	background: var(--vscode-input-background);
+	border: 1px solid var(--vscode-input-border);
+	border-radius: 6px;
+	padding: 6px 8px;
+	margin-bottom: 12px;
 }
 
 .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 8px 16px;
-    font-variant-numeric: tabular-nums;
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+	gap: 8px 16px;
+	font-variant-numeric: tabular-nums;
 }
 
 .stat {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+	display: flex;
+	align-items: center;
+	gap: 8px;
 }
 
 /* Badge container for SVG icons */
 .badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 18px;
-    height: 18px;
-    border-radius: 4px;
-    background: var(--vscode-input-background);
-    color: var(--vscode-descriptionForeground);
-    flex-shrink: 0;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 18px;
+	height: 18px;
+	border-radius: 4px;
+	background: var(--vscode-input-background);
+	color: var(--vscode-descriptionForeground);
+	flex-shrink: 0;
 }
 
 .badge svg {
-    width: 12px;
-    height: 12px;
+	width: 12px;
+	height: 12px;
 }
 
 /* Compact stats panel - always enabled */
 .stats-panel.compact {
-    padding: 10px 12px;
-    border-radius: 6px;
+	padding: 10px 12px;
+	border-radius: 6px;
 }
 
 .stats-panel.compact .stats-controls {
-    padding: 4px 6px;
+	padding: 4px 6px;
 }
 
 .stats-panel.compact .stats-grid {
-    gap: 6px 12px;
+	gap: 6px 12px;
 }
 
 .stats-panel.compact .badge {
-    width: 16px;
-    height: 16px;
+	width: 16px;
+	height: 16px;
 }
 
 .stats-panel.compact .badge svg {
-    width: 10px;
-    height: 10px;
+	width: 10px;
+	height: 10px;
 }

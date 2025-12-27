@@ -29,6 +29,25 @@ npm run build:images
 bash scripts/setup-test-data.sh
 ```
 
+## Linting & Formatting
+We use **Biome** for linting and formatting. Run locally:
+
+```bash
+# Run linting
+npm run lint
+
+# Auto-format files
+npm run format
+```
+
+We provide Husky + lint-staged for pre-commit checks. After installing dev dependencies, enable Git hooks with:
+
+```bash
+npm run prepare
+```
+
+CI: a GitHub Actions job (`.github/workflows/biome.yml`) runs Biome on pushes and PRs and will fail when Biome reports diagnostics.
+
 ## Coding Standards
 - TypeScript strict mode
 - Keep webview code CSP-safe (nonce, no inline event handlers)

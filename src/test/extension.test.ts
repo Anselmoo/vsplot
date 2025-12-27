@@ -1,10 +1,7 @@
 import * as assert from "assert";
-import * as vscode from "vscode";
 import * as path from "path";
-import type {
-	ChartTestConfig,
-	ChartTestState,
-} from "../providers/chartViewProvider";
+import * as vscode from "vscode";
+import type { ChartTestConfig, ChartTestState } from "../providers/chartViewProvider";
 
 // Keep the test in sync with package.json publisher + name
 const EXTENSION_ID = "AnselmHahn.vsplot";
@@ -82,10 +79,7 @@ suite("Extension Test Suite", () => {
 		assert.strictEqual(state.x, 4);
 		assert.strictEqual(state.agg, "avg");
 		// species has 3 categories
-		assert.ok(
-			state.labelsCount === 3,
-			`expected 3 categories, got ${state.labelsCount}`,
-		);
+		assert.ok(state.labelsCount === 3, `expected 3 categories, got ${state.labelsCount}`);
 	});
 
 	test("Scatter enforces numeric axes and builds dataset", async function () {
@@ -217,7 +211,7 @@ suite("Extension Test Suite", () => {
 		const doc = await vscode.workspace.openTextDocument(uri);
 		await vscode.window.showTextDocument(doc);
 		await vscode.commands.executeCommand("vsplot.plotData", uri);
-		
+
 		// Test with curve smoothing enabled (default)
 		const cfgSmooth: ChartTestConfig = {
 			chartType: "line",
@@ -231,7 +225,7 @@ suite("Extension Test Suite", () => {
 		)) as ChartTestState;
 		assert.strictEqual(stateSmooth.chartType, "line");
 		assert.strictEqual(stateSmooth.curveSmoothing, true);
-		
+
 		// Test with curve smoothing disabled
 		const cfgLinear: ChartTestConfig = {
 			chartType: "line",
@@ -266,9 +260,7 @@ suite("Extension Test Suite", () => {
 				state.stylePreset === "vibrant",
 		);
 		assert.strictEqual(typeof state.decimals, "number");
-		assert.ok(
-			state.decimals === 0 || state.decimals === 1 || state.decimals === 2,
-		);
+		assert.ok(state.decimals === 0 || state.decimals === 1 || state.decimals === 2);
 	});
 
 	test("Preview TSV file without error", async function () {

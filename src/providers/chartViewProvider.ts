@@ -1,15 +1,12 @@
 import * as vscode from "vscode";
 import type { ParsedData } from "../data/load";
-import { loadHtmlTemplate, getNonce } from "./webviewUtils";
+import { getNonce, loadHtmlTemplate } from "./webviewUtils";
 
 export class ChartViewProvider implements vscode.WebviewViewProvider {
 	public static readonly viewType = "vsplot.chartView";
 	private _view?: vscode.WebviewView;
 	private _currentWebview?: vscode.Webview;
-	private _pendingTestResolvers: Map<
-		string,
-		(payload: ChartTestState) => void
-	> = new Map();
+	private _pendingTestResolvers: Map<string, (payload: ChartTestState) => void> = new Map();
 	private _pendingConfigAcks: Map<string, () => void> = new Map();
 
 	constructor(private readonly _extensionUri: vscode.Uri) {}
@@ -74,9 +71,7 @@ export class ChartViewProvider implements vscode.WebviewViewProvider {
 					const uri = await vscode.window.showSaveDialog({
 						saveLabel: "Save Chart Image",
 						filters: { "PNG Image": ["png"] },
-						defaultUri: vscode.Uri.file(
-							message.filename ?? `chart_${Date.now()}.png`,
-						),
+						defaultUri: vscode.Uri.file(message.filename ?? `chart_${Date.now()}.png`),
 					});
 					if (!uri) {
 						return;
@@ -154,29 +149,20 @@ export class ChartViewProvider implements vscode.WebviewViewProvider {
 
 	/**
 	 * Generate HTML for the webview
-	 * 
+	 *
 	 * This method loads an external HTML template from media/chartView/index.html
-	 * and replaces placeholders with actual values to keep the provider code 
+	 * and replaces placeholders with actual values to keep the provider code
 	 * clean and maintainable.
-	 * 
+	 *
 	 * @param webview - The webview to generate HTML for
 	 * @returns HTML string with references to external resources
 	 */
 	private _getHtmlForWebview(webview: vscode.Webview) {
 		const vsplotConfig = vscode.workspace.getConfiguration("vsplot");
-		const defaultChartType = vsplotConfig.get<string>(
-			"defaultChartType",
-			"line",
-		);
-		const defaultStylePreset = vsplotConfig.get<string>(
-			"defaultStylePreset",
-			"clean",
-		);
+		const defaultChartType = vsplotConfig.get<string>("defaultChartType", "line");
+		const defaultStylePreset = vsplotConfig.get<string>("defaultStylePreset", "clean");
 		const defaultDecimals = vsplotConfig.get<number>("defaultDecimals", 2);
-		const defaultUseThousands = vsplotConfig.get<boolean>(
-			"useThousands",
-			false,
-		);
+		const defaultUseThousands = vsplotConfig.get<boolean>("useThousands", false);
 
 		// Build URIs for external resources
 		const stylesUri = webview.asWebviewUri(
@@ -191,18 +177,10 @@ export class ChartViewProvider implements vscode.WebviewViewProvider {
 			vscode.Uri.joinPath(this._extensionUri, "media", "chart.umd.js"),
 		);
 		const zoomPluginUri = webview.asWebviewUri(
-			vscode.Uri.joinPath(
-				this._extensionUri,
-				"media",
-				"chartjs-plugin-zoom.umd.js",
-			),
+			vscode.Uri.joinPath(this._extensionUri, "media", "chartjs-plugin-zoom.umd.js"),
 		);
 		const dateAdapterUri = webview.asWebviewUri(
-			vscode.Uri.joinPath(
-				this._extensionUri,
-				"media",
-				"chartjs-adapter-date-fns.bundle.js",
-			),
+			vscode.Uri.joinPath(this._extensionUri, "media", "chartjs-adapter-date-fns.bundle.js"),
 		);
 
 		const nonce = getNonce();
@@ -211,7 +189,7 @@ export class ChartViewProvider implements vscode.WebviewViewProvider {
 		const csp = `default-src 'none'; img-src ${webview.cspSource} data: blob:; style-src 'unsafe-inline' ${webview.cspSource}; script-src 'nonce-${nonce}' ${webview.cspSource}; font-src ${webview.cspSource}; connect-src ${webview.cspSource} data:;`;
 
 		// Load HTML template and replace placeholders
-		return loadHtmlTemplate(this._extensionUri, 'media/chartView/index.html', {
+		return loadHtmlTemplate(this._extensionUri, "media/chartView/index.html", {
 			CSP: csp,
 			NONCE: nonce,
 			STYLES_URI: stylesUri.toString(),
@@ -222,7 +200,7 @@ export class ChartViewProvider implements vscode.WebviewViewProvider {
 			DEFAULT_CHART_TYPE: defaultChartType,
 			DEFAULT_STYLE_PRESET: defaultStylePreset,
 			DEFAULT_DECIMALS: String(defaultDecimals),
-			DEFAULT_USE_THOUSANDS: String(defaultUseThousands)
+			DEFAULT_USE_THOUSANDS: String(defaultUseThousands),
 		});
 	}
 }

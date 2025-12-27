@@ -1,6 +1,6 @@
 import * as assert from "assert";
-import * as vscode from "vscode";
 import * as path from "path";
+import * as vscode from "vscode";
 import { parseDataFile } from "../data/load";
 
 suite("Edge Cases and Robustness Tests", () => {
@@ -8,13 +8,10 @@ suite("Edge Cases and Robustness Tests", () => {
 		this.timeout(10000);
 		const content = "";
 		const tmpPath = path.join(__dirname, "../../test-data/empty-file.txt");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8")
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
-		
+
 		try {
 			await parseDataFile(uri);
 			assert.fail("Should have thrown an error for empty file");
@@ -34,13 +31,10 @@ suite("Edge Cases and Robustness Tests", () => {
 		this.timeout(10000);
 		const content = "   \n\t\n  \n";
 		const tmpPath = path.join(__dirname, "../../test-data/whitespace-only.txt");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8")
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
-		
+
 		try {
 			await parseDataFile(uri);
 			assert.fail("Should have thrown an error for whitespace-only file");
@@ -61,10 +55,7 @@ suite("Edge Cases and Robustness Tests", () => {
 		// First 3 lines use comma, last line uses semicolon - comma should win
 		const content = "a,b,c\n1,2,3\n4,5,6\n7;8;9";
 		const tmpPath = path.join(__dirname, "../../test-data/mixed-delimiters.txt");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8")
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 		const data = await parseDataFile(uri);
@@ -73,7 +64,7 @@ suite("Edge Cases and Robustness Tests", () => {
 		assert.strictEqual(
 			data?.detectedDelimiter,
 			",",
-			"Should detect comma as most consistent delimiter"
+			"Should detect comma as most consistent delimiter",
 		);
 		assert.strictEqual(data?.headers.length, 3, "Should have 3 columns");
 		assert.strictEqual(data?.rows.length, 3, "Should have 3 data rows");
@@ -91,10 +82,7 @@ suite("Edge Cases and Robustness Tests", () => {
 		// Header has 3 columns, but data rows have varying counts
 		const content = "a,b,c\n1,2,3\n4,5\n6,7,8,9";
 		const tmpPath = path.join(__dirname, "../../test-data/inconsistent-columns.csv");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8")
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 		const data = await parseDataFile(uri);
@@ -121,16 +109,14 @@ suite("Edge Cases and Robustness Tests", () => {
 		this.timeout(15000);
 		// Generate a large CSV with 10,000 rows
 		const header = "id,value1,value2,value3\n";
-		const rows = Array.from({ length: 10000 }, (_, i) => 
-			`${i},${Math.random()},${Math.random()},${Math.random()}`
+		const rows = Array.from(
+			{ length: 10000 },
+			(_, i) => `${i},${Math.random()},${Math.random()},${Math.random()}`,
 		).join("\n");
 		const content = header + rows;
-		
+
 		const tmpPath = path.join(__dirname, "../../test-data/large-dataset.csv");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8")
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 		const data = await parseDataFile(uri);
@@ -150,12 +136,10 @@ suite("Edge Cases and Robustness Tests", () => {
 
 	test("Special characters in data should be preserved", async function () {
 		this.timeout(10000);
-		const content = "name,description\nTest,Contains @#$%^&*()!\nAnother,Has \"quotes\" and 'apostrophes'\nThird,Unicode: émojis 🎉 中文";
+		const content =
+			"name,description\nTest,Contains @#$%^&*()!\nAnother,Has \"quotes\" and 'apostrophes'\nThird,Unicode: émojis 🎉 中文";
 		const tmpPath = path.join(__dirname, "../../test-data/special-chars.csv");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8")
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 		const data = await parseDataFile(uri);
@@ -163,7 +147,11 @@ suite("Edge Cases and Robustness Tests", () => {
 		assert.ok(data, "Data with special characters should be parsed");
 		assert.strictEqual(data?.headers.length, 2, "Should have 2 columns");
 		assert.strictEqual(data?.rows.length, 3, "Should have 3 data rows");
-		assert.strictEqual(data?.rows[0][1], "Contains @#$%^&*()!", "Special chars should be preserved");
+		assert.strictEqual(
+			data?.rows[0][1],
+			"Contains @#$%^&*()!",
+			"Special chars should be preserved",
+		);
 
 		// Clean up
 		try {
@@ -179,10 +167,7 @@ suite("Edge Cases and Robustness Tests", () => {
 		const longValue = "x".repeat(1000);
 		const content = `col1,col2,col3\n${longValue},${longValue},${longValue}\nshort,values,here`;
 		const tmpPath = path.join(__dirname, "../../test-data/long-lines.csv");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8")
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 		const data = await parseDataFile(uri);
@@ -190,7 +175,11 @@ suite("Edge Cases and Robustness Tests", () => {
 		assert.ok(data, "Data with very long lines should be parsed");
 		assert.strictEqual(data?.headers.length, 3, "Should have 3 columns");
 		assert.strictEqual(data?.rows.length, 2, "Should have 2 data rows");
-		assert.strictEqual((data?.rows[0][0] as string).length, 1000, "First cell should have 1000 characters");
+		assert.strictEqual(
+			(data?.rows[0][0] as string).length,
+			1000,
+			"First cell should have 1000 characters",
+		);
 
 		// Clean up
 		try {
@@ -205,10 +194,7 @@ suite("Edge Cases and Robustness Tests", () => {
 		// All numeric data - first line should be treated as data, not headers
 		const content = "1,2,3\n4,5,6\n7,8,9";
 		const tmpPath = path.join(__dirname, "../../test-data/numeric-only.csv");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8")
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 		const data = await parseDataFile(uri);
@@ -234,10 +220,7 @@ suite("Edge Cases and Robustness Tests", () => {
 		// Header has mix of text and numbers, but should still be treated as header
 		const content = "name,age,id123\nAlice,25,100\nBob,30,200";
 		const tmpPath = path.join(__dirname, "../../test-data/mixed-headers.csv");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8")
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 		const data = await parseDataFile(uri);
@@ -262,10 +245,7 @@ suite("Edge Cases and Robustness Tests", () => {
 		const bom = "\uFEFF";
 		const content = `${bom}name,value\ntest,123`;
 		const tmpPath = path.join(__dirname, "../../test-data/with-bom.csv");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8")
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 		const data = await parseDataFile(uri);
@@ -287,10 +267,7 @@ suite("Edge Cases and Robustness Tests", () => {
 		this.timeout(10000);
 		const content = "col1,col2,col3";
 		const tmpPath = path.join(__dirname, "../../test-data/header-only.csv");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8")
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 		const data = await parseDataFile(uri);
@@ -312,10 +289,7 @@ suite("Edge Cases and Robustness Tests", () => {
 		this.timeout(10000);
 		const content = "name,value\ntest,123\n\n\n\n";
 		const tmpPath = path.join(__dirname, "../../test-data/trailing-empty.csv");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8")
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 		const data = await parseDataFile(uri);
@@ -336,10 +310,7 @@ suite("Edge Cases and Robustness Tests", () => {
 		this.timeout(10000);
 		const content = "\n\n# Comment\n\nname,value\ntest,123";
 		const tmpPath = path.join(__dirname, "../../test-data/leading-empty.csv");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8")
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 		const data = await parseDataFile(uri);
@@ -359,12 +330,10 @@ suite("Edge Cases and Robustness Tests", () => {
 	test("Delimiter with quoted values containing delimiter should parse correctly", async function () {
 		this.timeout(10000);
 		// CSV with quotes containing commas
-		const content = 'name,description\n"Smith, John","Developer, Senior"\n"Doe, Jane","Manager, Project"';
+		const content =
+			'name,description\n"Smith, John","Developer, Senior"\n"Doe, Jane","Manager, Project"';
 		const tmpPath = path.join(__dirname, "../../test-data/quoted-delimiters.csv");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8")
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 		const data = await parseDataFile(uri);

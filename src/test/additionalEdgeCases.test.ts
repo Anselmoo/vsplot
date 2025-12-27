@@ -1,6 +1,6 @@
 import * as assert from "assert";
-import * as vscode from "vscode";
 import * as path from "path";
+import * as vscode from "vscode";
 import { parseDataFile } from "../data/load";
 
 suite("Additional Edge Cases Tests", () => {
@@ -8,10 +8,7 @@ suite("Additional Edge Cases Tests", () => {
 		this.timeout(10000);
 		const content = "Name,Age,Score\n\n\n";
 		const tmpPath = path.join(__dirname, "../../test-data/headers-empty-lines.csv");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8")
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 		const data = await parseDataFile(uri);
@@ -33,10 +30,7 @@ suite("Additional Edge Cases Tests", () => {
 		const longValue = "A".repeat(10000);
 		const content = `Header1,Header2\n${longValue},Value2\nValue3,Value4`;
 		const tmpPath = path.join(__dirname, "../../test-data/long-values.csv");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8")
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 		const data = await parseDataFile(uri);
@@ -56,10 +50,7 @@ suite("Additional Edge Cases Tests", () => {
 		this.timeout(10000);
 		const content = "A;B;C\n1;2;3\n4;5;6";
 		const tmpPath = path.join(__dirname, "../../test-data/semicolon-override.txt");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8")
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 		const data = await parseDataFile(uri, { delimiter: ";" });
@@ -81,10 +72,7 @@ suite("Additional Edge Cases Tests", () => {
 		this.timeout(10000);
 		const content = "A|B|C\n1|2|3\n4|5|6\n7,8,9";
 		const tmpPath = path.join(__dirname, "../../test-data/mixed-delim.dat");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8")
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 		const data = await parseDataFile(uri);
@@ -105,10 +93,7 @@ suite("Additional Edge Cases Tests", () => {
 		this.timeout(10000);
 		const content = "1,2,3";
 		const tmpPath = path.join(__dirname, "../../test-data/single-row.csv");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8")
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 		const data = await parseDataFile(uri);
@@ -130,10 +115,7 @@ suite("Additional Edge Cases Tests", () => {
 		this.timeout(10000);
 		const content = '{"user": {"name": "John", "age": 30}, "location": "NYC"}';
 		const tmpPath = path.join(__dirname, "../../test-data/nested-object.json");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8")
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 		const data = await parseDataFile(uri);
@@ -154,10 +136,7 @@ suite("Additional Edge Cases Tests", () => {
 		this.timeout(10000);
 		const content = "Value,Amount\nItem1,-100\nItem2,-250.5\nItem3,300";
 		const tmpPath = path.join(__dirname, "../../test-data/negative-numbers.csv");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8")
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 		const data = await parseDataFile(uri);
@@ -179,10 +158,7 @@ suite("Additional Edge Cases Tests", () => {
 		this.timeout(10000);
 		const content = "Value,Number\nSmall,1.5e-10\nLarge,3.2e8";
 		const tmpPath = path.join(__dirname, "../../test-data/scientific-notation.csv");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8")
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 		const data = await parseDataFile(uri);
@@ -203,10 +179,7 @@ suite("Additional Edge Cases Tests", () => {
 		this.timeout(10000);
 		const content = "Name,Active\nAlice,true\nBob,false\nCharlie,TRUE";
 		const tmpPath = path.join(__dirname, "../../test-data/boolean-strings.csv");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8")
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 		const data = await parseDataFile(uri);
@@ -228,10 +201,7 @@ suite("Additional Edge Cases Tests", () => {
 		this.timeout(10000);
 		const content = "# Comment line\nA|B|C\n1|2|3\n% Another comment\n4|5|6";
 		const tmpPath = path.join(__dirname, "../../test-data/comments.out");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8")
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 		const data = await parseDataFile(uri);
