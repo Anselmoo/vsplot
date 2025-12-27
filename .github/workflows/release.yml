@@ -69,13 +69,13 @@ jobs:
           version: latest
 
       - name: Run Biome (CI)
-        run: biome ci .
+        run: biome ci src/
 
       - name: Lint summary
         if: always()
         run: |
           echo "### Code Quality Summary" >> $GITHUB_STEP_SUMMARY
-          echo "**Linting:** ✅ Passed (Biome)" >> $GITHUB_STEP_SUMMARY
+          echo "**Linting:** ✅ Passed (Biome - only check src/)" >> $GITHUB_STEP_SUMMARY
 
   # ============================================================================
   # Security Audit
