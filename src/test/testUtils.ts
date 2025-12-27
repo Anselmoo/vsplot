@@ -5,9 +5,21 @@ import * as vscode from "vscode";
 export const EXTENSION_ID = "AnselmHahn.vsplot";
 
 // Valid configuration constants - these should match the actual values supported by the application
-export const VALID_CHART_TYPES = ["line", "bar", "scatter", "pie", "doughnut"] as const;
+export const VALID_CHART_TYPES = [
+	"line",
+	"bar",
+	"scatter",
+	"pie",
+	"doughnut",
+] as const;
 export const VALID_STYLE_PRESETS = ["clean", "soft", "vibrant"] as const;
-export const VALID_AGGREGATION_TYPES = ["sum", "avg", "count", "min", "max"] as const;
+export const VALID_AGGREGATION_TYPES = [
+	"sum",
+	"avg",
+	"count",
+	"min",
+	"max",
+] as const;
 
 /**
  * Test helper to get extension base path
@@ -24,7 +36,10 @@ export function getExtensionBasePath(): string {
  * Test helper to create a temporary test file.
  * Note: Assumes test-data directory exists (should be created by test setup scripts).
  */
-export async function createTempFile(fileName: string, content: string): Promise<vscode.Uri> {
+export async function createTempFile(
+	fileName: string,
+	content: string,
+): Promise<vscode.Uri> {
 	const basePath = getExtensionBasePath();
 	const testDataDir = path.join(basePath, "test-data");
 	const tmpPath = path.join(testDataDir, fileName);
@@ -36,7 +51,10 @@ export async function createTempFile(fileName: string, content: string): Promise
 		// Directory already exists, ignore
 	}
 
-	await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
+	await vscode.workspace.fs.writeFile(
+		vscode.Uri.file(tmpPath),
+		Buffer.from(content, "utf8"),
+	);
 	return vscode.Uri.file(tmpPath);
 }
 

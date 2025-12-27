@@ -27,8 +27,14 @@ suite("Extension Activation Tests", () => {
 		const commands = await vscode.commands.getCommands(true);
 
 		// Check main commands
-		assert.ok(commands.includes("vsplot.previewData"), "previewData command should be registered");
-		assert.ok(commands.includes("vsplot.plotData"), "plotData command should be registered");
+		assert.ok(
+			commands.includes("vsplot.previewData"),
+			"previewData command should be registered",
+		);
+		assert.ok(
+			commands.includes("vsplot.plotData"),
+			"plotData command should be registered",
+		);
 		assert.ok(
 			commands.includes("vsplot.openDataViewer"),
 			"openDataViewer command should be registered",

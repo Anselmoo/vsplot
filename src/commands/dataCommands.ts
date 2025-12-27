@@ -21,7 +21,10 @@ export interface CommandDependencies {
 	parseDataFile: (uri: vscode.Uri) => Promise<ParsedData | null>;
 	showErrorMessage: (msg: string) => void;
 	showInfoMessage: (msg: string) => void;
-	findWorkspaceFiles: (pattern: string, exclude?: string) => Thenable<vscode.Uri[]>;
+	findWorkspaceFiles: (
+		pattern: string,
+		exclude?: string,
+	) => Thenable<vscode.Uri[]>;
 	showQuickPick: (
 		items: FileQuickPickItem[],
 		options?: vscode.QuickPickOptions,
@@ -43,8 +46,10 @@ export function createDefaultDependencies(): CommandDependencies {
 		showInfoMessage: (msg) => {
 			vscode.window.showInformationMessage(msg);
 		},
-		findWorkspaceFiles: (pattern, exclude) => vscode.workspace.findFiles(pattern, exclude),
-		showQuickPick: (items, options) => vscode.window.showQuickPick(items, options),
+		findWorkspaceFiles: (pattern, exclude) =>
+			vscode.workspace.findFiles(pattern, exclude),
+		showQuickPick: (items, options) =>
+			vscode.window.showQuickPick(items, options),
 		getWorkspaceFolders: () => vscode.workspace.workspaceFolders,
 		asRelativePath: (uri) => vscode.workspace.asRelativePath(uri),
 	};
@@ -102,7 +107,9 @@ export function resolveUri(
 export async function executePreviewData(
 	uri: vscode.Uri | undefined,
 	deps: CommandDependencies,
-	previewProvider: { showPreview: (uri: vscode.Uri, data: ParsedData) => Promise<void> },
+	previewProvider: {
+		showPreview: (uri: vscode.Uri, data: ParsedData) => Promise<void>;
+	},
 ): Promise<CommandResult> {
 	const resolved = resolveUri(uri, deps.getActiveEditorUri);
 	if (!resolved.success) {
@@ -129,7 +136,9 @@ export async function executePreviewData(
 export async function executePlotData(
 	uri: vscode.Uri | undefined,
 	deps: CommandDependencies,
-	chartProvider: { showChart: (uri: vscode.Uri, data: ParsedData) => Promise<void> },
+	chartProvider: {
+		showChart: (uri: vscode.Uri, data: ParsedData) => Promise<void>;
+	},
 ): Promise<CommandResult> {
 	const resolved = resolveUri(uri, deps.getActiveEditorUri);
 	if (!resolved.success) {
@@ -154,7 +163,9 @@ export async function executePlotData(
  */
 export async function executeOpenDataViewer(
 	deps: CommandDependencies,
-	previewProvider: { showPreview: (uri: vscode.Uri, data: ParsedData) => Promise<void> },
+	previewProvider: {
+		showPreview: (uri: vscode.Uri, data: ParsedData) => Promise<void>;
+	},
 ): Promise<CommandResult> {
 	const workspaceFolders = deps.getWorkspaceFolders();
 	if (!workspaceFolders) {
@@ -273,5 +284,9 @@ export function registerDataCommands(
 		},
 	);
 
-	context.subscriptions.push(previewDataCommand, plotDataCommand, openDataViewerCommand);
+	context.subscriptions.push(
+		previewDataCommand,
+		plotDataCommand,
+		openDataViewerCommand,
+	);
 }
