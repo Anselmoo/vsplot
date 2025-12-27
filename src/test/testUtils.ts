@@ -64,7 +64,7 @@ export async function createTempFile(
 export async function deleteTempFile(uri: vscode.Uri): Promise<void> {
 	try {
 		await vscode.workspace.fs.delete(uri);
-	} catch (e) {
+	} catch (_e) {
 		// Log cleanup errors for debugging, but don't fail the test
 		const errorMessage = e instanceof Error ? e.message : String(e);
 		console.warn(`Failed to clean up temp file ${uri.fsPath}: ${errorMessage}`);

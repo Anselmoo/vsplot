@@ -20,7 +20,11 @@ const thresholds = {
 //   instrumentation quirks
 // For a detailed breakdown of these exclusions, see docs/TESTING_COVERAGE.md.
 
-const summaryPath = path.resolve(process.cwd(), "coverage", "coverage-summary.json");
+const summaryPath = path.resolve(
+	process.cwd(),
+	"coverage",
+	"coverage-summary.json",
+);
 
 if (!fs.existsSync(summaryPath)) {
 	console.error(
@@ -63,7 +67,9 @@ for (const [metric, min] of Object.entries(thresholds)) {
 	}
 
 	if (pct + 1e-9 < min) {
-		console.error(`Coverage for ${metric} (${pct.toFixed(2)}%) is below the required ${min}%.`);
+		console.error(
+			`Coverage for ${metric} (${pct.toFixed(2)}%) is below the required ${min}%.`,
+		);
 		hasFailure = true;
 	}
 }

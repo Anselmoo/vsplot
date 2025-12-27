@@ -161,7 +161,7 @@ suite("Comment Line Handling Tests", () => {
 		try {
 			await parseDataFile(uri);
 			assert.fail("Should have thrown an error for file with only comments");
-		} catch (error) {
+		} catch (_error) {
 			// Expected to throw
 			assert.ok(true, "Correctly threw error for file with only comments");
 		}
