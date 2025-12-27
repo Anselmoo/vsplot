@@ -1,6 +1,6 @@
 import * as assert from "assert";
-import * as vscode from "vscode";
 import * as path from "path";
+import * as vscode from "vscode";
 import type {
 	ChartTestConfig,
 	ChartTestState,
@@ -169,7 +169,9 @@ suite("Extension Test Suite", () => {
 		// Regression test for issue #30: https://github.com/Anselmoo/vsplot/issues/30
 		// Test data contributed by @JerryJohnsonLee: index (0,1,2...), label (decimals), predictions (decimals)
 		// Downloaded by scripts/setup-test-data.sh to avoid license issues with committed test data
-		const uri = vscode.Uri.file(path.join(basePath, "test-data", "scatter-numeric-regression.csv"));
+		const uri = vscode.Uri.file(
+			path.join(basePath, "test-data", "scatter-numeric-regression.csv"),
+		);
 		const doc = await vscode.workspace.openTextDocument(uri);
 		await vscode.window.showTextDocument(doc);
 		await vscode.commands.executeCommand("vsplot.plotData", uri);
@@ -180,8 +182,14 @@ suite("Extension Test Suite", () => {
 			"vsplot.test.requestChartState",
 		)) as ChartTestState;
 		assert.strictEqual(state.chartType, "scatter");
-		assert.ok(state.datasetLens.length >= 1, "should have at least one dataset");
-		assert.ok(state.datasetLens[0] === 100, `expected 100 points, got ${state.datasetLens[0]}`);
+		assert.ok(
+			state.datasetLens.length >= 1,
+			"should have at least one dataset",
+		);
+		assert.ok(
+			state.datasetLens[0] === 100,
+			`expected 100 points, got ${state.datasetLens[0]}`,
+		);
 	});
 
 	test("Doughnut with count aggregation on species", async function () {
@@ -217,7 +225,7 @@ suite("Extension Test Suite", () => {
 		const doc = await vscode.workspace.openTextDocument(uri);
 		await vscode.window.showTextDocument(doc);
 		await vscode.commands.executeCommand("vsplot.plotData", uri);
-		
+
 		// Test with curve smoothing enabled (default)
 		const cfgSmooth: ChartTestConfig = {
 			chartType: "line",
@@ -225,13 +233,16 @@ suite("Extension Test Suite", () => {
 			y: 1,
 			curveSmoothing: true,
 		};
-		await vscode.commands.executeCommand("vsplot.test.applyChartConfig", cfgSmooth);
+		await vscode.commands.executeCommand(
+			"vsplot.test.applyChartConfig",
+			cfgSmooth,
+		);
 		const stateSmooth = (await vscode.commands.executeCommand(
 			"vsplot.test.requestChartState",
 		)) as ChartTestState;
 		assert.strictEqual(stateSmooth.chartType, "line");
 		assert.strictEqual(stateSmooth.curveSmoothing, true);
-		
+
 		// Test with curve smoothing disabled
 		const cfgLinear: ChartTestConfig = {
 			chartType: "line",
@@ -239,7 +250,10 @@ suite("Extension Test Suite", () => {
 			y: 1,
 			curveSmoothing: false,
 		};
-		await vscode.commands.executeCommand("vsplot.test.applyChartConfig", cfgLinear);
+		await vscode.commands.executeCommand(
+			"vsplot.test.applyChartConfig",
+			cfgLinear,
+		);
 		const stateLinear = (await vscode.commands.executeCommand(
 			"vsplot.test.requestChartState",
 		)) as ChartTestState;

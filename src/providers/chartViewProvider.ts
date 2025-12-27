@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import type { ParsedData } from "../data/load";
-import { loadHtmlTemplate, getNonce } from "./webviewUtils";
+import { getNonce, loadHtmlTemplate } from "./webviewUtils";
 
 export class ChartViewProvider implements vscode.WebviewViewProvider {
 	public static readonly viewType = "vsplot.chartView";
@@ -154,11 +154,11 @@ export class ChartViewProvider implements vscode.WebviewViewProvider {
 
 	/**
 	 * Generate HTML for the webview
-	 * 
+	 *
 	 * This method loads an external HTML template from media/chartView/index.html
-	 * and replaces placeholders with actual values to keep the provider code 
+	 * and replaces placeholders with actual values to keep the provider code
 	 * clean and maintainable.
-	 * 
+	 *
 	 * @param webview - The webview to generate HTML for
 	 * @returns HTML string with references to external resources
 	 */
@@ -180,7 +180,12 @@ export class ChartViewProvider implements vscode.WebviewViewProvider {
 
 		// Build URIs for external resources
 		const stylesUri = webview.asWebviewUri(
-			vscode.Uri.joinPath(this._extensionUri, "media", "chartView", "styles.css"),
+			vscode.Uri.joinPath(
+				this._extensionUri,
+				"media",
+				"chartView",
+				"styles.css",
+			),
 		);
 		const scriptUri = webview.asWebviewUri(
 			vscode.Uri.joinPath(this._extensionUri, "media", "chartView", "main.js"),
@@ -211,7 +216,7 @@ export class ChartViewProvider implements vscode.WebviewViewProvider {
 		const csp = `default-src 'none'; img-src ${webview.cspSource} data: blob:; style-src 'unsafe-inline' ${webview.cspSource}; script-src 'nonce-${nonce}' ${webview.cspSource}; font-src ${webview.cspSource}; connect-src ${webview.cspSource} data:;`;
 
 		// Load HTML template and replace placeholders
-		return loadHtmlTemplate(this._extensionUri, 'media/chartView/index.html', {
+		return loadHtmlTemplate(this._extensionUri, "media/chartView/index.html", {
 			CSP: csp,
 			NONCE: nonce,
 			STYLES_URI: stylesUri.toString(),
@@ -222,7 +227,7 @@ export class ChartViewProvider implements vscode.WebviewViewProvider {
 			DEFAULT_CHART_TYPE: defaultChartType,
 			DEFAULT_STYLE_PRESET: defaultStylePreset,
 			DEFAULT_DECIMALS: String(defaultDecimals),
-			DEFAULT_USE_THOUSANDS: String(defaultUseThousands)
+			DEFAULT_USE_THOUSANDS: String(defaultUseThousands),
 		});
 	}
 }

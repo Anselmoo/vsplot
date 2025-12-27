@@ -24,7 +24,7 @@
 
 ## Coding conventions
 
-- TypeScript uses ESLint (`.eslintrc.json`) with `@typescript-eslint` rules: camel/Pascal case imports, braces on conditionals, semicolons enforced via `@typescript-eslint/semi`.
+- TypeScript uses Biome for linting and formatting; it enforces project rules (formerly managed by ESLint and `@typescript-eslint`) such as camel/Pascal case imports, braces on conditionals, and semicolon style.
 - Prefer async/await with VS Code APIs and return typed `Promise<ParsedData | null>` from parsing helpers; surface user-facing failures with `vscode.window.showErrorMessage` for consistency.
 - Webview templates require CSP-safe scripts: generate nonces with `getNonce()` and inject URIs using `webview.asWebviewUri`.
 

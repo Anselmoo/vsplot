@@ -37,6 +37,19 @@
 3. **Filter, search, and sort** within the preview webview; then press **Create Chart** to open the Chart view beside it.
 4. Pick an X axis, up to two Y axes, adjust aggregation/zoom presets, and export the chart as a PNG when you are ready.
 
+## Development & Linting
+
+This project uses **Biome** for linting and formatting. Run locally:
+
+```bash
+# Run linting
+npm run lint
+
+# Auto-format files
+npm run format
+```
+
+See `CONTRIBUTING.md` for Husky and lint-staged setup and CI behaviour.
 > 💡 Need sample datasets? Run `bash scripts/setup-test-data.sh` (or use the downloaded archives) and open anything under `sample-data/` to explore the UI immediately.
 
 ## Preview data in seconds

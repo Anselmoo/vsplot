@@ -1,34 +1,54 @@
 import * as assert from "assert";
-import * as vscode from "vscode";
 import * as path from "path";
+import * as vscode from "vscode";
 import { parseDataFile } from "../data/load";
 
 suite("Delimiter Detection Tests", () => {
 	test("Detects colon delimiter", async function () {
 		this.timeout(10000);
 		const uri = vscode.Uri.file(
-			path.join(__dirname, "../../test-data/colon-delimited.txt")
+			path.join(__dirname, "../../test-data/colon-delimited.txt"),
 		);
 		const data = await parseDataFile(uri);
 
 		assert.ok(data, "Data should be parsed");
-		assert.strictEqual(data?.detectedDelimiter, ":", "Should detect colon delimiter");
+		assert.strictEqual(
+			data?.detectedDelimiter,
+			":",
+			"Should detect colon delimiter",
+		);
 		assert.strictEqual(data?.headers.length, 3, "Should have 3 columns");
-		assert.strictEqual(data?.headers[0], "name", "First header should be 'name'");
-		assert.strictEqual(data?.headers[1], "age", "Second header should be 'age'");
-		assert.strictEqual(data?.headers[2], "city", "Third header should be 'city'");
+		assert.strictEqual(
+			data?.headers[0],
+			"name",
+			"First header should be 'name'",
+		);
+		assert.strictEqual(
+			data?.headers[1],
+			"age",
+			"Second header should be 'age'",
+		);
+		assert.strictEqual(
+			data?.headers[2],
+			"city",
+			"Third header should be 'city'",
+		);
 		assert.strictEqual(data?.rows.length, 3, "Should have 3 data rows");
 	});
 
 	test("Detects pipe delimiter", async function () {
 		this.timeout(10000);
 		const uri = vscode.Uri.file(
-			path.join(__dirname, "../../test-data/pipe-delimited.dat")
+			path.join(__dirname, "../../test-data/pipe-delimited.dat"),
 		);
 		const data = await parseDataFile(uri);
 
 		assert.ok(data, "Data should be parsed");
-		assert.strictEqual(data?.detectedDelimiter, "|", "Should detect pipe delimiter");
+		assert.strictEqual(
+			data?.detectedDelimiter,
+			"|",
+			"Should detect pipe delimiter",
+		);
 		assert.strictEqual(data?.headers.length, 3, "Should have 3 columns");
 		assert.strictEqual(data?.rows.length, 3, "Should have 3 data rows");
 	});
@@ -36,12 +56,16 @@ suite("Delimiter Detection Tests", () => {
 	test("Detects space delimiter", async function () {
 		this.timeout(10000);
 		const uri = vscode.Uri.file(
-			path.join(__dirname, "../../test-data/space-delimited.txt")
+			path.join(__dirname, "../../test-data/space-delimited.txt"),
 		);
 		const data = await parseDataFile(uri);
 
 		assert.ok(data, "Data should be parsed");
-		assert.strictEqual(data?.detectedDelimiter, " ", "Should detect space delimiter");
+		assert.strictEqual(
+			data?.detectedDelimiter,
+			" ",
+			"Should detect space delimiter",
+		);
 		assert.strictEqual(data?.headers.length, 3, "Should have 3 columns");
 		assert.strictEqual(data?.rows.length, 3, "Should have 3 data rows");
 	});
@@ -49,7 +73,7 @@ suite("Delimiter Detection Tests", () => {
 	test("Handles single column with fallback", async function () {
 		this.timeout(10000);
 		const uri = vscode.Uri.file(
-			path.join(__dirname, "../../test-data/single-column.txt")
+			path.join(__dirname, "../../test-data/single-column.txt"),
 		);
 		const data = await parseDataFile(uri);
 
@@ -67,7 +91,7 @@ suite("Delimiter Detection Tests", () => {
 		const tmpPath = path.join(__dirname, "../../test-data/override-test.txt");
 		await vscode.workspace.fs.writeFile(
 			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8")
+			Buffer.from(content, "utf8"),
 		);
 
 		const uri = vscode.Uri.file(tmpPath);
@@ -77,7 +101,7 @@ suite("Delimiter Detection Tests", () => {
 		assert.strictEqual(
 			dataAuto?.detectedDelimiter,
 			",",
-			"Should auto-detect comma"
+			"Should auto-detect comma",
 		);
 		assert.strictEqual(dataAuto?.headers.length, 3, "Should have 3 columns");
 
@@ -86,13 +110,13 @@ suite("Delimiter Detection Tests", () => {
 		assert.strictEqual(
 			dataOverride?.detectedDelimiter,
 			"|",
-			"Should use override delimiter"
+			"Should use override delimiter",
 		);
 		// With pipe delimiter, "a,b,c" is one column
 		assert.strictEqual(
 			dataOverride?.headers.length,
 			1,
-			"Should have 1 column when using pipe on comma-separated data"
+			"Should have 1 column when using pipe on comma-separated data",
 		);
 
 		// Clean up
@@ -107,10 +131,13 @@ suite("Delimiter Detection Tests", () => {
 		this.timeout(10000);
 		// Create a tab-separated file
 		const content = "a\tb\tc\n1\t2\t3\n4\t5\t6";
-		const tmpPath = path.join(__dirname, "../../test-data/tab-override-test.txt");
+		const tmpPath = path.join(
+			__dirname,
+			"../../test-data/tab-override-test.txt",
+		);
 		await vscode.workspace.fs.writeFile(
 			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8")
+			Buffer.from(content, "utf8"),
 		);
 
 		const uri = vscode.Uri.file(tmpPath);
@@ -121,7 +148,7 @@ suite("Delimiter Detection Tests", () => {
 		assert.strictEqual(
 			data?.detectedDelimiter,
 			"\t",
-			"Should use tab delimiter"
+			"Should use tab delimiter",
 		);
 		assert.strictEqual(data?.headers.length, 3, "Should have 3 columns");
 		assert.strictEqual(data?.rows.length, 2, "Should have 2 data rows");
@@ -140,11 +167,11 @@ suite("Delimiter Detection Tests", () => {
 		const content = "a,b,c\n1,2,3\n4,5,6\n7,8,9";
 		const tmpPath = path.join(
 			__dirname,
-			"../../test-data/consistency-test.txt"
+			"../../test-data/consistency-test.txt",
 		);
 		await vscode.workspace.fs.writeFile(
 			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8")
+			Buffer.from(content, "utf8"),
 		);
 
 		const uri = vscode.Uri.file(tmpPath);
@@ -154,7 +181,7 @@ suite("Delimiter Detection Tests", () => {
 		assert.strictEqual(
 			data?.detectedDelimiter,
 			",",
-			"Should detect comma as most consistent delimiter"
+			"Should detect comma as most consistent delimiter",
 		);
 		assert.strictEqual(data?.headers.length, 3, "Should have 3 columns");
 		assert.strictEqual(data?.rows.length, 3, "Should have 3 data rows");
@@ -173,7 +200,7 @@ suite("Delimiter Detection Tests", () => {
 		const tmpPath = path.join(__dirname, "../../test-data/semicolon-test.txt");
 		await vscode.workspace.fs.writeFile(
 			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8")
+			Buffer.from(content, "utf8"),
 		);
 
 		const uri = vscode.Uri.file(tmpPath);
@@ -183,7 +210,7 @@ suite("Delimiter Detection Tests", () => {
 		assert.strictEqual(
 			data?.detectedDelimiter,
 			";",
-			"Should detect semicolon delimiter"
+			"Should detect semicolon delimiter",
 		);
 		assert.strictEqual(data?.headers.length, 3, "Should have 3 columns");
 		assert.strictEqual(data?.rows.length, 2, "Should have 2 data rows");

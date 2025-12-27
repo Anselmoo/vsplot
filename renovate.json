@@ -1,13 +1,9 @@
 {
-  "labels": ["dependencies"],
-  "packageRules": [
-    {
-      "matchPackageNames": ["/eslint/"],
-      "labels": ["linting"]
-    },
-    {
-      "matchDepTypes": ["optionalDependencies"],
-      "addLabels": ["optional"]
-    }
-  ]
+	"labels": ["dependencies"],
+	"packageRules": [
+		{
+			"matchDepTypes": ["optionalDependencies"],
+			"addLabels": ["optional"]
+		}
+	]
 }

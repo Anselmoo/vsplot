@@ -1,0 +1,12 @@
+{
+	"$schema": "https://biomejs.dev/schemas/2.3.10/schema.json",
+	"vcs": { "clientKind": "git", "enabled": true, "useIgnoreFile": true },
+  "files": {
+    "ignore": ["media/**", "out/**", "coverage/**", "test-data/**"]
+  },
+		"formatWithErrors": false,
+		"indentStyle": "tab",
+		"lineEnding": "lf",
+		"lineWidth": 100
+	}
+}

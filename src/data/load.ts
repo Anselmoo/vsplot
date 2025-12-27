@@ -1,217 +1,248 @@
-import * as vscode from 'vscode';
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from "fs";
+import * as path from "path";
+import * as vscode from "vscode";
 
 export interface ParsedData {
-    headers: string[];
-    rows: (string | number)[][];
-    fileName: string;
-    fileType: 'csv' | 'json' | 'txt' | 'dat' | 'tsv' | 'tab' | 'out' | 'data';
-    totalRows: number;
-    detectedDelimiter?: string;
+	headers: string[];
+	rows: (string | number)[][];
+	fileName: string;
+	fileType: "csv" | "json" | "txt" | "dat" | "tsv" | "tab" | "out" | "data";
+	totalRows: number;
+	detectedDelimiter?: string;
 }
 
 export interface ParseOptions {
-    delimiter?: string;
-    commentMarkers?: string[];
+	delimiter?: string;
+	commentMarkers?: string[];
 }
 
 /**
  * Parse a data file and return structured data
- * 
+ *
  * Supports CSV, JSON, and delimited text files (TXT, DAT, TSV, TAB, OUT, DATA).
- * 
+ *
  * Delimiter Detection:
  * - Auto-detects delimiter for non-CSV files from: comma, pipe, semicolon, colon, tab, space
  * - User can override delimiter via options.delimiter parameter
  * - TSV files default to tab delimiter unless overridden
- * 
+ *
  * Comment Handling:
  * - Skips lines starting with #, %, // by default
  * - User can override comment markers via options.commentMarkers parameter
- * 
+ *
  * @param uri - URI of the file to parse
  * @param options - Optional settings including delimiter override and comment markers
  * @returns Promise resolving to ParsedData or null if unsupported file type
  */
-export async function parseDataFile(uri: vscode.Uri, options?: ParseOptions): Promise<ParsedData | null> {
-    try {
-        const filePath = uri.fsPath;
-        const fileName = path.basename(filePath);
-        const fileExtension = path.extname(filePath).toLowerCase();
+export async function parseDataFile(
+	uri: vscode.Uri,
+	options?: ParseOptions,
+): Promise<ParsedData | null> {
+	try {
+		const filePath = uri.fsPath;
+		const fileName = path.basename(filePath);
+		const fileExtension = path.extname(filePath).toLowerCase();
 
-        // Read file content
-        const content = await fs.promises.readFile(filePath, 'utf8');
+		// Read file content
+		const content = await fs.promises.readFile(filePath, "utf8");
 
-        // Default comment markers: #, %, //
-        const commentMarkers = options?.commentMarkers ?? ['#', '%', '//'];
+		// Default comment markers: #, %, //
+		const commentMarkers = options?.commentMarkers ?? ["#", "%", "//"];
 
-        switch (fileExtension) {
-            case '.csv':
-                return parseCSV(content, fileName, commentMarkers);
-            case '.json':
-                return parseJSON(content, fileName);
-            case '.txt':
-            case '.dat':
-            case '.out':
-            case '.data':
-            case '.tab':
-                return parseDelimited(content, fileName, fileExtension.slice(1) as 'txt' | 'dat' | 'out' | 'data' | 'tab' | 'tsv', options?.delimiter, commentMarkers);
-            case '.tsv':
-                // TSV files have tab delimiter by default
-                return parseDelimited(content, fileName, 'tsv', options?.delimiter ?? '\t', commentMarkers);
-            default:
-                vscode.window.showErrorMessage(`Unsupported file type: ${fileExtension}`);
-                return null;
-        }
-    } catch (error) {
-        vscode.window.showErrorMessage(`Error reading file: ${error}`);
-        return null;
-    }
+		switch (fileExtension) {
+			case ".csv":
+				return parseCSV(content, fileName, commentMarkers);
+			case ".json":
+				return parseJSON(content, fileName);
+			case ".txt":
+			case ".dat":
+			case ".out":
+			case ".data":
+			case ".tab":
+				return parseDelimited(
+					content,
+					fileName,
+					fileExtension.slice(1) as
+						| "txt"
+						| "dat"
+						| "out"
+						| "data"
+						| "tab"
+						| "tsv",
+					options?.delimiter,
+					commentMarkers,
+				);
+			case ".tsv":
+				// TSV files have tab delimiter by default
+				return parseDelimited(
+					content,
+					fileName,
+					"tsv",
+					options?.delimiter ?? "\t",
+					commentMarkers,
+				);
+			default:
+				vscode.window.showErrorMessage(
+					`Unsupported file type: ${fileExtension}`,
+				);
+				return null;
+		}
+	} catch (error) {
+		vscode.window.showErrorMessage(`Error reading file: ${error}`);
+		return null;
+	}
 }
 
 /**
  * Check if a line is a comment based on configured comment markers
- * 
+ *
  * @param line - Line to check
  * @param commentMarkers - Array of comment marker strings
  * @returns true if line starts with any comment marker, false otherwise
  */
 function isCommentLine(line: string, commentMarkers: string[]): boolean {
-    const trimmed = line.trim();
-    if (!trimmed) {
-        return false; // Empty lines are not comment lines
-    }
-    return commentMarkers.some(marker => trimmed.startsWith(marker));
+	const trimmed = line.trim();
+	if (!trimmed) {
+		return false; // Empty lines are not comment lines
+	}
+	return commentMarkers.some((marker) => trimmed.startsWith(marker));
 }
 
-function parseCSV(content: string, fileName: string, commentMarkers: string[] = ['#', '%', '//']): ParsedData {
-    const lines = content.trim().split('\n');
-    if (lines.length === 0) {
-        throw new Error('File is empty');
-    }
+function parseCSV(
+	content: string,
+	fileName: string,
+	commentMarkers: string[] = ["#", "%", "//"],
+): ParsedData {
+	const lines = content.trim().split("\n");
+	if (lines.length === 0) {
+		throw new Error("File is empty");
+	}
 
-    // Filter out comment lines and empty lines
-    const nonCommentLines = lines.filter(line => {
-        const trimmed = line.trim();
-        return trimmed && !isCommentLine(line, commentMarkers);
-    });
-    
-    if (nonCommentLines.length === 0) {
-        throw new Error('File contains only comments or empty lines');
-    }
+	// Filter out comment lines and empty lines
+	const nonCommentLines = lines.filter((line) => {
+		const trimmed = line.trim();
+		return trimmed && !isCommentLine(line, commentMarkers);
+	});
 
-    // Parse CSV with basic comma separation (could be enhanced with proper CSV parser)
-    const firstRowData = parseCSVLine(nonCommentLines[0]);
-    let headers: string[];
-    let dataStartIndex = 0;
+	if (nonCommentLines.length === 0) {
+		throw new Error("File contains only comments or empty lines");
+	}
 
-    // Check if first line looks like headers (non-numeric)
-    const hasHeaders = firstRowData.some(item => Number.isNaN(Number(item)) && item !== '');
+	// Parse CSV with basic comma separation (could be enhanced with proper CSV parser)
+	const firstRowData = parseCSVLine(nonCommentLines[0]);
+	let headers: string[];
+	let dataStartIndex = 0;
 
-    if (hasHeaders) {
-        headers = firstRowData;
-        dataStartIndex = 1;
-    } else {
-        // All numeric - generate column headers
-        headers = firstRowData.map((_, index) => `Column ${index + 1}`);
-        dataStartIndex = 0;
-    }
+	// Check if first line looks like headers (non-numeric)
+	const hasHeaders = firstRowData.some(
+		(item) => Number.isNaN(Number(item)) && item !== "",
+	);
 
-    const rows: (string | number)[][] = [];
+	if (hasHeaders) {
+		headers = firstRowData;
+		dataStartIndex = 1;
+	} else {
+		// All numeric - generate column headers
+		headers = firstRowData.map((_, index) => `Column ${index + 1}`);
+		dataStartIndex = 0;
+	}
 
-    for (let i = dataStartIndex; i < nonCommentLines.length; i++) {
-        if (nonCommentLines[i].trim()) {
-            const raw = parseCSVLine(nonCommentLines[i]);
-            const coerced = raw.map(v => {
-                const n = Number(v);
-                return !Number.isNaN(n) && v !== '' ? n : v;
-            });
-            rows.push(coerced);
-        }
-    }
+	const rows: (string | number)[][] = [];
 
-    return {
-        headers,
-        rows,
-        fileName,
-        fileType: 'csv',
-        totalRows: rows.length
-    };
+	for (let i = dataStartIndex; i < nonCommentLines.length; i++) {
+		if (nonCommentLines[i].trim()) {
+			const raw = parseCSVLine(nonCommentLines[i]);
+			const coerced = raw.map((v) => {
+				const n = Number(v);
+				return !Number.isNaN(n) && v !== "" ? n : v;
+			});
+			rows.push(coerced);
+		}
+	}
+
+	return {
+		headers,
+		rows,
+		fileName,
+		fileType: "csv",
+		totalRows: rows.length,
+	};
 }
 
 function parseCSVLine(line: string): string[] {
-    const result: string[] = [];
-    let current = '';
-    let inQuotes = false;
+	const result: string[] = [];
+	let current = "";
+	let inQuotes = false;
 
-    for (let i = 0; i < line.length; i++) {
-        const char = line[i];
+	for (let i = 0; i < line.length; i++) {
+		const char = line[i];
 
-        if (char === '"') {
-            inQuotes = !inQuotes;
-        } else if (char === ',' && !inQuotes) {
-            result.push(current.trim());
-            current = '';
-        } else {
-            current += char;
-        }
-    }
+		if (char === '"') {
+			inQuotes = !inQuotes;
+		} else if (char === "," && !inQuotes) {
+			result.push(current.trim());
+			current = "";
+		} else {
+			current += char;
+		}
+	}
 
-    result.push(current.trim());
-    return result;
+	result.push(current.trim());
+	return result;
 }
 
 function parseJSON(content: string, fileName: string): ParsedData {
-    try {
-        const jsonData = JSON.parse(content);
+	try {
+		const jsonData = JSON.parse(content);
 
-        if (Array.isArray(jsonData)) {
-            // Array of objects
-            if (jsonData.length > 0 && typeof jsonData[0] === 'object') {
-                const headers = Object.keys(jsonData[0]);
-                const rows = jsonData.map(obj => headers.map(header => obj[header]));
+		if (Array.isArray(jsonData)) {
+			// Array of objects
+			if (jsonData.length > 0 && typeof jsonData[0] === "object") {
+				const headers = Object.keys(jsonData[0]);
+				const rows = jsonData.map((obj) =>
+					headers.map((header) => obj[header]),
+				);
 
-                return {
-                    headers,
-                    rows,
-                    fileName,
-                    fileType: 'json',
-                    totalRows: rows.length
-                };
-            } else {
-                // Array of primitives
-                return {
-                    headers: ['Value'],
-                    rows: jsonData.map(item => [item]),
-                    fileName,
-                    fileType: 'json',
-                    totalRows: jsonData.length
-                };
-            }
-        } else if (typeof jsonData === 'object' && jsonData !== null) {
-            // Single object
-            const headers = Object.keys(jsonData);
-            const rows = [headers.map(header => jsonData[header])];
+				return {
+					headers,
+					rows,
+					fileName,
+					fileType: "json",
+					totalRows: rows.length,
+				};
+			} else {
+				// Array of primitives
+				return {
+					headers: ["Value"],
+					rows: jsonData.map((item) => [item]),
+					fileName,
+					fileType: "json",
+					totalRows: jsonData.length,
+				};
+			}
+		} else if (typeof jsonData === "object" && jsonData !== null) {
+			// Single object
+			const headers = Object.keys(jsonData);
+			const rows = [headers.map((header) => jsonData[header])];
 
-            return {
-                headers,
-                rows,
-                fileName,
-                fileType: 'json',
-                totalRows: 1
-            };
-        } else {
-            throw new Error('JSON format not supported for tabular display');
-        }
-    } catch (error) {
-        throw new Error(`Invalid JSON: ${error}`);
-    }
+			return {
+				headers,
+				rows,
+				fileName,
+				fileType: "json",
+				totalRows: 1,
+			};
+		} else {
+			throw new Error("JSON format not supported for tabular display");
+		}
+	} catch (error) {
+		throw new Error(`Invalid JSON: ${error}`);
+	}
 }
 
 /**
  * Parse delimited text files (TXT, DAT, TSV, TAB, OUT, DATA)
- * 
+ *
  * Features:
  * - Auto-detects delimiter from common candidates: comma, pipe, semicolon, colon, tab, space
  * - Scores delimiters by column count and consistency across first 6 lines
@@ -219,7 +250,7 @@ function parseJSON(content: string, fileName: string): ParsedData {
  * - Fallback to comma delimiter if no multi-column delimiter detected
  * - Auto-detects headers vs numeric data in first line
  * - Filters out comment lines based on configured markers
- * 
+ *
  * @param content - File content as string
  * @param fileName - Name of the file being parsed
  * @param fileType - Type of file (txt, dat, tsv, tab, out, data)
@@ -227,88 +258,96 @@ function parseJSON(content: string, fileName: string): ParsedData {
  * @param commentMarkers - Array of comment marker strings (default: ['#', '%', '//'])
  * @returns ParsedData object with headers, rows, and detected delimiter
  */
-function parseDelimited(content: string, fileName: string, fileType: 'txt' | 'dat' | 'tsv' | 'tab' | 'out' | 'data', overrideDelimiter?: string, commentMarkers: string[] = ['#', '%', '//']): ParsedData {
-    const lines = content.trim().split('\n');
-    if (lines.length === 0) {
-        throw new Error('File is empty');
-    }
+function parseDelimited(
+	content: string,
+	fileName: string,
+	fileType: "txt" | "dat" | "tsv" | "tab" | "out" | "data",
+	overrideDelimiter?: string,
+	commentMarkers: string[] = ["#", "%", "//"],
+): ParsedData {
+	const lines = content.trim().split("\n");
+	if (lines.length === 0) {
+		throw new Error("File is empty");
+	}
 
-    // Filter out comment lines and empty lines
-    const nonCommentLines = lines.filter(line => {
-        const trimmed = line.trim();
-        return trimmed && !isCommentLine(line, commentMarkers);
-    });
-    
-    if (nonCommentLines.length === 0) {
-        throw new Error('File contains only comments or empty lines');
-    }
+	// Filter out comment lines and empty lines
+	const nonCommentLines = lines.filter((line) => {
+		const trimmed = line.trim();
+		return trimmed && !isCommentLine(line, commentMarkers);
+	});
 
-    // Detect delimiter among common candidates unless override provided
-    const firstLine = nonCommentLines[0];
-    let delimiter = overrideDelimiter ?? '';
-    if (!delimiter) {
-        // Candidates cover all common delimiters: comma, pipe, semicolon, colon, tab, space
-        const candidates = [',', '|', ';', ':', '\t', ' '];
-        let best = ',';
-        let bestScore = -1;
-        for (const cand of candidates) {
-            const parts = firstLine.split(cand);
-            if (parts.length <= 1) {
-                continue;
-            }
-            // Score by column count and consistency with next few lines
-            let consistent = 0;
-            const expected = parts.length;
-            for (let i = 1; i < Math.min(6, nonCommentLines.length); i++) {
-                if (nonCommentLines[i].split(cand).length === expected) {
-                    consistent++;
-                }
-            }
-            const score = expected * 10 + consistent;
-            if (score > bestScore) {
-                bestScore = score;
-                best = cand;
-            }
-        }
-        // Fallback to comma if no delimiter produces multiple columns
-        delimiter = best;
-    }
+	if (nonCommentLines.length === 0) {
+		throw new Error("File contains only comments or empty lines");
+	}
 
-    // Assume first line contains headers or generate them
-    const firstRowData = firstLine.split(delimiter).map(item => item.trim());
-    let headers: string[];
-    let dataStartIndex = 0;
+	// Detect delimiter among common candidates unless override provided
+	const firstLine = nonCommentLines[0];
+	let delimiter = overrideDelimiter ?? "";
+	if (!delimiter) {
+		// Candidates cover all common delimiters: comma, pipe, semicolon, colon, tab, space
+		const candidates = [",", "|", ";", ":", "\t", " "];
+		let best = ",";
+		let bestScore = -1;
+		for (const cand of candidates) {
+			const parts = firstLine.split(cand);
+			if (parts.length <= 1) {
+				continue;
+			}
+			// Score by column count and consistency with next few lines
+			let consistent = 0;
+			const expected = parts.length;
+			for (let i = 1; i < Math.min(6, nonCommentLines.length); i++) {
+				if (nonCommentLines[i].split(cand).length === expected) {
+					consistent++;
+				}
+			}
+			const score = expected * 10 + consistent;
+			if (score > bestScore) {
+				bestScore = score;
+				best = cand;
+			}
+		}
+		// Fallback to comma if no delimiter produces multiple columns
+		delimiter = best;
+	}
 
-    // Check if first line looks like headers (non-numeric)
-    const hasHeaders = firstRowData.some(item => Number.isNaN(Number(item)) && item !== '');
+	// Assume first line contains headers or generate them
+	const firstRowData = firstLine.split(delimiter).map((item) => item.trim());
+	let headers: string[];
+	let dataStartIndex = 0;
 
-    if (hasHeaders) {
-        headers = firstRowData;
-        dataStartIndex = 1;
-    } else {
-        headers = firstRowData.map((_, index) => `Column ${index + 1}`);
-        dataStartIndex = 0;
-    }
+	// Check if first line looks like headers (non-numeric)
+	const hasHeaders = firstRowData.some(
+		(item) => Number.isNaN(Number(item)) && item !== "",
+	);
 
-    const rows: (string | number)[][] = [];
-    for (let i = dataStartIndex; i < nonCommentLines.length; i++) {
-        if (nonCommentLines[i].trim()) {
-            const rowData = nonCommentLines[i].split(delimiter).map(item => {
-                const trimmed = item.trim();
-                // Try to convert to number if possible
-                const num = Number(trimmed);
-                return !Number.isNaN(num) && trimmed !== '' ? num : trimmed;
-            });
-            rows.push(rowData);
-        }
-    }
+	if (hasHeaders) {
+		headers = firstRowData;
+		dataStartIndex = 1;
+	} else {
+		headers = firstRowData.map((_, index) => `Column ${index + 1}`);
+		dataStartIndex = 0;
+	}
 
-    return {
-        headers,
-        rows,
-        fileName,
-        fileType,
-        totalRows: rows.length,
-        detectedDelimiter: delimiter
-    };
+	const rows: (string | number)[][] = [];
+	for (let i = dataStartIndex; i < nonCommentLines.length; i++) {
+		if (nonCommentLines[i].trim()) {
+			const rowData = nonCommentLines[i].split(delimiter).map((item) => {
+				const trimmed = item.trim();
+				// Try to convert to number if possible
+				const num = Number(trimmed);
+				return !Number.isNaN(num) && trimmed !== "" ? num : trimmed;
+			});
+			rows.push(rowData);
+		}
+	}
+
+	return {
+		headers,
+		rows,
+		fileName,
+		fileType,
+		totalRows: rows.length,
+		detectedDelimiter: delimiter,
+	};
 }
