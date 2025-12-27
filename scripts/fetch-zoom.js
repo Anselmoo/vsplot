@@ -2,8 +2,14 @@ const https = require("https");
 const fs = require("fs");
 const path = require("path");
 
-const out = path.resolve(__dirname, "..", "media", "chartjs-plugin-zoom.umd.js");
-const url = "https://unpkg.com/chartjs-plugin-zoom@2.2.0/dist/chartjs-plugin-zoom.umd.js";
+const out = path.resolve(
+	__dirname,
+	"..",
+	"media",
+	"chartjs-plugin-zoom.umd.js",
+);
+const url =
+	"https://unpkg.com/chartjs-plugin-zoom@2.2.0/dist/chartjs-plugin-zoom.umd.js";
 
 if (!fs.existsSync(path.dirname(out))) {
 	fs.mkdirSync(path.dirname(out), { recursive: true });

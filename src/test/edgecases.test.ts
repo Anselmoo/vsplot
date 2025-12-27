@@ -44,7 +44,7 @@ suite("Edge Cases and Robustness Tests", () => {
 		try {
 			await parseDataFile(uri);
 			assert.fail("Should have thrown an error for whitespace-only file");
-		} catch (error) {
+		} catch (_error) {
 			assert.ok(true, "Correctly threw error for whitespace-only file");
 		}
 
