@@ -38,7 +38,7 @@ try {
 	summary = JSON.parse(fs.readFileSync(summaryPath, "utf8"));
 } catch (_error) {
 	console.error(
-		`Unable to read coverage summary: ${error instanceof Error ? error.message : error}`,
+		`Unable to read coverage summary: ${error instanceof Error ? _error.message : error}`,
 	);
 	process.exit(1);
 }

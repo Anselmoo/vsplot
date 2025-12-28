@@ -358,8 +358,8 @@ suite("Command Logic Unit Tests", () => {
 				await executePreviewData(uri, deps, mockProvider);
 				assert.fail("Should have thrown an error");
 			} catch (_error) {
-				assert.ok(error instanceof Error);
-				assert.strictEqual(error.message, "Preview panel creation failed");
+				assert.ok(_error instanceof Error);
+				assert.strictEqual(_error.message, "Preview panel creation failed");
 			}
 		});
 
@@ -381,8 +381,8 @@ suite("Command Logic Unit Tests", () => {
 				await executePlotData(uri, deps, mockProvider);
 				assert.fail("Should have thrown an error");
 			} catch (_error) {
-				assert.ok(error instanceof Error);
-				assert.strictEqual(error.message, "Chart creation failed");
+				assert.ok(_error instanceof Error);
+				assert.strictEqual(_error.message, "Chart creation failed");
 			}
 		});
 
@@ -413,8 +413,8 @@ suite("Command Logic Unit Tests", () => {
 				await executeOpenDataViewer(deps, mockProvider);
 				assert.fail("Should have thrown an error");
 			} catch (_error) {
-				assert.ok(error instanceof Error);
-				assert.strictEqual(error.message, "Preview panel creation failed");
+				assert.ok(_error instanceof Error);
+				assert.strictEqual(_error.message, "Preview panel creation failed");
 			}
 		});
 
@@ -432,8 +432,8 @@ suite("Command Logic Unit Tests", () => {
 				await executePreviewData(uri, deps, mockProvider);
 				assert.fail("Should have thrown an error");
 			} catch (_error) {
-				assert.ok(error instanceof Error);
-				assert.strictEqual(error.message, "File read failed");
+				assert.ok(_error instanceof Error);
+				assert.strictEqual(_error.message, "File read failed");
 			}
 		});
 
@@ -451,8 +451,8 @@ suite("Command Logic Unit Tests", () => {
 				await executePlotData(uri, deps, mockProvider);
 				assert.fail("Should have thrown an error");
 			} catch (_error) {
-				assert.ok(error instanceof Error);
-				assert.strictEqual(error.message, "File read failed");
+				assert.ok(_error instanceof Error);
+				assert.strictEqual(_error.message, "File read failed");
 			}
 		});
 
@@ -471,8 +471,8 @@ suite("Command Logic Unit Tests", () => {
 				await executeOpenDataViewer(deps, mockProvider);
 				assert.fail("Should have thrown an error");
 			} catch (_error) {
-				assert.ok(error instanceof Error);
-				assert.strictEqual(error.message, "Workspace search failed");
+				assert.ok(_error instanceof Error);
+				assert.strictEqual(_error.message, "Workspace search failed");
 			}
 		});
 	});

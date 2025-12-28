@@ -240,9 +240,9 @@ export function registerDataCommands(
 				if (!result.success && result.error) {
 					deps.showErrorMessage(result.error);
 				}
-			} catch (error: unknown) {
+			} catch (_error: unknown) {
 				deps.showErrorMessage(
-					`Failed to preview data: ${error instanceof Error ? error.message : String(error)}`,
+					`Failed to preview data: ${_error instanceof Error ? _error.message : String(_error)}`,
 				);
 			}
 		},
@@ -257,9 +257,9 @@ export function registerDataCommands(
 				if (!result.success && result.error) {
 					deps.showErrorMessage(result.error);
 				}
-			} catch (error: unknown) {
+			} catch (_error: unknown) {
 				deps.showErrorMessage(
-					`Failed to plot data: ${error instanceof Error ? error.message : String(error)}`,
+					`Failed to plot data: ${_error instanceof Error ? _error.message : String(_error)}`,
 				);
 			}
 		},
@@ -276,9 +276,9 @@ export function registerDataCommands(
 				} else if (result.info) {
 					deps.showInfoMessage(result.info);
 				}
-			} catch (error: unknown) {
+			} catch (_error: unknown) {
 				deps.showErrorMessage(
-					`Failed to open data viewer: ${error instanceof Error ? error.message : String(error)}`,
+					`Failed to open data viewer: ${_error instanceof Error ? _error.message : String(_error)}`,
 				);
 			}
 		},

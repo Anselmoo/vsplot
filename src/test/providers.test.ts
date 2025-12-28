@@ -49,7 +49,7 @@ suite("Provider Integration Tests", () => {
 				await vscode.commands.executeCommand("vsplot.previewData", uri);
 				assert.ok(true, "Preview handled special characters");
 			} catch (_error) {
-				assert.fail(`Preview failed with special chars: ${error}`);
+				assert.fail(`Preview failed with special chars: ${_error}`);
 			}
 
 			// Clean up
@@ -81,7 +81,7 @@ suite("Provider Integration Tests", () => {
 				await vscode.commands.executeCommand("vsplot.previewData", uri);
 				assert.ok(true, "Preview handled unicode characters");
 			} catch (_error) {
-				assert.fail(`Preview failed with unicode: ${error}`);
+				assert.fail(`Preview failed with unicode: ${_error}`);
 			}
 
 			// Clean up
@@ -120,7 +120,7 @@ suite("Provider Integration Tests", () => {
 				await vscode.commands.executeCommand("vsplot.previewData", uri);
 				assert.ok(true, "Preview handled large dataset");
 			} catch (_error) {
-				assert.fail(`Preview failed with large dataset: ${error}`);
+				assert.fail(`Preview failed with large dataset: ${_error}`);
 			}
 
 			// Clean up

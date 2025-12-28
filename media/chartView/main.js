@@ -433,7 +433,7 @@ function createChart() {
 		// Cache initial bounds for manual reset fallback
 		cacheInitialBounds(chart);
 	} catch (_error) {
-		showError("Error creating chart: " + error.message);
+		showError("Error creating chart: " + _error.message);
 	}
 }
 

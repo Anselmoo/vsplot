@@ -88,7 +88,7 @@ export async function parseDataFile(
 				return null;
 		}
 	} catch (_error) {
-		vscode.window.showErrorMessage(`Error reading file: ${error}`);
+		vscode.window.showErrorMessage(`Error reading file: ${_error}`);
 		return null;
 	}
 }
@@ -236,7 +236,7 @@ function parseJSON(content: string, fileName: string): ParsedData {
 			throw new Error("JSON format not supported for tabular display");
 		}
 	} catch (_error) {
-		throw new Error(`Invalid JSON: ${error}`);
+		throw new Error(`Invalid JSON: ${_error}`);
 	}
 }
 

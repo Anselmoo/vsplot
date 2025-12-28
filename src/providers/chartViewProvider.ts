@@ -85,8 +85,8 @@ export class ChartViewProvider implements vscode.WebviewViewProvider {
 					const buffer = Buffer.from(base64, "base64");
 					await vscode.workspace.fs.writeFile(uri, buffer);
 					vscode.window.showInformationMessage("Chart image saved.");
-				} catch (err: unknown) {
-					const m = err instanceof Error ? err.message : String(err);
+				} catch (_error: unknown) {
+					const m = _error instanceof Error ? _error.message : String(_error);
 					vscode.window.showErrorMessage(`Failed to save chart image: ${m}`);
 				}
 				return;

@@ -260,7 +260,7 @@ suite("Data Commands Tests", () => {
 			// If command completes without error, TSV was handled
 			assert.ok(true, "TSV file was previewed successfully");
 		} catch (_error) {
-			assert.fail(`TSV preview failed: ${error}`);
+			assert.fail(`TSV preview failed: ${_error}`);
 		}
 
 		// Clean up
@@ -288,7 +288,7 @@ suite("Data Commands Tests", () => {
 			// If command completes without error, TAB was handled
 			assert.ok(true, "TAB file was plotted successfully");
 		} catch (_error) {
-			assert.fail(`TAB plot failed: ${error}`);
+			assert.fail(`TAB plot failed: ${_error}`);
 		}
 
 		// Clean up
@@ -315,7 +315,7 @@ suite("Data Commands Tests", () => {
 			await vscode.commands.executeCommand("vsplot.previewData", uri);
 			assert.ok(true, "OUT file was previewed successfully");
 		} catch (_error) {
-			assert.fail(`OUT preview failed: ${error}`);
+			assert.fail(`OUT preview failed: ${_error}`);
 		}
 
 		// Clean up
@@ -343,7 +343,7 @@ suite("Data Commands Tests", () => {
 			await vscode.commands.executeCommand("vsplot.plotData", uri);
 			assert.ok(true, "DATA file was plotted successfully");
 		} catch (_error) {
-			assert.fail(`DATA plot failed: ${error}`);
+			assert.fail(`DATA plot failed: ${_error}`);
 		}
 
 		// Clean up
@@ -370,7 +370,7 @@ suite("Data Commands Tests", () => {
 			await vscode.commands.executeCommand("vsplot.previewData", uri);
 			assert.ok(true, "JSON array of objects was previewed successfully");
 		} catch (_error) {
-			assert.fail(`JSON preview failed: ${error}`);
+			assert.fail(`JSON preview failed: ${_error}`);
 		}
 
 		// Clean up
@@ -556,7 +556,7 @@ suite("Data Commands Tests", () => {
 			await vscode.commands.executeCommand("vsplot.previewData", uri);
 			assert.ok(true, "Single object JSON previewed successfully");
 		} catch (_error) {
-			assert.fail(`Single object JSON preview failed: ${error}`);
+			assert.fail(`Single object JSON preview failed: ${_error}`);
 		}
 
 		// Clean up
@@ -586,7 +586,7 @@ suite("Data Commands Tests", () => {
 			await vscode.commands.executeCommand("vsplot.plotData", uri);
 			assert.ok(true, "Single object JSON plotted successfully");
 		} catch (_error) {
-			assert.fail(`Single object JSON plot failed: ${error}`);
+			assert.fail(`Single object JSON plot failed: ${_error}`);
 		}
 
 		// Clean up

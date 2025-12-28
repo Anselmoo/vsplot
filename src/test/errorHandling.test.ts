@@ -139,7 +139,7 @@ suite("Error Handling and Edge Case Tests", () => {
 				await vscode.commands.executeCommand("vsplot.previewData", uri);
 				assert.ok(true, "Preview handled long headers");
 			} catch (_error) {
-				assert.fail(`Preview failed with long headers: ${error}`);
+				assert.fail(`Preview failed with long headers: ${_error}`);
 			}
 
 			// Clean up
@@ -173,7 +173,7 @@ suite("Error Handling and Edge Case Tests", () => {
 				await vscode.commands.executeCommand("vsplot.previewData", uri);
 				assert.ok(true, "Preview handled many columns");
 			} catch (_error) {
-				assert.fail(`Preview failed with many columns: ${error}`);
+				assert.fail(`Preview failed with many columns: ${_error}`);
 			}
 
 			// Clean up
@@ -207,7 +207,7 @@ suite("Error Handling and Edge Case Tests", () => {
 				await vscode.commands.executeCommand("vsplot.previewData", uri);
 				assert.ok(true, "Preview handled many objects");
 			} catch (_error) {
-				assert.fail(`Preview failed with many objects: ${error}`);
+				assert.fail(`Preview failed with many objects: ${_error}`);
 			}
 
 			// Clean up
@@ -473,7 +473,7 @@ suite("Error Handling and Edge Case Tests", () => {
 				await vscode.commands.executeCommand("vsplot.previewData", uri);
 				assert.ok(true, "DAT file with semicolon parsed");
 			} catch (_error) {
-				assert.fail(`DAT file parsing failed: ${error}`);
+				assert.fail(`DAT file parsing failed: ${_error}`);
 			}
 
 			// Clean up
@@ -500,7 +500,7 @@ suite("Error Handling and Edge Case Tests", () => {
 				await vscode.commands.executeCommand("vsplot.previewData", uri);
 				assert.ok(true, "OUT file with space delimiter parsed");
 			} catch (_error) {
-				assert.fail(`OUT file parsing failed: ${error}`);
+				assert.fail(`OUT file parsing failed: ${_error}`);
 			}
 
 			// Clean up
@@ -527,7 +527,7 @@ suite("Error Handling and Edge Case Tests", () => {
 				await vscode.commands.executeCommand("vsplot.previewData", uri);
 				assert.ok(true, "DATA file with colon delimiter parsed");
 			} catch (_error) {
-				assert.fail(`DATA file parsing failed: ${error}`);
+				assert.fail(`DATA file parsing failed: ${_error}`);
 			}
 
 			// Clean up
@@ -554,7 +554,7 @@ suite("Error Handling and Edge Case Tests", () => {
 				await vscode.commands.executeCommand("vsplot.previewData", uri);
 				assert.ok(true, "TAB file with comma delimiter parsed");
 			} catch (_error) {
-				assert.fail(`TAB file parsing failed: ${error}`);
+				assert.fail(`TAB file parsing failed: ${_error}`);
 			}
 
 			// Clean up
