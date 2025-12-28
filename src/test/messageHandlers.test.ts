@@ -3,7 +3,7 @@
  * These tests use dependency injection to test webview message handling
  * that was previously unreachable via integration tests.
  */
-import * as assert from "assert";
+import * as assert from "node:assert";
 import * as vscode from "vscode";
 import { createDefaultDependencies } from "../commands/dataCommands";
 import type { ParsedData } from "../data/load";

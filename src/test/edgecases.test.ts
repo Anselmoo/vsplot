@@ -1,5 +1,5 @@
-import * as assert from "assert";
-import * as path from "path";
+import * as assert from "node:assert";
+import * as path from "node:path";
 import * as vscode from "vscode";
 import { parseDataFile } from "../data/load";
 
@@ -18,14 +18,14 @@ suite("Edge Cases and Robustness Tests", () => {
 		try {
 			await parseDataFile(uri);
 			assert.fail("Should have thrown an error for empty file");
-		} catch (error) {
+		} catch (_error) {
 			assert.ok(true, "Correctly threw error for empty file");
 		}
 
 		// Clean up
 		try {
 			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-		} catch (e) {
+		} catch (_e) {
 			// Ignore cleanup errors
 		}
 	});
@@ -51,7 +51,7 @@ suite("Edge Cases and Robustness Tests", () => {
 		// Clean up
 		try {
 			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-		} catch (e) {
+		} catch (_e) {
 			// Ignore cleanup errors
 		}
 	});
@@ -84,7 +84,7 @@ suite("Edge Cases and Robustness Tests", () => {
 		// Clean up
 		try {
 			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-		} catch (e) {
+		} catch (_e) {
 			// Ignore cleanup errors
 		}
 	});
@@ -130,7 +130,7 @@ suite("Edge Cases and Robustness Tests", () => {
 		// Clean up
 		try {
 			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-		} catch (e) {
+		} catch (_e) {
 			// Ignore cleanup errors
 		}
 	});
@@ -166,7 +166,7 @@ suite("Edge Cases and Robustness Tests", () => {
 		// Clean up
 		try {
 			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-		} catch (e) {
+		} catch (_e) {
 			// Ignore cleanup errors
 		}
 	});
@@ -196,7 +196,7 @@ suite("Edge Cases and Robustness Tests", () => {
 		// Clean up
 		try {
 			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-		} catch (e) {
+		} catch (_e) {
 			// Ignore cleanup errors
 		}
 	});
@@ -227,7 +227,7 @@ suite("Edge Cases and Robustness Tests", () => {
 		// Clean up
 		try {
 			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-		} catch (e) {
+		} catch (_e) {
 			// Ignore cleanup errors
 		}
 	});
@@ -268,7 +268,7 @@ suite("Edge Cases and Robustness Tests", () => {
 		// Clean up
 		try {
 			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-		} catch (e) {
+		} catch (_e) {
 			// Ignore cleanup errors
 		}
 	});
@@ -307,7 +307,7 @@ suite("Edge Cases and Robustness Tests", () => {
 		// Clean up
 		try {
 			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-		} catch (e) {
+		} catch (_e) {
 			// Ignore cleanup errors
 		}
 	});
@@ -334,7 +334,7 @@ suite("Edge Cases and Robustness Tests", () => {
 		// Clean up
 		try {
 			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-		} catch (e) {
+		} catch (_e) {
 			// Ignore cleanup errors
 		}
 	});
@@ -359,7 +359,7 @@ suite("Edge Cases and Robustness Tests", () => {
 		// Clean up
 		try {
 			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-		} catch (e) {
+		} catch (_e) {
 			// Ignore cleanup errors
 		}
 	});
@@ -387,7 +387,7 @@ suite("Edge Cases and Robustness Tests", () => {
 		// Clean up
 		try {
 			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-		} catch (e) {
+		} catch (_e) {
 			// Ignore cleanup errors
 		}
 	});
@@ -411,7 +411,7 @@ suite("Edge Cases and Robustness Tests", () => {
 		// Clean up
 		try {
 			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-		} catch (e) {
+		} catch (_e) {
 			// Ignore cleanup errors
 		}
 	});
@@ -445,7 +445,7 @@ suite("Edge Cases and Robustness Tests", () => {
 		// Clean up
 		try {
 			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-		} catch (e) {
+		} catch (_e) {
 			// Ignore cleanup errors
 		}
 	});

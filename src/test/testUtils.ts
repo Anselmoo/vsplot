@@ -1,4 +1,4 @@
-import * as path from "path";
+import * as path from "node:path";
 import * as vscode from "vscode";
 
 // Extension ID constant
@@ -66,7 +66,7 @@ export async function deleteTempFile(uri: vscode.Uri): Promise<void> {
 		await vscode.workspace.fs.delete(uri);
 	} catch (_e) {
 		// Log cleanup errors for debugging, but don't fail the test
-		const errorMessage = e instanceof Error ? e.message : String(e);
+		const errorMessage = _e instanceof Error ? _e.message : String(_e);
 		console.warn(`Failed to clean up temp file ${uri.fsPath}: ${errorMessage}`);
 	}
 }

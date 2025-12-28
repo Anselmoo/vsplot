@@ -1,5 +1,5 @@
-import * as assert from "assert";
-import * as path from "path";
+import * as assert from "node:assert";
+import * as path from "node:path";
 import * as vscode from "vscode";
 import type {
 	ChartTestConfig,
@@ -48,16 +48,16 @@ suite("Provider Integration Tests", () => {
 			try {
 				await vscode.commands.executeCommand("vsplot.previewData", uri);
 				assert.ok(true, "Preview handled special characters");
-			} catch (error) {
+			} catch (_error) {
 				assert.fail(`Preview failed with special chars: ${error}`);
 			}
 
 			// Clean up
 			try {
 				await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-			} catch (e) {
+			} catch (_e) {
 				// Log cleanup errors for debugging but don't fail the test
-				const errorMessage = e instanceof Error ? e.message : String(e);
+				const errorMessage = _e instanceof Error ? _e.message : String(_e);
 				console.warn(`Cleanup warning: ${errorMessage}`);
 			}
 		});
@@ -80,16 +80,16 @@ suite("Provider Integration Tests", () => {
 			try {
 				await vscode.commands.executeCommand("vsplot.previewData", uri);
 				assert.ok(true, "Preview handled unicode characters");
-			} catch (error) {
+			} catch (_error) {
 				assert.fail(`Preview failed with unicode: ${error}`);
 			}
 
 			// Clean up
 			try {
 				await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-			} catch (e) {
+			} catch (_e) {
 				// Log cleanup errors for debugging but don't fail the test
-				const errorMessage = e instanceof Error ? e.message : String(e);
+				const errorMessage = _e instanceof Error ? _e.message : String(_e);
 				console.warn(`Cleanup warning: ${errorMessage}`);
 			}
 		});
@@ -119,16 +119,16 @@ suite("Provider Integration Tests", () => {
 			try {
 				await vscode.commands.executeCommand("vsplot.previewData", uri);
 				assert.ok(true, "Preview handled large dataset");
-			} catch (error) {
+			} catch (_error) {
 				assert.fail(`Preview failed with large dataset: ${error}`);
 			}
 
 			// Clean up
 			try {
 				await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-			} catch (e) {
+			} catch (_e) {
 				// Log cleanup errors for debugging but don't fail the test
-				const errorMessage = e instanceof Error ? e.message : String(e);
+				const errorMessage = _e instanceof Error ? _e.message : String(_e);
 				console.warn(`Cleanup warning: ${errorMessage}`);
 			}
 		});
@@ -500,9 +500,9 @@ suite("Provider Integration Tests", () => {
 				// Clean up TSV file
 				try {
 					await vscode.workspace.fs.delete(vscode.Uri.file(tsvPath));
-				} catch (e) {
+				} catch (_e) {
 					// Log cleanup errors for debugging but don't fail the test
-					const errorMessage = e instanceof Error ? e.message : String(e);
+					const errorMessage = _e instanceof Error ? _e.message : String(_e);
 					console.warn(`Cleanup warning: ${errorMessage}`);
 				}
 			} finally {

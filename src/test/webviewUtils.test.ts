@@ -1,6 +1,6 @@
-import * as assert from "assert";
-import * as fs from "fs";
-import * as path from "path";
+import * as assert from "node:assert";
+import * as fs from "node:fs";
+import * as path from "node:path";
 import * as vscode from "vscode";
 import { getNonce, loadHtmlTemplate } from "../providers/webviewUtils";
 
@@ -57,7 +57,7 @@ suite("Webview Utils Tests", () => {
 		try {
 			const ext = vscode.extensions.getExtension(EXTENSION_ID);
 			assert.ok(ext, "Extension should be available");
-			const extensionUri = vscode.Uri.file(ext!.extensionPath);
+			const extensionUri = vscode.Uri.file(ext?.extensionPath);
 
 			const result = loadHtmlTemplate(extensionUri, templatePath, {
 				MESSAGE: "Hello World",
@@ -72,7 +72,7 @@ suite("Webview Utils Tests", () => {
 			// Clean up
 			try {
 				await fs.promises.unlink(fullPath);
-			} catch (e) {
+			} catch (_e) {
 				// Ignore cleanup errors
 			}
 		}
@@ -94,7 +94,7 @@ suite("Webview Utils Tests", () => {
 		try {
 			const ext = vscode.extensions.getExtension(EXTENSION_ID);
 			assert.ok(ext, "Extension should be available");
-			const extensionUri = vscode.Uri.file(ext!.extensionPath);
+			const extensionUri = vscode.Uri.file(ext?.extensionPath);
 
 			const result = loadHtmlTemplate(extensionUri, templatePath, {
 				TITLE: "Test Page",
@@ -111,7 +111,7 @@ suite("Webview Utils Tests", () => {
 			// Clean up
 			try {
 				await fs.promises.unlink(fullPath);
-			} catch (e) {
+			} catch (_e) {
 				// Ignore cleanup errors
 			}
 		}
@@ -133,7 +133,7 @@ suite("Webview Utils Tests", () => {
 		try {
 			const ext = vscode.extensions.getExtension(EXTENSION_ID);
 			assert.ok(ext, "Extension should be available");
-			const extensionUri = vscode.Uri.file(ext!.extensionPath);
+			const extensionUri = vscode.Uri.file(ext?.extensionPath);
 
 			const result = loadHtmlTemplate(extensionUri, templatePath, {
 				VALUE: "42",
@@ -148,7 +148,7 @@ suite("Webview Utils Tests", () => {
 			// Clean up
 			try {
 				await fs.promises.unlink(fullPath);
-			} catch (e) {
+			} catch (_e) {
 				// Ignore cleanup errors
 			}
 		}
@@ -169,7 +169,7 @@ suite("Webview Utils Tests", () => {
 		try {
 			const ext = vscode.extensions.getExtension(EXTENSION_ID);
 			assert.ok(ext, "Extension should be available");
-			const extensionUri = vscode.Uri.file(ext!.extensionPath);
+			const extensionUri = vscode.Uri.file(ext?.extensionPath);
 
 			const result = loadHtmlTemplate(extensionUri, templatePath, {
 				EMPTY: "",
@@ -184,7 +184,7 @@ suite("Webview Utils Tests", () => {
 			// Clean up
 			try {
 				await fs.promises.unlink(fullPath);
-			} catch (e) {
+			} catch (_e) {
 				// Ignore cleanup errors
 			}
 		}

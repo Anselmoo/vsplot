@@ -1,6 +1,6 @@
 // Generates colored chart images at multiple sizes under images/
-const fs = require("fs");
-const path = require("path");
+const fs = require("node:fs");
+const path = require("node:path");
 const { PNG } = require("pngjs");
 
 const imagesDir = path.join(__dirname, "..", "images");

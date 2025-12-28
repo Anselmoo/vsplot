@@ -92,9 +92,8 @@ export async function handleExportData(
 		await deps.writeFile(uri, Buffer.from(csv, "utf8"));
 		deps.showInfoMessage("Filtered data exported.");
 		return { success: true };
-	} catch (e) {
-		const errorMsg =
-			"Failed to export data: " + (e instanceof Error ? e.message : String(e));
+	} catch (_e) {
+		const errorMsg = `Failed to export data: ${_e instanceof Error ? _e.message : String(_e)}`;
 		deps.showErrorMessage(errorMsg);
 		return { success: false, error: errorMsg };
 	}
@@ -120,9 +119,8 @@ export async function handleCreateChart(
 			currentUri ?? vscode.Uri.file(message.data.fileName || "preview");
 		await chartProvider.showChart(uri, message.data);
 		return { success: true };
-	} catch (e) {
-		const errorMsg =
-			"Failed to create chart: " + (e instanceof Error ? e.message : String(e));
+	} catch (_e) {
+		const errorMsg = `Failed to create chart: ${_e instanceof Error ? _e.message : String(_e)}`;
 		deps.showErrorMessage(errorMsg);
 		return { success: false, error: errorMsg };
 	}
@@ -154,9 +152,8 @@ export async function handleReparse(
 			await postMessage({ type: "showData", data });
 		}
 		return { success: true };
-	} catch (e) {
-		const errorMsg =
-			"Failed to reparse: " + (e instanceof Error ? e.message : String(e));
+	} catch (_e) {
+		const errorMsg = `Failed to reparse: ${_e instanceof Error ? _e.message : String(_e)}`;
 		deps.showErrorMessage(errorMsg);
 		return { success: false, error: errorMsg };
 	}
@@ -175,7 +172,7 @@ export function toCSV(headers: string[], rows: (string | number)[][]): string {
 		}
 		const s = String(v);
 		if (/[",\n]/.test(s)) {
-			return '"' + s.replace(/"/g, '""') + '"';
+			return `"${s.replace(/"/g, '""')}"`;
 		}
 		return s;
 	};

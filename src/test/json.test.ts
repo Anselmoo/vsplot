@@ -1,5 +1,5 @@
-import * as assert from "assert";
-import * as path from "path";
+import * as assert from "node:assert";
+import * as path from "node:path";
 import * as vscode from "vscode";
 import { parseDataFile } from "../data/load";
 
@@ -42,7 +42,7 @@ suite("JSON Parsing Tests", () => {
 		// Clean up
 		try {
 			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-		} catch (e) {
+		} catch (_e) {
 			// Ignore cleanup errors
 		}
 	});
@@ -71,7 +71,7 @@ suite("JSON Parsing Tests", () => {
 		// Clean up
 		try {
 			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-		} catch (e) {
+		} catch (_e) {
 			// Ignore cleanup errors
 		}
 	});
@@ -103,7 +103,7 @@ suite("JSON Parsing Tests", () => {
 		// Clean up
 		try {
 			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-		} catch (e) {
+		} catch (_e) {
 			// Ignore cleanup errors
 		}
 	});
@@ -134,7 +134,7 @@ suite("JSON Parsing Tests", () => {
 		// Clean up
 		try {
 			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-		} catch (e) {
+		} catch (_e) {
 			// Ignore cleanup errors
 		}
 	});
@@ -166,7 +166,7 @@ suite("JSON Parsing Tests", () => {
 		// Clean up
 		try {
 			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-		} catch (e) {
+		} catch (_e) {
 			// Ignore cleanup errors
 		}
 	});
@@ -201,7 +201,7 @@ suite("JSON Parsing Tests", () => {
 		// Clean up
 		try {
 			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-		} catch (e) {
+		} catch (_e) {
 			// Ignore cleanup errors
 		}
 	});
@@ -224,7 +224,7 @@ suite("JSON Parsing Tests", () => {
 		// Clean up
 		try {
 			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-		} catch (e) {
+		} catch (_e) {
 			// Ignore cleanup errors
 		}
 	});
@@ -247,7 +247,7 @@ suite("JSON Parsing Tests", () => {
 		// Clean up
 		try {
 			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-		} catch (e) {
+		} catch (_e) {
 			// Ignore cleanup errors
 		}
 	});
@@ -273,7 +273,7 @@ suite("JSON Parsing Tests", () => {
 		// Clean up
 		try {
 			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-		} catch (e) {
+		} catch (_e) {
 			// Ignore cleanup errors
 		}
 	});

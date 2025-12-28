@@ -37,8 +37,8 @@ export function activate(context: vscode.ExtensionContext) {
 			async (cfg: ChartTestConfig) => {
 				try {
 					await chartViewProvider.applyChartConfig(cfg);
-				} catch (e) {
-					vscode.window.showErrorMessage(String(e));
+				} catch (_e) {
+					vscode.window.showErrorMessage(String(_e));
 				}
 			},
 		),

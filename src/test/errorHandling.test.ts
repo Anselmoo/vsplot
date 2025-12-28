@@ -1,5 +1,5 @@
-import * as assert from "assert";
-import * as path from "path";
+import * as assert from "node:assert";
+import * as path from "node:path";
 import * as vscode from "vscode";
 import type {
 	ChartTestConfig,
@@ -52,7 +52,7 @@ suite("Error Handling and Edge Case Tests", () => {
 			// Clean up
 			try {
 				await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-			} catch (e) {
+			} catch (_e) {
 				// Ignore cleanup errors
 			}
 		});
@@ -117,7 +117,7 @@ suite("Error Handling and Edge Case Tests", () => {
 			// Clean up
 			try {
 				await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-			} catch (e) {
+			} catch (_e) {
 				// Ignore cleanup errors
 			}
 		});
@@ -138,14 +138,14 @@ suite("Error Handling and Edge Case Tests", () => {
 			try {
 				await vscode.commands.executeCommand("vsplot.previewData", uri);
 				assert.ok(true, "Preview handled long headers");
-			} catch (error) {
+			} catch (_error) {
 				assert.fail(`Preview failed with long headers: ${error}`);
 			}
 
 			// Clean up
 			try {
 				await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-			} catch (e) {
+			} catch (_e) {
 				// Ignore cleanup errors
 			}
 		});
@@ -172,14 +172,14 @@ suite("Error Handling and Edge Case Tests", () => {
 			try {
 				await vscode.commands.executeCommand("vsplot.previewData", uri);
 				assert.ok(true, "Preview handled many columns");
-			} catch (error) {
+			} catch (_error) {
 				assert.fail(`Preview failed with many columns: ${error}`);
 			}
 
 			// Clean up
 			try {
 				await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-			} catch (e) {
+			} catch (_e) {
 				// Ignore cleanup errors
 			}
 		});
@@ -206,14 +206,14 @@ suite("Error Handling and Edge Case Tests", () => {
 			try {
 				await vscode.commands.executeCommand("vsplot.previewData", uri);
 				assert.ok(true, "Preview handled many objects");
-			} catch (error) {
+			} catch (_error) {
 				assert.fail(`Preview failed with many objects: ${error}`);
 			}
 
 			// Clean up
 			try {
 				await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-			} catch (e) {
+			} catch (_e) {
 				// Ignore cleanup errors
 			}
 		});
@@ -238,7 +238,7 @@ suite("Error Handling and Edge Case Tests", () => {
 			// Clean up
 			try {
 				await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-			} catch (e) {
+			} catch (_e) {
 				// Ignore cleanup errors
 			}
 		});
@@ -286,7 +286,7 @@ suite("Error Handling and Edge Case Tests", () => {
 			// Clean up
 			try {
 				await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-			} catch (e) {
+			} catch (_e) {
 				// Ignore cleanup errors
 			}
 		});
@@ -326,7 +326,7 @@ suite("Error Handling and Edge Case Tests", () => {
 			// Clean up
 			try {
 				await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-			} catch (e) {
+			} catch (_e) {
 				// Ignore cleanup errors
 			}
 		});
@@ -366,7 +366,7 @@ suite("Error Handling and Edge Case Tests", () => {
 			// Clean up
 			try {
 				await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-			} catch (e) {
+			} catch (_e) {
 				// Ignore cleanup errors
 			}
 		});
@@ -406,7 +406,7 @@ suite("Error Handling and Edge Case Tests", () => {
 			// Clean up
 			try {
 				await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-			} catch (e) {
+			} catch (_e) {
 				// Ignore cleanup errors
 			}
 		});
@@ -472,14 +472,14 @@ suite("Error Handling and Edge Case Tests", () => {
 			try {
 				await vscode.commands.executeCommand("vsplot.previewData", uri);
 				assert.ok(true, "DAT file with semicolon parsed");
-			} catch (error) {
+			} catch (_error) {
 				assert.fail(`DAT file parsing failed: ${error}`);
 			}
 
 			// Clean up
 			try {
 				await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-			} catch (e) {
+			} catch (_e) {
 				// Ignore cleanup errors
 			}
 		});
@@ -499,14 +499,14 @@ suite("Error Handling and Edge Case Tests", () => {
 			try {
 				await vscode.commands.executeCommand("vsplot.previewData", uri);
 				assert.ok(true, "OUT file with space delimiter parsed");
-			} catch (error) {
+			} catch (_error) {
 				assert.fail(`OUT file parsing failed: ${error}`);
 			}
 
 			// Clean up
 			try {
 				await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-			} catch (e) {
+			} catch (_e) {
 				// Ignore cleanup errors
 			}
 		});
@@ -526,14 +526,14 @@ suite("Error Handling and Edge Case Tests", () => {
 			try {
 				await vscode.commands.executeCommand("vsplot.previewData", uri);
 				assert.ok(true, "DATA file with colon delimiter parsed");
-			} catch (error) {
+			} catch (_error) {
 				assert.fail(`DATA file parsing failed: ${error}`);
 			}
 
 			// Clean up
 			try {
 				await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-			} catch (e) {
+			} catch (_e) {
 				// Ignore cleanup errors
 			}
 		});
@@ -553,14 +553,14 @@ suite("Error Handling and Edge Case Tests", () => {
 			try {
 				await vscode.commands.executeCommand("vsplot.previewData", uri);
 				assert.ok(true, "TAB file with comma delimiter parsed");
-			} catch (error) {
+			} catch (_error) {
 				assert.fail(`TAB file parsing failed: ${error}`);
 			}
 
 			// Clean up
 			try {
 				await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-			} catch (e) {
+			} catch (_e) {
 				// Ignore cleanup errors
 			}
 		});

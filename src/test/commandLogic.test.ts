@@ -3,7 +3,7 @@
  * These tests use dependency injection to test all code paths
  * that were previously unreachable via command execution.
  */
-import * as assert from "assert";
+import * as assert from "node:assert";
 import * as vscode from "vscode";
 import {
 	type CommandDependencies,
@@ -357,7 +357,7 @@ suite("Command Logic Unit Tests", () => {
 			try {
 				await executePreviewData(uri, deps, mockProvider);
 				assert.fail("Should have thrown an error");
-			} catch (error) {
+			} catch (_error) {
 				assert.ok(error instanceof Error);
 				assert.strictEqual(error.message, "Preview panel creation failed");
 			}
@@ -380,7 +380,7 @@ suite("Command Logic Unit Tests", () => {
 			try {
 				await executePlotData(uri, deps, mockProvider);
 				assert.fail("Should have thrown an error");
-			} catch (error) {
+			} catch (_error) {
 				assert.ok(error instanceof Error);
 				assert.strictEqual(error.message, "Chart creation failed");
 			}
@@ -412,7 +412,7 @@ suite("Command Logic Unit Tests", () => {
 			try {
 				await executeOpenDataViewer(deps, mockProvider);
 				assert.fail("Should have thrown an error");
-			} catch (error) {
+			} catch (_error) {
 				assert.ok(error instanceof Error);
 				assert.strictEqual(error.message, "Preview panel creation failed");
 			}
@@ -431,7 +431,7 @@ suite("Command Logic Unit Tests", () => {
 			try {
 				await executePreviewData(uri, deps, mockProvider);
 				assert.fail("Should have thrown an error");
-			} catch (error) {
+			} catch (_error) {
 				assert.ok(error instanceof Error);
 				assert.strictEqual(error.message, "File read failed");
 			}
@@ -450,7 +450,7 @@ suite("Command Logic Unit Tests", () => {
 			try {
 				await executePlotData(uri, deps, mockProvider);
 				assert.fail("Should have thrown an error");
-			} catch (error) {
+			} catch (_error) {
 				assert.ok(error instanceof Error);
 				assert.strictEqual(error.message, "File read failed");
 			}
@@ -470,7 +470,7 @@ suite("Command Logic Unit Tests", () => {
 			try {
 				await executeOpenDataViewer(deps, mockProvider);
 				assert.fail("Should have thrown an error");
-			} catch (error) {
+			} catch (_error) {
 				assert.ok(error instanceof Error);
 				assert.strictEqual(error.message, "Workspace search failed");
 			}

@@ -1,5 +1,5 @@
-import * as fs from "fs";
-import * as path from "path";
+import * as fs from "node:fs";
+import * as path from "node:path";
 import * as vscode from "vscode";
 
 export interface ParsedData {
@@ -87,7 +87,7 @@ export async function parseDataFile(
 				);
 				return null;
 		}
-	} catch (error) {
+	} catch (_error) {
 		vscode.window.showErrorMessage(`Error reading file: ${error}`);
 		return null;
 	}
@@ -235,7 +235,7 @@ function parseJSON(content: string, fileName: string): ParsedData {
 		} else {
 			throw new Error("JSON format not supported for tabular display");
 		}
-	} catch (error) {
+	} catch (_error) {
 		throw new Error(`Invalid JSON: ${error}`);
 	}
 }

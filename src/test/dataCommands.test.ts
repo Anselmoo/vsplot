@@ -1,5 +1,5 @@
-import * as assert from "assert";
-import * as path from "path";
+import * as assert from "node:assert";
+import * as path from "node:path";
 import * as vscode from "vscode";
 import { closeAllEditors } from "./testUtils";
 
@@ -25,7 +25,7 @@ suite("Data Commands Tests", () => {
 			await vscode.commands.executeCommand("vsplot.previewData", uri);
 			// Command should complete without throwing
 			assert.ok(true, "Command should handle unsupported file type gracefully");
-		} catch (error) {
+		} catch (_error) {
 			// If it throws, that's also acceptable
 			assert.ok(true, "Command threw error for unsupported file type");
 		}
@@ -33,7 +33,7 @@ suite("Data Commands Tests", () => {
 		// Clean up
 		try {
 			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-		} catch (e) {
+		} catch (_e) {
 			// Ignore cleanup errors
 		}
 	});
@@ -118,7 +118,7 @@ suite("Data Commands Tests", () => {
 			await vscode.commands.executeCommand("vsplot.previewData", uri);
 			// Command might complete or show error message
 			assert.ok(true, "Command handled parse failure gracefully");
-		} catch (error) {
+		} catch (_error) {
 			// Throwing is also acceptable for parse failures
 			assert.ok(true, "Command threw error for parse failure");
 		}
@@ -126,7 +126,7 @@ suite("Data Commands Tests", () => {
 		// Clean up
 		try {
 			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-		} catch (e) {
+		} catch (_e) {
 			// Ignore cleanup errors
 		}
 	});
@@ -148,7 +148,7 @@ suite("Data Commands Tests", () => {
 			await vscode.commands.executeCommand("vsplot.plotData", uri);
 			// Command might complete or show error message
 			assert.ok(true, "Command handled parse failure gracefully");
-		} catch (error) {
+		} catch (_error) {
 			// Throwing is also acceptable for parse failures
 			assert.ok(true, "Command threw error for parse failure");
 		}
@@ -156,7 +156,7 @@ suite("Data Commands Tests", () => {
 		// Clean up
 		try {
 			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-		} catch (e) {
+		} catch (_e) {
 			// Ignore cleanup errors
 		}
 	});
@@ -175,14 +175,14 @@ suite("Data Commands Tests", () => {
 		try {
 			await vscode.commands.executeCommand("vsplot.previewData", uri);
 			assert.ok(true, "Command handled corrupted file gracefully");
-		} catch (error) {
+		} catch (_error) {
 			assert.ok(true, "Command threw error for corrupted file");
 		}
 
 		// Clean up
 		try {
 			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-		} catch (e) {
+		} catch (_e) {
 			// Ignore cleanup errors
 		}
 	});
@@ -208,7 +208,7 @@ suite("Data Commands Tests", () => {
 			await vscode.commands.executeCommand("vsplot.plotData", uri);
 			// Command should complete without throwing
 			assert.ok(true, "Command should handle unsupported file type gracefully");
-		} catch (error) {
+		} catch (_error) {
 			// If it throws, that's also acceptable
 			assert.ok(true, "Command threw error for unsupported file type");
 		}
@@ -216,7 +216,7 @@ suite("Data Commands Tests", () => {
 		// Clean up
 		try {
 			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-		} catch (e) {
+		} catch (_e) {
 			// Ignore cleanup errors
 		}
 	});
@@ -237,7 +237,7 @@ suite("Data Commands Tests", () => {
 			// The command will be waiting for user input, so we can't await it fully
 			// But we verified it started without error
 			assert.ok(true, "openDataViewer command executed without error");
-		} catch (error) {
+		} catch (_error) {
 			// Command might fail if no workspace is open, which is acceptable
 			assert.ok(true, "Command handled no-workspace case");
 		}
@@ -259,14 +259,14 @@ suite("Data Commands Tests", () => {
 			await vscode.commands.executeCommand("vsplot.previewData", uri);
 			// If command completes without error, TSV was handled
 			assert.ok(true, "TSV file was previewed successfully");
-		} catch (error) {
+		} catch (_error) {
 			assert.fail(`TSV preview failed: ${error}`);
 		}
 
 		// Clean up
 		try {
 			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-		} catch (e) {
+		} catch (_e) {
 			// Ignore cleanup errors
 		}
 	});
@@ -287,14 +287,14 @@ suite("Data Commands Tests", () => {
 			await vscode.commands.executeCommand("vsplot.plotData", uri);
 			// If command completes without error, TAB was handled
 			assert.ok(true, "TAB file was plotted successfully");
-		} catch (error) {
+		} catch (_error) {
 			assert.fail(`TAB plot failed: ${error}`);
 		}
 
 		// Clean up
 		try {
 			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-		} catch (e) {
+		} catch (_e) {
 			// Ignore cleanup errors
 		}
 	});
@@ -314,14 +314,14 @@ suite("Data Commands Tests", () => {
 		try {
 			await vscode.commands.executeCommand("vsplot.previewData", uri);
 			assert.ok(true, "OUT file was previewed successfully");
-		} catch (error) {
+		} catch (_error) {
 			assert.fail(`OUT preview failed: ${error}`);
 		}
 
 		// Clean up
 		try {
 			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-		} catch (e) {
+		} catch (_e) {
 			// Ignore cleanup errors
 		}
 	});
@@ -342,14 +342,14 @@ suite("Data Commands Tests", () => {
 		try {
 			await vscode.commands.executeCommand("vsplot.plotData", uri);
 			assert.ok(true, "DATA file was plotted successfully");
-		} catch (error) {
+		} catch (_error) {
 			assert.fail(`DATA plot failed: ${error}`);
 		}
 
 		// Clean up
 		try {
 			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-		} catch (e) {
+		} catch (_e) {
 			// Ignore cleanup errors
 		}
 	});
@@ -369,14 +369,14 @@ suite("Data Commands Tests", () => {
 		try {
 			await vscode.commands.executeCommand("vsplot.previewData", uri);
 			assert.ok(true, "JSON array of objects was previewed successfully");
-		} catch (error) {
+		} catch (_error) {
 			assert.fail(`JSON preview failed: ${error}`);
 		}
 
 		// Clean up
 		try {
 			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-		} catch (e) {
+		} catch (_e) {
 			// Ignore cleanup errors
 		}
 	});
@@ -400,7 +400,7 @@ suite("Data Commands Tests", () => {
 			await vscode.commands.executeCommand("vsplot.previewData", uri);
 			// The command should handle this gracefully (showing error message)
 			assert.ok(true, "Command handled file with only comments");
-		} catch (error) {
+		} catch (_error) {
 			// Throwing is acceptable for invalid files
 			assert.ok(true, "Command threw error for file with only comments");
 		}
@@ -408,7 +408,7 @@ suite("Data Commands Tests", () => {
 		// Clean up
 		try {
 			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-		} catch (e) {
+		} catch (_e) {
 			// Ignore cleanup errors
 		}
 	});
@@ -429,7 +429,7 @@ suite("Data Commands Tests", () => {
 			await vscode.commands.executeCommand("vsplot.plotData", uri);
 			// The command should handle this gracefully (showing error message)
 			assert.ok(true, "Command handled whitespace-only file");
-		} catch (error) {
+		} catch (_error) {
 			// Throwing is acceptable for invalid files
 			assert.ok(true, "Command threw error for whitespace-only file");
 		}
@@ -437,7 +437,7 @@ suite("Data Commands Tests", () => {
 		// Clean up
 		try {
 			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-		} catch (e) {
+		} catch (_e) {
 			// Ignore cleanup errors
 		}
 	});
@@ -461,7 +461,7 @@ suite("Data Commands Tests", () => {
 			await vscode.commands.executeCommand("vsplot.previewData", uri);
 			// Command should complete and show error to user
 			assert.ok(true, "Command handled invalid JSON gracefully");
-		} catch (error) {
+		} catch (_error) {
 			// Throwing is also acceptable
 			assert.ok(true, "Command threw error for invalid JSON");
 		}
@@ -469,7 +469,7 @@ suite("Data Commands Tests", () => {
 		// Clean up
 		try {
 			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-		} catch (e) {
+		} catch (_e) {
 			// Ignore cleanup errors
 		}
 	});
@@ -493,7 +493,7 @@ suite("Data Commands Tests", () => {
 			await vscode.commands.executeCommand("vsplot.plotData", uri);
 			// Command should complete and show error to user
 			assert.ok(true, "Command handled invalid JSON gracefully");
-		} catch (error) {
+		} catch (_error) {
 			// Throwing is also acceptable
 			assert.ok(true, "Command threw error for invalid JSON");
 		}
@@ -501,7 +501,7 @@ suite("Data Commands Tests", () => {
 		// Clean up
 		try {
 			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-		} catch (e) {
+		} catch (_e) {
 			// Ignore cleanup errors
 		}
 	});
@@ -525,14 +525,14 @@ suite("Data Commands Tests", () => {
 			await vscode.commands.executeCommand("vsplot.previewData", uri);
 			// Command should handle this by showing error
 			assert.ok(true, "Command handled JSON primitive gracefully");
-		} catch (error) {
+		} catch (_error) {
 			assert.ok(true, "Command threw error for JSON primitive");
 		}
 
 		// Clean up
 		try {
 			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-		} catch (e) {
+		} catch (_e) {
 			// Ignore cleanup errors
 		}
 	});
@@ -555,14 +555,14 @@ suite("Data Commands Tests", () => {
 		try {
 			await vscode.commands.executeCommand("vsplot.previewData", uri);
 			assert.ok(true, "Single object JSON previewed successfully");
-		} catch (error) {
+		} catch (_error) {
 			assert.fail(`Single object JSON preview failed: ${error}`);
 		}
 
 		// Clean up
 		try {
 			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-		} catch (e) {
+		} catch (_e) {
 			// Ignore cleanup errors
 		}
 	});
@@ -585,14 +585,14 @@ suite("Data Commands Tests", () => {
 		try {
 			await vscode.commands.executeCommand("vsplot.plotData", uri);
 			assert.ok(true, "Single object JSON plotted successfully");
-		} catch (error) {
+		} catch (_error) {
 			assert.fail(`Single object JSON plot failed: ${error}`);
 		}
 
 		// Clean up
 		try {
 			await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-		} catch (e) {
+		} catch (_e) {
 			// Ignore cleanup errors
 		}
 	});

@@ -36,7 +36,7 @@ if (!fs.existsSync(summaryPath)) {
 let summary;
 try {
 	summary = JSON.parse(fs.readFileSync(summaryPath, "utf8"));
-} catch (error) {
+} catch (_error) {
 	console.error(
 		`Unable to read coverage summary: ${error instanceof Error ? error.message : error}`,
 	);
