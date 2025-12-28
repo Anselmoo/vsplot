@@ -149,7 +149,7 @@ suite("CSV Parsing Edge Cases Tests", () => {
 		this.timeout(10000);
 		// UTF-8 BOM is EF BB BF
 		const bom = "\uFEFF";
-		const content = bom + "Name,Age,Score\nAlice,25,95\nBob,30,87";
+		const content = `${bom}Name,Age,Score\nAlice,25,95\nBob,30,87`;
 		const tmpPath = path.join(__dirname, "../../test-data/csv-with-bom.csv");
 		await vscode.workspace.fs.writeFile(
 			vscode.Uri.file(tmpPath),

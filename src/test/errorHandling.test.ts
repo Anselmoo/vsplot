@@ -125,7 +125,7 @@ suite("Error Handling and Edge Case Tests", () => {
 		test("should handle CSV with very long header names", async function () {
 			this.timeout(10000);
 
-			const longHeader = "Column_" + "X".repeat(500);
+			const longHeader = `Column_${"X".repeat(500)}`;
 			const content = `${longHeader},${longHeader}2,${longHeader}3\n1,2,3\n4,5,6`;
 			const tmpPath = path.join(__dirname, "../../test-data/long-headers.csv");
 			await vscode.workspace.fs.writeFile(

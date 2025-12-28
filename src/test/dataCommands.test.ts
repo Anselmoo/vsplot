@@ -229,7 +229,7 @@ suite("Data Commands Tests", () => {
 		try {
 			// Execute the command - it will show a quick pick if there are files
 			// Since we can't interact with the UI, we just verify it doesn't crash
-			const promise = vscode.commands.executeCommand("vsplot.openDataViewer");
+			const _promise = vscode.commands.executeCommand("vsplot.openDataViewer");
 
 			// Give it a moment to start
 			await new Promise((resolve) => setTimeout(resolve, 100));
