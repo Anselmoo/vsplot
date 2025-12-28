@@ -1,6 +1,6 @@
 // Generates colored chart images at multiple sizes under images/
-const fs = require("fs");
-const path = require("path");
+const fs = require("node:fs");
+const path = require("node:path");
 const { PNG } = require("pngjs");
 
 const imagesDir = path.join(__dirname, "..", "images");
@@ -163,10 +163,22 @@ function renderChartImage(width, height, outFile) {
 	drawBars(png, width, margin, baseY, barHeightsPx, [colors.bar1, colors.bar2, colors.bar3]);
 
 	const linePts = [
-		{ x: margin + Math.round(width * 0.06), y: baseY - Math.round(drawableH * 0.35) },
-		{ x: margin + Math.round(width * 0.22), y: baseY - Math.round(drawableH * 0.28) },
-		{ x: margin + Math.round(width * 0.4), y: baseY - Math.round(drawableH * 0.62) },
-		{ x: margin + Math.round(width * 0.62), y: baseY - Math.round(drawableH * 0.45) },
+		{
+			x: margin + Math.round(width * 0.06),
+			y: baseY - Math.round(drawableH * 0.35),
+		},
+		{
+			x: margin + Math.round(width * 0.22),
+			y: baseY - Math.round(drawableH * 0.28),
+		},
+		{
+			x: margin + Math.round(width * 0.4),
+			y: baseY - Math.round(drawableH * 0.62),
+		},
+		{
+			x: margin + Math.round(width * 0.62),
+			y: baseY - Math.round(drawableH * 0.45),
+		},
 	];
 	drawLinePath(
 		png,

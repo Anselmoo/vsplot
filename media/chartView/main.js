@@ -23,7 +23,8 @@ let initialBounds = null;
 // Get default settings from body data attributes
 const defaultStylePreset = document.body.dataset.defaultStylePreset || "clean";
 const defaultDecimals = parseInt(document.body.dataset.defaultDecimals) || 2;
-const defaultUseThousands = document.body.dataset.defaultUseThousands === "true";
+const defaultUseThousands =
+	document.body.dataset.defaultUseThousands === "true";
 
 // Current style settings
 let stylePreset = defaultStylePreset;
@@ -36,12 +37,19 @@ let useThousands = defaultUseThousands;
  */
 try {
 	const zoomPlugin =
-		window.chartjsPluginZoom || window.ChartZoom || window["chartjs-plugin-zoom"] || undefined;
-	if (zoomPlugin && window.Chart && typeof window.Chart.register === "function") {
+		window.chartjsPluginZoom ||
+		window.ChartZoom ||
+		window["chartjs-plugin-zoom"] ||
+		undefined;
+	if (
+		zoomPlugin &&
+		window.Chart &&
+		typeof window.Chart.register === "function"
+	) {
 		window.Chart.register(zoomPlugin);
 		pluginAvailable = true;
 	}
-} catch (e) {
+} catch (_e) {
 	// Zoom plugin not available, will use manual zoom fallback
 }
 
@@ -59,9 +67,12 @@ window.addEventListener("message", (event) => {
 					applyConfig(pendingConfig);
 					createChart();
 					if (pendingConfigId) {
-						vscode.postMessage({ type: "vsplot:test:config-applied", id: pendingConfigId });
+						vscode.postMessage({
+							type: "vsplot:test:config-applied",
+							id: pendingConfigId,
+						});
 					}
-				} catch (e) {
+				} catch (_e) {
 					console.error("Error applying pending config:", e);
 				}
 				pendingConfig = null;
@@ -78,10 +89,13 @@ window.addEventListener("message", (event) => {
 					applyConfig(cfg);
 					createChart();
 					if (message.id) {
-						vscode.postMessage({ type: "vsplot:test:config-applied", id: message.id });
+						vscode.postMessage({
+							type: "vsplot:test:config-applied",
+							id: message.id,
+						});
 					}
 				}
-			} catch (e) {
+			} catch (_e) {
 				console.error("Error setting config:", e);
 			}
 			break;
@@ -106,11 +120,17 @@ window.addEventListener("message", (event) => {
 							: 0,
 					datasetLens:
 						chart && chart.data && chart.data.datasets
-							? chart.data.datasets.map((d) => (Array.isArray(d.data) ? d.data.length : 0))
+							? chart.data.datasets.map((d) =>
+									Array.isArray(d.data) ? d.data.length : 0,
+								)
 							: [],
 				};
-				vscode.postMessage({ type: "vsplot:test:state", id: message.id, payload: state });
-			} catch (e) {
+				vscode.postMessage({
+					type: "vsplot:test:state",
+					id: message.id,
+					payload: state,
+				});
+			} catch (_e) {
 				vscode.postMessage({
 					type: "vsplot:test:state",
 					id: message.id,
@@ -127,10 +147,14 @@ window.addEventListener("message", (event) => {
  */
 function applyConfig(cfg) {
 	if (cfg.chartType) document.getElementById("chartType").value = cfg.chartType;
-	if (typeof cfg.x === "number") document.getElementById("xAxis").value = String(cfg.x);
-	if (typeof cfg.y === "number") document.getElementById("yAxis").value = String(cfg.y);
-	if (typeof cfg.y2 !== "undefined") document.getElementById("yAxis2").value = String(cfg.y2);
-	if (typeof cfg.legend === "boolean") document.getElementById("legendToggle").checked = cfg.legend;
+	if (typeof cfg.x === "number")
+		document.getElementById("xAxis").value = String(cfg.x);
+	if (typeof cfg.y === "number")
+		document.getElementById("yAxis").value = String(cfg.y);
+	if (typeof cfg.y2 !== "undefined")
+		document.getElementById("yAxis2").value = String(cfg.y2);
+	if (typeof cfg.legend === "boolean")
+		document.getElementById("legendToggle").checked = cfg.legend;
 	if (typeof cfg.dragZoom === "boolean")
 		document.getElementById("dragZoomToggle").checked = cfg.dragZoom;
 	if (typeof cfg.curveSmoothing === "boolean")
@@ -157,7 +181,8 @@ function applyConfig(cfg) {
 function initializeChart() {
 	if (!currentData) return;
 
-	document.getElementById("title").textContent = `Chart: ${currentData.fileName}`;
+	document.getElementById("title").textContent =
+		`Chart: ${currentData.fileName}`;
 
 	// Populate axis selectors
 	const xAxisSelect = document.getElementById("xAxis");
@@ -225,7 +250,7 @@ function initializeChart() {
 				document.getElementById("curveToggle").checked = saved.curveSmoothing;
 			}
 			restored = true;
-		} catch (e) {
+		} catch (_e) {
 			console.error("Error restoring state:", e);
 		}
 	}
@@ -234,7 +259,7 @@ function initializeChart() {
 			document.getElementById("stylePreset").value = stylePreset;
 			document.getElementById("decimals").value = String(decimals);
 			document.getElementById("thousands").checked = !!useThousands;
-		} catch (e) {
+		} catch (_e) {
 			console.error("Error setting defaults:", e);
 		}
 	}
@@ -298,7 +323,9 @@ function createChart() {
 		// Allow scatter to have Y2 as separate dataset rendered against right axis
 
 		if (
-			(chartType === "line" || chartType === "bar" || chartType === "scatter") &&
+			(chartType === "line" ||
+				chartType === "bar" ||
+				chartType === "scatter") &&
 			!isNaN(yAxis2Index) &&
 			yAxis2Index >= 0 &&
 			isCategoricalY2
@@ -312,7 +339,9 @@ function createChart() {
 		// Show/hide aggregation control
 		const aggGroup = document.getElementById("aggGroup");
 		const showAgg =
-			(chartType === "bar" && !xIsTime) || chartType === "pie" || chartType === "doughnut";
+			(chartType === "bar" && !xIsTime) ||
+			chartType === "pie" ||
+			chartType === "doughnut";
 		aggGroup.style.display = showAgg ? "flex" : "none";
 
 		// Show/hide curve smoothing control (only for line charts)
@@ -340,7 +369,9 @@ function createChart() {
 
 		const dragEnabled = document.getElementById("dragZoomToggle").checked;
 		const curveSmoothing =
-			chartType === "line" ? document.getElementById("curveToggle").checked : true;
+			chartType === "line"
+				? document.getElementById("curveToggle").checked
+				: true;
 
 		chart = new Chart(ctx, {
 			type: chartType,
@@ -362,7 +393,7 @@ function createChart() {
 			const metaEl = document.getElementById("chartMeta");
 			statsEl.classList.add("compact");
 			metaEl.classList.add("compact");
-		} catch (e) {
+		} catch (_e) {
 			console.error("Error applying card classes:", e);
 		}
 
@@ -385,7 +416,9 @@ function createChart() {
 				legend: document.getElementById("legendToggle").checked,
 				dragZoom: document.getElementById("dragZoomToggle").checked,
 				curveSmoothing:
-					chartType === "line" ? document.getElementById("curveToggle").checked : undefined,
+					chartType === "line"
+						? document.getElementById("curveToggle").checked
+						: undefined,
 				color: document.getElementById("colorPicker").value,
 				agg: document.getElementById("aggFunc").value,
 				stylePreset,
@@ -393,14 +426,14 @@ function createChart() {
 				thousands: useThousands,
 			};
 			vscode.setState && vscode.setState({ byFile });
-		} catch (e) {
+		} catch (_e) {
 			console.error("Error saving state:", e);
 		}
 
 		// Cache initial bounds for manual reset fallback
 		cacheInitialBounds(chart);
-	} catch (error) {
-		showError("Error creating chart: " + error.message);
+	} catch (_error) {
+		showError("Error creating chart: " + _error.message);
 	}
 }
 
@@ -430,7 +463,8 @@ function prepareChartData(chartType, xAxisIndex, yAxisIndex, yAxis2Index) {
 			aggregator(aggregatedData, key, value);
 		});
 
-		const aggOut = aggFunc === "avg" ? collapseAvg(aggregatedData) : aggregatedData;
+		const aggOut =
+			aggFunc === "avg" ? collapseAvg(aggregatedData) : aggregatedData;
 		const result = {
 			labels: Object.keys(aggOut),
 			datasets: [
@@ -463,7 +497,9 @@ function prepareChartData(chartType, xAxisIndex, yAxisIndex, yAxis2Index) {
 		});
 		const out1 = aggFunc === "avg" ? collapseAvg(aggregated) : aggregated;
 		const out2 = aggFunc === "avg" ? collapseAvg(aggregated2) : aggregated2;
-		const labels = Object.keys(out1).sort((a, b) => String(a).localeCompare(String(b)));
+		const labels = Object.keys(out1).sort((a, b) =>
+			String(a).localeCompare(String(b)),
+		);
 		const values = labels.map((k) => out1[k]);
 		const values2 = hasY2 ? labels.map((k) => out2[k] || 0) : undefined;
 		const result = {
@@ -505,7 +541,9 @@ function prepareChartData(chartType, xAxisIndex, yAxisIndex, yAxis2Index) {
 		let result;
 		if (chartType === "scatter") {
 			const points = currentData.rows.map((row) => ({
-				x: xIsTime ? new Date(row[xAxisIndex]) : parseFloat(row[xAxisIndex]) || 0,
+				x: xIsTime
+					? new Date(row[xAxisIndex])
+					: parseFloat(row[xAxisIndex]) || 0,
 				y: parseFloat(row[yAxisIndex]) || 0,
 			}));
 			result = {
@@ -524,7 +562,9 @@ function prepareChartData(chartType, xAxisIndex, yAxisIndex, yAxis2Index) {
 								{
 									label: y2Label,
 									data: currentData.rows.map((row) => ({
-										x: xIsTime ? new Date(row[xAxisIndex]) : parseFloat(row[xAxisIndex]) || 0,
+										x: xIsTime
+											? new Date(row[xAxisIndex])
+											: parseFloat(row[xAxisIndex]) || 0,
 										y: parseFloat(row[yAxis2Index]) || 0,
 									})),
 									yAxisID: "y2",
@@ -580,7 +620,9 @@ function prepareChartData(chartType, xAxisIndex, yAxisIndex, yAxis2Index) {
 				const labels = xIsTimeLocal
 					? currentData.rows.map((row) => new Date(row[xAxisIndex]))
 					: currentData.rows.map((row) => row[xAxisIndex]);
-				const values = currentData.rows.map((row) => parseFloat(row[yAxisIndex]) || 0);
+				const values = currentData.rows.map(
+					(row) => parseFloat(row[yAxisIndex]) || 0,
+				);
 				const values2 = hasY2
 					? currentData.rows.map((row) => parseFloat(row[yAxis2Index]) || 0)
 					: undefined;
@@ -591,7 +633,9 @@ function prepareChartData(chartType, xAxisIndex, yAxisIndex, yAxis2Index) {
 							label: yLabel,
 							data: values,
 							backgroundColor:
-								chartType === "bar" ? getPickedColor("rgba", 0.7) : getPickedColor("rgba", 0.2),
+								chartType === "bar"
+									? getPickedColor("rgba", 0.7)
+									: getPickedColor("rgba", 0.2),
 							borderColor: getPickedColor("rgba", 1),
 							borderWidth: chartType === "bar" ? 1 : 2,
 							borderRadius: chartType === "bar" ? 4 : 0,
@@ -646,13 +690,20 @@ function getChartOptions(
 	y2Title,
 	curveSmoothing = true,
 ) {
-	const fg = getComputedStyle(document.body).getPropertyValue("--vscode-foreground");
-	const grid = getComputedStyle(document.body).getPropertyValue("--vscode-widget-border");
+	const fg = getComputedStyle(document.body).getPropertyValue(
+		"--vscode-foreground",
+	);
+	const grid = getComputedStyle(document.body).getPropertyValue(
+		"--vscode-widget-border",
+	);
 	const tooltipBg =
-		getComputedStyle(document.body).getPropertyValue("--vscode-editorHoverWidget-background") ||
-		"rgba(0,0,0,0.8)";
+		getComputedStyle(document.body).getPropertyValue(
+			"--vscode-editorHoverWidget-background",
+		) || "rgba(0,0,0,0.8)";
 	const tooltipFg =
-		getComputedStyle(document.body).getPropertyValue("--vscode-editorHoverWidget-foreground") || fg;
+		getComputedStyle(document.body).getPropertyValue(
+			"--vscode-editorHoverWidget-foreground",
+		) || fg;
 	const baseOptions = {
 		responsive: true,
 		maintainAspectRatio: false,
@@ -685,7 +736,7 @@ function getChartOptions(
 										: ctx.raw;
 							if (typeof val === "number") return dsLabel + formatNumber(val);
 							return dsLabel + String(val);
-						} catch (e) {
+						} catch (_e) {
 							return ctx.formattedValue;
 						}
 					},
@@ -720,7 +771,11 @@ function getChartOptions(
 		},
 	};
 
-	if (chartType !== "pie" && chartType !== "doughnut" && chartType !== "radar") {
+	if (
+		chartType !== "pie" &&
+		chartType !== "doughnut" &&
+		chartType !== "radar"
+	) {
 		baseOptions.scales = {
 			x: {
 				type: detectXScaleType(),
@@ -729,7 +784,7 @@ function getChartOptions(
 					callback: (v) => {
 						try {
 							return formatTick("x", v);
-						} catch (e) {
+						} catch (_e) {
 							return v;
 						}
 					},
@@ -738,7 +793,9 @@ function getChartOptions(
 				title: {
 					display: !!xAxisTitle,
 					text: xAxisTitle,
-					color: getComputedStyle(document.body).getPropertyValue("--vscode-descriptionForeground"),
+					color: getComputedStyle(document.body).getPropertyValue(
+						"--vscode-descriptionForeground",
+					),
 				},
 			},
 			y: {
@@ -747,7 +804,7 @@ function getChartOptions(
 					callback: (v) => {
 						try {
 							return formatTick("y", v);
-						} catch (e) {
+						} catch (_e) {
 							return v;
 						}
 					},
@@ -756,7 +813,9 @@ function getChartOptions(
 				title: {
 					display: !!yAxisTitle,
 					text: yAxisTitle,
-					color: getComputedStyle(document.body).getPropertyValue("--vscode-descriptionForeground"),
+					color: getComputedStyle(document.body).getPropertyValue(
+						"--vscode-descriptionForeground",
+					),
 				},
 			},
 		};
@@ -768,7 +827,7 @@ function getChartOptions(
 					callback: (v) => {
 						try {
 							return formatTick("y2", v);
-						} catch (e) {
+						} catch (_e) {
 							return v;
 						}
 					},
@@ -779,7 +838,9 @@ function getChartOptions(
 				title: {
 					display: !!y2Title,
 					text: y2Title,
-					color: getComputedStyle(document.body).getPropertyValue("--vscode-descriptionForeground"),
+					color: getComputedStyle(document.body).getPropertyValue(
+						"--vscode-descriptionForeground",
+					),
 				},
 			};
 		}
@@ -906,7 +967,10 @@ function updateChartStats() {
 		const avg = yValues.reduce((a, b) => a + b, 0) / yValues.length;
 		const sorted = [...yValues].sort((a, b) => a - b);
 		const mid = Math.floor(sorted.length / 2);
-		const median = sorted.length % 2 !== 0 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+		const median =
+			sorted.length % 2 !== 0
+				? sorted[mid]
+				: (sorted[mid - 1] + sorted[mid]) / 2;
 		const variance =
 			yValues.reduce((acc, v) => acc + (v - avg) ** 2, 0) /
 			(yValues.length > 1 ? yValues.length - 1 : 1);
@@ -1029,7 +1093,8 @@ document.getElementById("yAxis").addEventListener("change", createChart);
 
 document.getElementById("legendToggle").addEventListener("change", () => {
 	if (chart) {
-		chart.options.plugins.legend.display = document.getElementById("legendToggle").checked;
+		chart.options.plugins.legend.display =
+			document.getElementById("legendToggle").checked;
 		chart.update();
 	}
 });
@@ -1048,7 +1113,9 @@ document.getElementById("curveToggle").addEventListener("change", () => {
 	if (chart) {
 		const curveSmoothing = document.getElementById("curveToggle").checked;
 		chart.options.elements.line.tension = curveSmoothing ? 0.3 : 0;
-		chart.options.elements.line.cubicInterpolationMode = curveSmoothing ? "monotone" : "default";
+		chart.options.elements.line.cubicInterpolationMode = curveSmoothing
+			? "monotone"
+			: "default";
 		chart.update();
 	}
 });
@@ -1109,7 +1176,9 @@ document.getElementById("decimals").addEventListener("change", () => {
 	decimals = parseInt(document.getElementById("decimals").value) || 2;
 	if (chart) {
 		const curveSmoothing =
-			chart.config.type === "line" ? document.getElementById("curveToggle").checked : true;
+			chart.config.type === "line"
+				? document.getElementById("curveToggle").checked
+				: true;
 		chart.options = getChartOptions(
 			chart.config.type,
 			chart.options.scales?.x?.title?.text,
@@ -1127,7 +1196,9 @@ document.getElementById("thousands").addEventListener("change", () => {
 	useThousands = document.getElementById("thousands").checked;
 	if (chart) {
 		const curveSmoothing =
-			chart.config.type === "line" ? document.getElementById("curveToggle").checked : true;
+			chart.config.type === "line"
+				? document.getElementById("curveToggle").checked
+				: true;
 		chart.options = getChartOptions(
 			chart.config.type,
 			chart.options.scales?.x?.title?.text,
@@ -1148,18 +1219,22 @@ document.getElementById("compactCardsToggle").addEventListener("change", () => {
 		const metaEl = document.getElementById("chartMeta");
 		statsEl.classList.toggle("compact", !!compactCards);
 		metaEl.classList.toggle("compact", !!compactCards);
-	} catch (e) {
+	} catch (_e) {
 		console.error("Error toggling compact cards:", e);
 	}
 	// persist without forcing chart rebuild
 	try {
 		const state = vscode.getState && vscode.getState();
 		const byFile = state && state.byFile ? state.byFile : {};
-		byFile[currentData.fileName] = Object.assign({}, byFile[currentData.fileName] || {}, {
-			compactCards,
-		});
+		byFile[currentData.fileName] = Object.assign(
+			{},
+			byFile[currentData.fileName] || {},
+			{
+				compactCards,
+			},
+		);
 		vscode.setState && vscode.setState({ byFile });
-	} catch (e) {
+	} catch (_e) {
 		console.error("Error persisting compact cards state:", e);
 	}
 });
@@ -1171,17 +1246,21 @@ document.getElementById("iconsToggle").addEventListener("change", () => {
 		const metaEl = document.getElementById("chartMeta");
 		statsEl.classList.toggle("no-icons", !showIcons);
 		metaEl.classList.toggle("no-icons", !showIcons);
-	} catch (e) {
+	} catch (_e) {
 		console.error("Error toggling icons:", e);
 	}
 	try {
 		const state = vscode.getState && vscode.getState();
 		const byFile = state && state.byFile ? state.byFile : {};
-		byFile[currentData.fileName] = Object.assign({}, byFile[currentData.fileName] || {}, {
-			showIcons,
-		});
+		byFile[currentData.fileName] = Object.assign(
+			{},
+			byFile[currentData.fileName] || {},
+			{
+				showIcons,
+			},
+		);
 		vscode.setState && vscode.setState({ byFile });
-	} catch (e) {
+	} catch (_e) {
 		console.error("Error persisting icons state:", e);
 	}
 });
@@ -1292,7 +1371,12 @@ function collapseAvg(obj) {
 	const out = {};
 	for (const k in obj) {
 		const v = obj[k];
-		out[k] = typeof v === "object" && v && "s" in v && "c" in v ? (v.c ? v.s / v.c : 0) : v;
+		out[k] =
+			typeof v === "object" && v && "s" in v && "c" in v
+				? v.c
+					? v.s / v.c
+					: 0
+				: v;
 	}
 	return out;
 }
@@ -1311,7 +1395,7 @@ function formatNumber(n) {
 			useGrouping: !!useThousands,
 		});
 		return nf.format(n);
-	} catch (e) {
+	} catch (_e) {
 		const fixed = n.toFixed(decimals);
 		return fixed;
 	}
@@ -1482,7 +1566,12 @@ function setupManualDrag(enable) {
 		const maxY = Math.max(start.y, endY);
 		start = null;
 		// Apply manual zoom
-		if (Math.abs(maxX - minX) > 5 && Math.abs(maxY - minY) > 5 && chart && chart.scales) {
+		if (
+			Math.abs(maxX - minX) > 5 &&
+			Math.abs(maxY - minY) > 5 &&
+			chart &&
+			chart.scales
+		) {
 			try {
 				const xScale = chart.scales.x;
 				const yScale = chart.scales.y;
@@ -1503,7 +1592,7 @@ function setupManualDrag(enable) {
 						chart.update();
 					}
 				}
-			} catch (e) {
+			} catch (_e) {
 				console.error("Error applying manual zoom:", e);
 			}
 		}

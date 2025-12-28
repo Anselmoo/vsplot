@@ -1,10 +1,7 @@
-import * as assert from "assert";
-import * as path from "path";
+import * as assert from "node:assert";
+import * as path from "node:path";
 import * as vscode from "vscode";
-import type {
-	ChartTestConfig,
-	ChartTestState,
-} from "../providers/chartViewProvider";
+import type { ChartTestConfig, ChartTestState } from "../providers/chartViewProvider";
 
 // Extension ID constant
 const EXTENSION_ID = "AnselmHahn.vsplot";
@@ -34,30 +31,24 @@ suite("Provider Integration Tests", () => {
 
 			const content =
 				'Name,Description\nTest,"Contains special chars: <>&\'""\nAnother,"More: @#$%"';
-			const tmpPath = path.join(
-				__dirname,
-				"../../test-data/special-chars-provider.csv",
-			);
-			await vscode.workspace.fs.writeFile(
-				vscode.Uri.file(tmpPath),
-				Buffer.from(content, "utf8"),
-			);
+			const tmpPath = path.join(__dirname, "../../test-data/special-chars-provider.csv");
+			await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 			const uri = vscode.Uri.file(tmpPath);
 
 			try {
 				await vscode.commands.executeCommand("vsplot.previewData", uri);
 				assert.ok(true, "Preview handled special characters");
-			} catch (error) {
-				assert.fail(`Preview failed with special chars: ${error}`);
+			} catch (_error) {
+				assert.fail(`Preview failed with special chars: ${_error}`);
 			}
 
 			// Clean up
 			try {
 				await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-			} catch (e) {
+			} catch (_e) {
 				// Log cleanup errors for debugging but don't fail the test
-				const errorMessage = e instanceof Error ? e.message : String(e);
+				const errorMessage = _e instanceof Error ? _e.message : String(_e);
 				console.warn(`Cleanup warning: ${errorMessage}`);
 			}
 		});
@@ -66,30 +57,24 @@ suite("Provider Integration Tests", () => {
 			this.timeout(10000);
 
 			const content = "Name,Value\n日本語,中文\nРусский,العربية\n한국어,ไทย";
-			const tmpPath = path.join(
-				__dirname,
-				"../../test-data/unicode-provider.csv",
-			);
-			await vscode.workspace.fs.writeFile(
-				vscode.Uri.file(tmpPath),
-				Buffer.from(content, "utf8"),
-			);
+			const tmpPath = path.join(__dirname, "../../test-data/unicode-provider.csv");
+			await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 			const uri = vscode.Uri.file(tmpPath);
 
 			try {
 				await vscode.commands.executeCommand("vsplot.previewData", uri);
 				assert.ok(true, "Preview handled unicode characters");
-			} catch (error) {
-				assert.fail(`Preview failed with unicode: ${error}`);
+			} catch (_error) {
+				assert.fail(`Preview failed with unicode: ${_error}`);
 			}
 
 			// Clean up
 			try {
 				await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-			} catch (e) {
+			} catch (_e) {
 				// Log cleanup errors for debugging but don't fail the test
-				const errorMessage = e instanceof Error ? e.message : String(e);
+				const errorMessage = _e instanceof Error ? _e.message : String(_e);
 				console.warn(`Cleanup warning: ${errorMessage}`);
 			}
 		});
@@ -105,30 +90,24 @@ suite("Provider Integration Tests", () => {
 			);
 			const content = [header, ...rows].join("\n");
 
-			const tmpPath = path.join(
-				__dirname,
-				"../../test-data/large-provider.csv",
-			);
-			await vscode.workspace.fs.writeFile(
-				vscode.Uri.file(tmpPath),
-				Buffer.from(content, "utf8"),
-			);
+			const tmpPath = path.join(__dirname, "../../test-data/large-provider.csv");
+			await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 			const uri = vscode.Uri.file(tmpPath);
 
 			try {
 				await vscode.commands.executeCommand("vsplot.previewData", uri);
 				assert.ok(true, "Preview handled large dataset");
-			} catch (error) {
-				assert.fail(`Preview failed with large dataset: ${error}`);
+			} catch (_error) {
+				assert.fail(`Preview failed with large dataset: ${_error}`);
 			}
 
 			// Clean up
 			try {
 				await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-			} catch (e) {
+			} catch (_e) {
 				// Log cleanup errors for debugging but don't fail the test
-				const errorMessage = e instanceof Error ? e.message : String(e);
+				const errorMessage = _e instanceof Error ? _e.message : String(_e);
 				console.warn(`Cleanup warning: ${errorMessage}`);
 			}
 		});
@@ -200,10 +179,7 @@ suite("Provider Integration Tests", () => {
 				legend: false,
 			};
 
-			await vscode.commands.executeCommand(
-				"vsplot.test.applyChartConfig",
-				config,
-			);
+			await vscode.commands.executeCommand("vsplot.test.applyChartConfig", config);
 
 			const state = (await vscode.commands.executeCommand(
 				"vsplot.test.requestChartState",
@@ -235,10 +211,7 @@ suite("Provider Integration Tests", () => {
 				agg: "count",
 			};
 
-			await vscode.commands.executeCommand(
-				"vsplot.test.applyChartConfig",
-				config,
-			);
+			await vscode.commands.executeCommand("vsplot.test.applyChartConfig", config);
 
 			const state = (await vscode.commands.executeCommand(
 				"vsplot.test.requestChartState",
@@ -269,26 +242,15 @@ suite("Provider Integration Tests", () => {
 				thousands: true,
 			};
 
-			await vscode.commands.executeCommand(
-				"vsplot.test.applyChartConfig",
-				config,
-			);
+			await vscode.commands.executeCommand("vsplot.test.applyChartConfig", config);
 
 			const state = (await vscode.commands.executeCommand(
 				"vsplot.test.requestChartState",
 			)) as ChartTestState;
 
-			assert.strictEqual(
-				state.stylePreset,
-				"soft",
-				"Style preset should be soft",
-			);
+			assert.strictEqual(state.stylePreset, "soft", "Style preset should be soft");
 			assert.strictEqual(state.decimals, 1, "Decimals should be 1");
-			assert.strictEqual(
-				state.thousands,
-				true,
-				"Thousands separator should be enabled",
-			);
+			assert.strictEqual(state.thousands, true, "Thousands separator should be enabled");
 		});
 
 		test("applyChartConfig should handle vibrant style preset", async function () {
@@ -311,20 +273,13 @@ suite("Provider Integration Tests", () => {
 				decimals: 0,
 			};
 
-			await vscode.commands.executeCommand(
-				"vsplot.test.applyChartConfig",
-				config,
-			);
+			await vscode.commands.executeCommand("vsplot.test.applyChartConfig", config);
 
 			const state = (await vscode.commands.executeCommand(
 				"vsplot.test.requestChartState",
 			)) as ChartTestState;
 
-			assert.strictEqual(
-				state.stylePreset,
-				"vibrant",
-				"Style preset should be vibrant",
-			);
+			assert.strictEqual(state.stylePreset, "vibrant", "Style preset should be vibrant");
 			assert.strictEqual(state.decimals, 0, "Decimals should be 0");
 		});
 
@@ -350,40 +305,26 @@ suite("Provider Integration Tests", () => {
 				dragZoom: true,
 			};
 
-			await vscode.commands.executeCommand(
-				"vsplot.test.applyChartConfig",
-				configEnabled,
-			);
+			await vscode.commands.executeCommand("vsplot.test.applyChartConfig", configEnabled);
 
 			const stateEnabled = (await vscode.commands.executeCommand(
 				"vsplot.test.requestChartState",
 			)) as ChartTestState;
 
-			assert.strictEqual(
-				stateEnabled.dragZoom,
-				true,
-				"Drag zoom should be enabled",
-			);
+			assert.strictEqual(stateEnabled.dragZoom, true, "Drag zoom should be enabled");
 
 			// Disable drag zoom
 			const configDisabled: ChartTestConfig = {
 				dragZoom: false,
 			};
 
-			await vscode.commands.executeCommand(
-				"vsplot.test.applyChartConfig",
-				configDisabled,
-			);
+			await vscode.commands.executeCommand("vsplot.test.applyChartConfig", configDisabled);
 
 			const stateDisabled = (await vscode.commands.executeCommand(
 				"vsplot.test.requestChartState",
 			)) as ChartTestState;
 
-			assert.strictEqual(
-				stateDisabled.dragZoom,
-				false,
-				"Drag zoom should be disabled",
-			);
+			assert.strictEqual(stateDisabled.dragZoom, false, "Drag zoom should be disabled");
 		});
 	});
 
@@ -416,9 +357,7 @@ suite("Provider Integration Tests", () => {
 				assert.ok(state, "Chart state should be available after workflow");
 			} finally {
 				// Ensure any opened editors/webviews are closed after the test
-				await vscode.commands.executeCommand(
-					"workbench.action.closeAllEditors",
-				);
+				await vscode.commands.executeCommand("workbench.action.closeAllEditors");
 			}
 		});
 
@@ -443,15 +382,10 @@ suite("Provider Integration Tests", () => {
 					"vsplot.test.requestChartState",
 				)) as ChartTestState;
 
-				assert.ok(
-					state,
-					"Chart state should be available after multiple plots",
-				);
+				assert.ok(state, "Chart state should be available after multiple plots");
 			} finally {
 				// Ensure any opened editors/webviews are closed after the test
-				await vscode.commands.executeCommand(
-					"workbench.action.closeAllEditors",
-				);
+				await vscode.commands.executeCommand("workbench.action.closeAllEditors");
 			}
 		});
 
@@ -465,10 +399,7 @@ suite("Provider Integration Tests", () => {
 
 				// Create a TSV file
 				const tsvContent = "A\tB\tC\n1\t2\t3\n4\t5\t6";
-				const tsvPath = path.join(
-					__dirname,
-					"../../test-data/workflow-test.tsv",
-				);
+				const tsvPath = path.join(__dirname, "../../test-data/workflow-test.tsv");
 				await vscode.workspace.fs.writeFile(
 					vscode.Uri.file(tsvPath),
 					Buffer.from(tsvContent, "utf8"),
@@ -476,40 +407,29 @@ suite("Provider Integration Tests", () => {
 
 				// Plot CSV first
 				const csvPath = path.join(basePath, "sample-data", "iris.csv");
-				await vscode.commands.executeCommand(
-					"vsplot.plotData",
-					vscode.Uri.file(csvPath),
-				);
+				await vscode.commands.executeCommand("vsplot.plotData", vscode.Uri.file(csvPath));
 
 				// Then plot TSV
-				await vscode.commands.executeCommand(
-					"vsplot.plotData",
-					vscode.Uri.file(tsvPath),
-				);
+				await vscode.commands.executeCommand("vsplot.plotData", vscode.Uri.file(tsvPath));
 
 				// Verify state
 				const state = (await vscode.commands.executeCommand(
 					"vsplot.test.requestChartState",
 				)) as ChartTestState;
 
-				assert.ok(
-					state,
-					"Chart state should be available after switching files",
-				);
+				assert.ok(state, "Chart state should be available after switching files");
 
 				// Clean up TSV file
 				try {
 					await vscode.workspace.fs.delete(vscode.Uri.file(tsvPath));
-				} catch (e) {
+				} catch (_e) {
 					// Log cleanup errors for debugging but don't fail the test
-					const errorMessage = e instanceof Error ? e.message : String(e);
+					const errorMessage = _e instanceof Error ? _e.message : String(_e);
 					console.warn(`Cleanup warning: ${errorMessage}`);
 				}
 			} finally {
 				// Ensure any opened editors/webviews are closed after the test
-				await vscode.commands.executeCommand(
-					"workbench.action.closeAllEditors",
-				);
+				await vscode.commands.executeCommand("workbench.action.closeAllEditors");
 			}
 		});
 	});

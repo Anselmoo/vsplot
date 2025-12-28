@@ -1,9 +1,6 @@
 import * as vscode from "vscode";
 import { registerDataCommands } from "./commands/dataCommands";
-import {
-	type ChartTestConfig,
-	ChartViewProvider,
-} from "./providers/chartViewProvider";
+import { type ChartTestConfig, ChartViewProvider } from "./providers/chartViewProvider";
 import { DataPreviewProvider } from "./providers/dataPreviewProvider";
 
 export function activate(context: vscode.ExtensionContext) {
@@ -11,20 +8,11 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// Register webview providers
 	const chartViewProvider = new ChartViewProvider(context.extensionUri);
-	const dataPreviewProvider = new DataPreviewProvider(
-		context.extensionUri,
-		chartViewProvider,
-	);
+	const dataPreviewProvider = new DataPreviewProvider(context.extensionUri, chartViewProvider);
 
 	context.subscriptions.push(
-		vscode.window.registerWebviewViewProvider(
-			"vsplot.dataPreview",
-			dataPreviewProvider,
-		),
-		vscode.window.registerWebviewViewProvider(
-			"vsplot.chartView",
-			chartViewProvider,
-		),
+		vscode.window.registerWebviewViewProvider("vsplot.dataPreview", dataPreviewProvider),
+		vscode.window.registerWebviewViewProvider("vsplot.chartView", chartViewProvider),
 	);
 
 	// Register commands
@@ -37,17 +25,14 @@ export function activate(context: vscode.ExtensionContext) {
 			async (cfg: ChartTestConfig) => {
 				try {
 					await chartViewProvider.applyChartConfig(cfg);
-				} catch (e) {
-					vscode.window.showErrorMessage(String(e));
+				} catch (_e) {
+					vscode.window.showErrorMessage(String(_e));
 				}
 			},
 		),
-		vscode.commands.registerCommand(
-			"vsplot.test.requestChartState",
-			async () => {
-				return chartViewProvider.requestChartState();
-			},
-		),
+		vscode.commands.registerCommand("vsplot.test.requestChartState", async () => {
+			return chartViewProvider.requestChartState();
+		}),
 	);
 
 	console.log("VSPlot extension registered all providers and commands");

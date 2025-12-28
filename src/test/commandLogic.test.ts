@@ -3,7 +3,7 @@
  * These tests use dependency injection to test all code paths
  * that were previously unreachable via command execution.
  */
-import * as assert from "assert";
+import * as assert from "node:assert";
 import * as vscode from "vscode";
 import {
 	type CommandDependencies,
@@ -16,9 +16,7 @@ import type { ParsedData } from "../data/load";
 
 // --- Mock Helpers ---
 
-function createMockDeps(
-	overrides: Partial<CommandDependencies> = {},
-): CommandDependencies {
+function createMockDeps(overrides: Partial<CommandDependencies> = {}): CommandDependencies {
 	return {
 		getActiveEditorUri: () => undefined,
 		parseDataFile: async () => null,
@@ -228,9 +226,7 @@ suite("Command Logic Unit Tests", () => {
 
 		test("should return info when no data files found", async () => {
 			const deps = createMockDeps({
-				getWorkspaceFolders: () => [
-					{ uri: vscode.Uri.file("/workspace"), name: "test", index: 0 },
-				],
+				getWorkspaceFolders: () => [{ uri: vscode.Uri.file("/workspace"), name: "test", index: 0 }],
 				findWorkspaceFiles: async () => [],
 			});
 			const mockProvider = { showPreview: async () => {} };
@@ -243,12 +239,8 @@ suite("Command Logic Unit Tests", () => {
 
 		test("should succeed when user cancels quick pick", async () => {
 			const deps = createMockDeps({
-				getWorkspaceFolders: () => [
-					{ uri: vscode.Uri.file("/workspace"), name: "test", index: 0 },
-				],
-				findWorkspaceFiles: async () => [
-					vscode.Uri.file("/workspace/test.csv"),
-				],
+				getWorkspaceFolders: () => [{ uri: vscode.Uri.file("/workspace"), name: "test", index: 0 }],
+				findWorkspaceFiles: async () => [vscode.Uri.file("/workspace/test.csv")],
 				showQuickPick: async () => undefined,
 			});
 			const mockProvider = { showPreview: async () => {} };
@@ -262,9 +254,7 @@ suite("Command Logic Unit Tests", () => {
 		test("should return error when selected file fails to parse", async () => {
 			const fileUri = vscode.Uri.file("/workspace/test.csv");
 			const deps = createMockDeps({
-				getWorkspaceFolders: () => [
-					{ uri: vscode.Uri.file("/workspace"), name: "test", index: 0 },
-				],
+				getWorkspaceFolders: () => [{ uri: vscode.Uri.file("/workspace"), name: "test", index: 0 }],
 				findWorkspaceFiles: async () => [fileUri],
 				showQuickPick: async () => ({
 					label: "test.csv",
@@ -288,9 +278,7 @@ suite("Command Logic Unit Tests", () => {
 			let previewUri: vscode.Uri | undefined;
 
 			const deps = createMockDeps({
-				getWorkspaceFolders: () => [
-					{ uri: vscode.Uri.file("/workspace"), name: "test", index: 0 },
-				],
+				getWorkspaceFolders: () => [{ uri: vscode.Uri.file("/workspace"), name: "test", index: 0 }],
 				findWorkspaceFiles: async () => [fileUri],
 				showQuickPick: async () => ({
 					label: "test.csv",
@@ -319,9 +307,7 @@ suite("Command Logic Unit Tests", () => {
 			let findCallCount = 0;
 
 			const deps = createMockDeps({
-				getWorkspaceFolders: () => [
-					{ uri: vscode.Uri.file("/workspace"), name: "test", index: 0 },
-				],
+				getWorkspaceFolders: () => [{ uri: vscode.Uri.file("/workspace"), name: "test", index: 0 }],
 				findWorkspaceFiles: async (pattern) => {
 					findCallCount++;
 					if (pattern === "**/*.csv") return [csvFile];
@@ -357,9 +343,9 @@ suite("Command Logic Unit Tests", () => {
 			try {
 				await executePreviewData(uri, deps, mockProvider);
 				assert.fail("Should have thrown an error");
-			} catch (error) {
-				assert.ok(error instanceof Error);
-				assert.strictEqual(error.message, "Preview panel creation failed");
+			} catch (_error) {
+				assert.ok(_error instanceof Error);
+				assert.strictEqual(_error.message, "Preview panel creation failed");
 			}
 		});
 
@@ -380,9 +366,9 @@ suite("Command Logic Unit Tests", () => {
 			try {
 				await executePlotData(uri, deps, mockProvider);
 				assert.fail("Should have thrown an error");
-			} catch (error) {
-				assert.ok(error instanceof Error);
-				assert.strictEqual(error.message, "Chart creation failed");
+			} catch (_error) {
+				assert.ok(_error instanceof Error);
+				assert.strictEqual(_error.message, "Chart creation failed");
 			}
 		});
 
@@ -391,9 +377,7 @@ suite("Command Logic Unit Tests", () => {
 			const mockData = createMockParsedData();
 
 			const deps = createMockDeps({
-				getWorkspaceFolders: () => [
-					{ uri: vscode.Uri.file("/workspace"), name: "test", index: 0 },
-				],
+				getWorkspaceFolders: () => [{ uri: vscode.Uri.file("/workspace"), name: "test", index: 0 }],
 				findWorkspaceFiles: async () => [fileUri],
 				showQuickPick: async () => ({
 					label: "test.csv",
@@ -412,9 +396,9 @@ suite("Command Logic Unit Tests", () => {
 			try {
 				await executeOpenDataViewer(deps, mockProvider);
 				assert.fail("Should have thrown an error");
-			} catch (error) {
-				assert.ok(error instanceof Error);
-				assert.strictEqual(error.message, "Preview panel creation failed");
+			} catch (_error) {
+				assert.ok(_error instanceof Error);
+				assert.strictEqual(_error.message, "Preview panel creation failed");
 			}
 		});
 
@@ -431,9 +415,9 @@ suite("Command Logic Unit Tests", () => {
 			try {
 				await executePreviewData(uri, deps, mockProvider);
 				assert.fail("Should have thrown an error");
-			} catch (error) {
-				assert.ok(error instanceof Error);
-				assert.strictEqual(error.message, "File read failed");
+			} catch (_error) {
+				assert.ok(_error instanceof Error);
+				assert.strictEqual(_error.message, "File read failed");
 			}
 		});
 
@@ -450,17 +434,15 @@ suite("Command Logic Unit Tests", () => {
 			try {
 				await executePlotData(uri, deps, mockProvider);
 				assert.fail("Should have thrown an error");
-			} catch (error) {
-				assert.ok(error instanceof Error);
-				assert.strictEqual(error.message, "File read failed");
+			} catch (_error) {
+				assert.ok(_error instanceof Error);
+				assert.strictEqual(_error.message, "File read failed");
 			}
 		});
 
 		test("executeOpenDataViewer should propagate exception from findWorkspaceFiles", async () => {
 			const deps = createMockDeps({
-				getWorkspaceFolders: () => [
-					{ uri: vscode.Uri.file("/workspace"), name: "test", index: 0 },
-				],
+				getWorkspaceFolders: () => [{ uri: vscode.Uri.file("/workspace"), name: "test", index: 0 }],
 				findWorkspaceFiles: async () => {
 					throw new Error("Workspace search failed");
 				},
@@ -470,9 +452,9 @@ suite("Command Logic Unit Tests", () => {
 			try {
 				await executeOpenDataViewer(deps, mockProvider);
 				assert.fail("Should have thrown an error");
-			} catch (error) {
-				assert.ok(error instanceof Error);
-				assert.strictEqual(error.message, "Workspace search failed");
+			} catch (_error) {
+				assert.ok(_error instanceof Error);
+				assert.strictEqual(_error.message, "Workspace search failed");
 			}
 		});
 	});

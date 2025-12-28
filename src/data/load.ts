@@ -1,5 +1,5 @@
-import * as fs from "fs";
-import * as path from "path";
+import * as fs from "node:fs";
+import * as path from "node:path";
 import * as vscode from "vscode";
 
 export interface ParsedData {
@@ -62,33 +62,19 @@ export async function parseDataFile(
 				return parseDelimited(
 					content,
 					fileName,
-					fileExtension.slice(1) as
-						| "txt"
-						| "dat"
-						| "out"
-						| "data"
-						| "tab"
-						| "tsv",
+					fileExtension.slice(1) as "txt" | "dat" | "out" | "data" | "tab" | "tsv",
 					options?.delimiter,
 					commentMarkers,
 				);
 			case ".tsv":
 				// TSV files have tab delimiter by default
-				return parseDelimited(
-					content,
-					fileName,
-					"tsv",
-					options?.delimiter ?? "\t",
-					commentMarkers,
-				);
+				return parseDelimited(content, fileName, "tsv", options?.delimiter ?? "\t", commentMarkers);
 			default:
-				vscode.window.showErrorMessage(
-					`Unsupported file type: ${fileExtension}`,
-				);
+				vscode.window.showErrorMessage(`Unsupported file type: ${fileExtension}`);
 				return null;
 		}
-	} catch (error) {
-		vscode.window.showErrorMessage(`Error reading file: ${error}`);
+	} catch (_error) {
+		vscode.window.showErrorMessage(`Error reading file: ${_error}`);
 		return null;
 	}
 }
@@ -134,9 +120,7 @@ function parseCSV(
 	let dataStartIndex = 0;
 
 	// Check if first line looks like headers (non-numeric)
-	const hasHeaders = firstRowData.some(
-		(item) => Number.isNaN(Number(item)) && item !== "",
-	);
+	const hasHeaders = firstRowData.some((item) => Number.isNaN(Number(item)) && item !== "");
 
 	if (hasHeaders) {
 		headers = firstRowData;
@@ -199,9 +183,7 @@ function parseJSON(content: string, fileName: string): ParsedData {
 			// Array of objects
 			if (jsonData.length > 0 && typeof jsonData[0] === "object") {
 				const headers = Object.keys(jsonData[0]);
-				const rows = jsonData.map((obj) =>
-					headers.map((header) => obj[header]),
-				);
+				const rows = jsonData.map((obj) => headers.map((header) => obj[header]));
 
 				return {
 					headers,
@@ -235,8 +217,8 @@ function parseJSON(content: string, fileName: string): ParsedData {
 		} else {
 			throw new Error("JSON format not supported for tabular display");
 		}
-	} catch (error) {
-		throw new Error(`Invalid JSON: ${error}`);
+	} catch (_error) {
+		throw new Error(`Invalid JSON: ${_error}`);
 	}
 }
 
@@ -317,9 +299,7 @@ function parseDelimited(
 	let dataStartIndex = 0;
 
 	// Check if first line looks like headers (non-numeric)
-	const hasHeaders = firstRowData.some(
-		(item) => Number.isNaN(Number(item)) && item !== "",
-	);
+	const hasHeaders = firstRowData.some((item) => Number.isNaN(Number(item)) && item !== "");
 
 	if (hasHeaders) {
 		headers = firstRowData;

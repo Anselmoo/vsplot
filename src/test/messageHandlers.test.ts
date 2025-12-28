@@ -3,7 +3,7 @@
  * These tests use dependency injection to test webview message handling
  * that was previously unreachable via integration tests.
  */
-import * as assert from "assert";
+import * as assert from "node:assert";
 import * as vscode from "vscode";
 import { createDefaultDependencies } from "../commands/dataCommands";
 import type { ParsedData } from "../data/load";
@@ -290,12 +290,7 @@ suite("Message Handler Unit Tests", () => {
 				data: mockData,
 			};
 
-			const result = await handleCreateChart(
-				message,
-				currentUri,
-				chartProvider,
-				createMockDeps(),
-			);
+			const result = await handleCreateChart(message, currentUri, chartProvider, createMockDeps());
 
 			assert.strictEqual(result.success, true);
 			assert.strictEqual(chartShown, true);
@@ -317,12 +312,7 @@ suite("Message Handler Unit Tests", () => {
 				data: createMockParsedData(),
 			};
 
-			const result = await handleCreateChart(
-				message,
-				undefined,
-				undefined,
-				deps,
-			);
+			const result = await handleCreateChart(message, undefined, undefined, deps);
 
 			assert.strictEqual(result.success, false);
 			assert.strictEqual(result.error, "Chart provider not available");
@@ -347,12 +337,7 @@ suite("Message Handler Unit Tests", () => {
 				data: mockData,
 			};
 
-			await handleCreateChart(
-				message,
-				undefined,
-				chartProvider,
-				createMockDeps(),
-			);
+			await handleCreateChart(message, undefined, chartProvider, createMockDeps());
 
 			assert.ok(receivedUri?.fsPath.includes("from-message.csv"));
 		});
@@ -379,12 +364,7 @@ suite("Message Handler Unit Tests", () => {
 				data: mockData,
 			};
 
-			await handleCreateChart(
-				message,
-				undefined,
-				chartProvider,
-				createMockDeps(),
-			);
+			await handleCreateChart(message, undefined, chartProvider, createMockDeps());
 
 			assert.ok(receivedUri?.fsPath.includes("preview"));
 		});
@@ -437,12 +417,7 @@ suite("Message Handler Unit Tests", () => {
 				delimiter: ",",
 			};
 
-			const result = await handleReparse(
-				message,
-				undefined,
-				async () => true,
-				deps,
-			);
+			const result = await handleReparse(message, undefined, async () => true, deps);
 
 			assert.strictEqual(result.success, false);
 			assert.ok(result.error?.includes("Cannot reparse"));
@@ -495,12 +470,7 @@ suite("Message Handler Unit Tests", () => {
 				delimiter: "auto",
 			};
 
-			await handleReparse(
-				message,
-				vscode.Uri.file("/test.csv"),
-				async () => true,
-				deps,
-			);
+			await handleReparse(message, vscode.Uri.file("/test.csv"), async () => true, deps);
 
 			assert.strictEqual(receivedDelimiter, undefined);
 		});
@@ -643,10 +613,7 @@ suite("Message Handler Unit Tests", () => {
 			const provider = new DataPreviewProvider(extensionUri);
 
 			// This should hit the else branch and create a webview panel
-			await provider.showPreview(
-				vscode.Uri.file("/test/preview.csv"),
-				mockData,
-			);
+			await provider.showPreview(vscode.Uri.file("/test/preview.csv"), mockData);
 
 			assert.ok(true, "DataPreviewProvider panel created");
 			await vscode.commands.executeCommand("workbench.action.closeAllEditors");

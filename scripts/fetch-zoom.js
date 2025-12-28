@@ -1,6 +1,6 @@
-const https = require("https");
-const fs = require("fs");
-const path = require("path");
+const https = require("node:https");
+const fs = require("node:fs");
+const path = require("node:path");
 
 const out = path.resolve(__dirname, "..", "media", "chartjs-plugin-zoom.umd.js");
 const url = "https://unpkg.com/chartjs-plugin-zoom@2.2.0/dist/chartjs-plugin-zoom.umd.js";

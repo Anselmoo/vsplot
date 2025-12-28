@@ -21,10 +21,7 @@ export interface CommandDependencies {
 	parseDataFile: (uri: vscode.Uri) => Promise<ParsedData | null>;
 	showErrorMessage: (msg: string) => void;
 	showInfoMessage: (msg: string) => void;
-	findWorkspaceFiles: (
-		pattern: string,
-		exclude?: string,
-	) => Thenable<vscode.Uri[]>;
+	findWorkspaceFiles: (pattern: string, exclude?: string) => Thenable<vscode.Uri[]>;
 	showQuickPick: (
 		items: FileQuickPickItem[],
 		options?: vscode.QuickPickOptions,
@@ -46,10 +43,8 @@ export function createDefaultDependencies(): CommandDependencies {
 		showInfoMessage: (msg) => {
 			vscode.window.showInformationMessage(msg);
 		},
-		findWorkspaceFiles: (pattern, exclude) =>
-			vscode.workspace.findFiles(pattern, exclude),
-		showQuickPick: (items, options) =>
-			vscode.window.showQuickPick(items, options),
+		findWorkspaceFiles: (pattern, exclude) => vscode.workspace.findFiles(pattern, exclude),
+		showQuickPick: (items, options) => vscode.window.showQuickPick(items, options),
 		getWorkspaceFolders: () => vscode.workspace.workspaceFolders,
 		asRelativePath: (uri) => vscode.workspace.asRelativePath(uri),
 	};
@@ -218,6 +213,29 @@ export async function executeOpenDataViewer(
 	return { success: true };
 }
 
+// Factory to create handler for opening data viewer (extracted for testability)
+export function makeOpenDataViewerHandler(
+	deps: CommandDependencies,
+	previewProvider: {
+		showPreview: (uri: vscode.Uri, data: ParsedData) => Promise<void>;
+	},
+) {
+	return async () => {
+		try {
+			const result = await executeOpenDataViewer(deps, previewProvider);
+			if (!result.success && result.error) {
+				deps.showErrorMessage(result.error);
+			} else if (result.info) {
+				deps.showInfoMessage(result.info);
+			}
+		} catch (_error: unknown) {
+			deps.showErrorMessage(
+				`Failed to open data viewer: ${_error instanceof Error ? _error.message : String(_error)}`,
+			);
+		}
+	};
+}
+
 // --- Command Registration (Thin Wrapper) ---
 
 /**
@@ -240,9 +258,9 @@ export function registerDataCommands(
 				if (!result.success && result.error) {
 					deps.showErrorMessage(result.error);
 				}
-			} catch (error: unknown) {
+			} catch (_error: unknown) {
 				deps.showErrorMessage(
-					`Failed to preview data: ${error instanceof Error ? error.message : String(error)}`,
+					`Failed to preview data: ${_error instanceof Error ? _error.message : String(_error)}`,
 				);
 			}
 		},
@@ -257,9 +275,9 @@ export function registerDataCommands(
 				if (!result.success && result.error) {
 					deps.showErrorMessage(result.error);
 				}
-			} catch (error: unknown) {
+			} catch (_error: unknown) {
 				deps.showErrorMessage(
-					`Failed to plot data: ${error instanceof Error ? error.message : String(error)}`,
+					`Failed to plot data: ${_error instanceof Error ? _error.message : String(_error)}`,
 				);
 			}
 		},
@@ -268,25 +286,8 @@ export function registerDataCommands(
 	// Register open data viewer command
 	const openDataViewerCommand = vscode.commands.registerCommand(
 		"vsplot.openDataViewer",
-		async () => {
-			try {
-				const result = await executeOpenDataViewer(deps, previewProvider);
-				if (!result.success && result.error) {
-					deps.showErrorMessage(result.error);
-				} else if (result.info) {
-					deps.showInfoMessage(result.info);
-				}
-			} catch (error: unknown) {
-				deps.showErrorMessage(
-					`Failed to open data viewer: ${error instanceof Error ? error.message : String(error)}`,
-				);
-			}
-		},
+		makeOpenDataViewerHandler(deps, previewProvider),
 	);
 
-	context.subscriptions.push(
-		previewDataCommand,
-		plotDataCommand,
-		openDataViewerCommand,
-	);
+	context.subscriptions.push(previewDataCommand, plotDataCommand, openDataViewerCommand);
 }

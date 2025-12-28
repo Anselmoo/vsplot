@@ -1,4 +1,4 @@
-import * as assert from "assert";
+import * as assert from "node:assert";
 import * as vscode from "vscode";
 
 // Extension ID constant
@@ -15,26 +15,20 @@ suite("Extension Activation Tests", () => {
 		const ext = vscode.extensions.getExtension(EXTENSION_ID);
 		assert.ok(ext, "Extension should be available");
 
-		await ext!.activate();
-		assert.strictEqual(ext!.isActive, true, "Extension should be active");
+		await ext?.activate();
+		assert.strictEqual(ext?.isActive, true, "Extension should be active");
 	});
 
 	test("All commands should be registered", async function () {
 		this.timeout(10000);
 		const ext = vscode.extensions.getExtension(EXTENSION_ID);
-		await ext!.activate();
+		await ext?.activate();
 
 		const commands = await vscode.commands.getCommands(true);
 
 		// Check main commands
-		assert.ok(
-			commands.includes("vsplot.previewData"),
-			"previewData command should be registered",
-		);
-		assert.ok(
-			commands.includes("vsplot.plotData"),
-			"plotData command should be registered",
-		);
+		assert.ok(commands.includes("vsplot.previewData"), "previewData command should be registered");
+		assert.ok(commands.includes("vsplot.plotData"), "plotData command should be registered");
 		assert.ok(
 			commands.includes("vsplot.openDataViewer"),
 			"openDataViewer command should be registered",
@@ -57,8 +51,8 @@ suite("Extension Activation Tests", () => {
 		assert.ok(ext, "Extension should be available");
 
 		// Multiple activations should not cause issues
-		await ext!.activate();
-		await ext!.activate();
-		assert.strictEqual(ext!.isActive, true, "Extension should remain active");
+		await ext?.activate();
+		await ext?.activate();
+		assert.strictEqual(ext?.isActive, true, "Extension should remain active");
 	});
 });

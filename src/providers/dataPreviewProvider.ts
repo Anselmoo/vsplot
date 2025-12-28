@@ -9,16 +9,11 @@ import { getNonce, loadHtmlTemplate } from "./webviewUtils";
  * Dependencies that can be injected for testing message handler logic.
  */
 export interface MessageHandlerDependencies {
-	showSaveDialog: (
-		options: vscode.SaveDialogOptions,
-	) => Thenable<vscode.Uri | undefined>;
+	showSaveDialog: (options: vscode.SaveDialogOptions) => Thenable<vscode.Uri | undefined>;
 	writeFile: (uri: vscode.Uri, content: Uint8Array) => Thenable<void>;
 	showInfoMessage: (msg: string) => void;
 	showErrorMessage: (msg: string) => void;
-	parseDataFile: (
-		uri: vscode.Uri,
-		options?: ParseOptions,
-	) => Promise<ParsedData | null>;
+	parseDataFile: (uri: vscode.Uri, options?: ParseOptions) => Promise<ParsedData | null>;
 }
 
 /**
@@ -47,7 +42,7 @@ export interface ExportDataMessage {
 
 export interface CreateChartMessage {
 	type: "createChart";
-	data: ParsedData & { fileName?: string };
+	data: Omit<ParsedData, "fileName"> & { fileName?: string };
 }
 
 export interface ReparseMessage {
@@ -55,10 +50,7 @@ export interface ReparseMessage {
 	delimiter: string | "auto";
 }
 
-export type WebviewMessage =
-	| ExportDataMessage
-	| CreateChartMessage
-	| ReparseMessage;
+export type WebviewMessage = ExportDataMessage | CreateChartMessage | ReparseMessage;
 
 // --- Result Type ---
 
@@ -92,9 +84,8 @@ export async function handleExportData(
 		await deps.writeFile(uri, Buffer.from(csv, "utf8"));
 		deps.showInfoMessage("Filtered data exported.");
 		return { success: true };
-	} catch (e) {
-		const errorMsg =
-			"Failed to export data: " + (e instanceof Error ? e.message : String(e));
+	} catch (_e) {
+		const errorMsg = `Failed to export data: ${_e instanceof Error ? _e.message : String(_e)}`;
 		deps.showErrorMessage(errorMsg);
 		return { success: false, error: errorMsg };
 	}
@@ -116,13 +107,11 @@ export async function handleCreateChart(
 			return { success: false, error: "Chart provider not available" };
 		}
 
-		const uri =
-			currentUri ?? vscode.Uri.file(message.data.fileName || "preview");
-		await chartProvider.showChart(uri, message.data);
+		const uri = currentUri ?? vscode.Uri.file(message.data.fileName || "preview");
+		await chartProvider.showChart(uri, message.data as ParsedData);
 		return { success: true };
-	} catch (e) {
-		const errorMsg =
-			"Failed to create chart: " + (e instanceof Error ? e.message : String(e));
+	} catch (_e) {
+		const errorMsg = `Failed to create chart: ${_e instanceof Error ? _e.message : String(_e)}`;
 		deps.showErrorMessage(errorMsg);
 		return { success: false, error: errorMsg };
 	}
@@ -154,9 +143,8 @@ export async function handleReparse(
 			await postMessage({ type: "showData", data });
 		}
 		return { success: true };
-	} catch (e) {
-		const errorMsg =
-			"Failed to reparse: " + (e instanceof Error ? e.message : String(e));
+	} catch (_e) {
+		const errorMsg = `Failed to reparse: ${_e instanceof Error ? _e.message : String(_e)}`;
 		deps.showErrorMessage(errorMsg);
 		return { success: false, error: errorMsg };
 	}
@@ -175,14 +163,11 @@ export function toCSV(headers: string[], rows: (string | number)[][]): string {
 		}
 		const s = String(v);
 		if (/[",\n]/.test(s)) {
-			return '"' + s.replace(/"/g, '""') + '"';
+			return `"${s.replace(/"/g, '""')}"`;
 		}
 		return s;
 	};
-	return [
-		headers.map(esc).join(","),
-		...rows.map((r) => r.map(esc).join(",")),
-	].join("\n");
+	return [headers.map(esc).join(","), ...rows.map((r) => r.map(esc).join(","))].join("\n");
 }
 
 // --- DataPreviewProvider Class ---
@@ -296,20 +281,10 @@ export class DataPreviewProvider implements vscode.WebviewViewProvider {
 
 		// Build URIs for external resources
 		const stylesUri = webview.asWebviewUri(
-			vscode.Uri.joinPath(
-				this._extensionUri,
-				"media",
-				"dataPreview",
-				"styles.css",
-			),
+			vscode.Uri.joinPath(this._extensionUri, "media", "dataPreview", "styles.css"),
 		);
 		const scriptUri = webview.asWebviewUri(
-			vscode.Uri.joinPath(
-				this._extensionUri,
-				"media",
-				"dataPreview",
-				"main.js",
-			),
+			vscode.Uri.joinPath(this._extensionUri, "media", "dataPreview", "main.js"),
 		);
 
 		const nonce = getNonce();
@@ -318,16 +293,12 @@ export class DataPreviewProvider implements vscode.WebviewViewProvider {
 		const csp = `default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}' ${webview.cspSource};`;
 
 		// Load HTML template and replace placeholders
-		return loadHtmlTemplate(
-			this._extensionUri,
-			"media/dataPreview/index.html",
-			{
-				CSP: csp,
-				NONCE: nonce,
-				STYLES_URI: stylesUri.toString(),
-				SCRIPT_URI: scriptUri.toString(),
-				ROWS_PER_PAGE: String(rowsPerPage),
-			},
-		);
+		return loadHtmlTemplate(this._extensionUri, "media/dataPreview/index.html", {
+			CSP: csp,
+			NONCE: nonce,
+			STYLES_URI: stylesUri.toString(),
+			SCRIPT_URI: scriptUri.toString(),
+			ROWS_PER_PAGE: String(rowsPerPage),
+		});
 	}
 }

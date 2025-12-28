@@ -6,10 +6,7 @@ export class ChartViewProvider implements vscode.WebviewViewProvider {
 	public static readonly viewType = "vsplot.chartView";
 	private _view?: vscode.WebviewView;
 	private _currentWebview?: vscode.Webview;
-	private _pendingTestResolvers: Map<
-		string,
-		(payload: ChartTestState) => void
-	> = new Map();
+	private _pendingTestResolvers: Map<string, (payload: ChartTestState) => void> = new Map();
 	private _pendingConfigAcks: Map<string, () => void> = new Map();
 
 	constructor(private readonly _extensionUri: vscode.Uri) {}
@@ -74,9 +71,7 @@ export class ChartViewProvider implements vscode.WebviewViewProvider {
 					const uri = await vscode.window.showSaveDialog({
 						saveLabel: "Save Chart Image",
 						filters: { "PNG Image": ["png"] },
-						defaultUri: vscode.Uri.file(
-							message.filename ?? `chart_${Date.now()}.png`,
-						),
+						defaultUri: vscode.Uri.file(message.filename ?? `chart_${Date.now()}.png`),
 					});
 					if (!uri) {
 						return;
@@ -85,8 +80,8 @@ export class ChartViewProvider implements vscode.WebviewViewProvider {
 					const buffer = Buffer.from(base64, "base64");
 					await vscode.workspace.fs.writeFile(uri, buffer);
 					vscode.window.showInformationMessage("Chart image saved.");
-				} catch (err: unknown) {
-					const m = err instanceof Error ? err.message : String(err);
+				} catch (_error: unknown) {
+					const m = _error instanceof Error ? _error.message : String(_error);
 					vscode.window.showErrorMessage(`Failed to save chart image: ${m}`);
 				}
 				return;
@@ -164,28 +159,14 @@ export class ChartViewProvider implements vscode.WebviewViewProvider {
 	 */
 	private _getHtmlForWebview(webview: vscode.Webview) {
 		const vsplotConfig = vscode.workspace.getConfiguration("vsplot");
-		const defaultChartType = vsplotConfig.get<string>(
-			"defaultChartType",
-			"line",
-		);
-		const defaultStylePreset = vsplotConfig.get<string>(
-			"defaultStylePreset",
-			"clean",
-		);
+		const defaultChartType = vsplotConfig.get<string>("defaultChartType", "line");
+		const defaultStylePreset = vsplotConfig.get<string>("defaultStylePreset", "clean");
 		const defaultDecimals = vsplotConfig.get<number>("defaultDecimals", 2);
-		const defaultUseThousands = vsplotConfig.get<boolean>(
-			"useThousands",
-			false,
-		);
+		const defaultUseThousands = vsplotConfig.get<boolean>("useThousands", false);
 
 		// Build URIs for external resources
 		const stylesUri = webview.asWebviewUri(
-			vscode.Uri.joinPath(
-				this._extensionUri,
-				"media",
-				"chartView",
-				"styles.css",
-			),
+			vscode.Uri.joinPath(this._extensionUri, "media", "chartView", "styles.css"),
 		);
 		const scriptUri = webview.asWebviewUri(
 			vscode.Uri.joinPath(this._extensionUri, "media", "chartView", "main.js"),
@@ -196,18 +177,10 @@ export class ChartViewProvider implements vscode.WebviewViewProvider {
 			vscode.Uri.joinPath(this._extensionUri, "media", "chart.umd.js"),
 		);
 		const zoomPluginUri = webview.asWebviewUri(
-			vscode.Uri.joinPath(
-				this._extensionUri,
-				"media",
-				"chartjs-plugin-zoom.umd.js",
-			),
+			vscode.Uri.joinPath(this._extensionUri, "media", "chartjs-plugin-zoom.umd.js"),
 		);
 		const dateAdapterUri = webview.asWebviewUri(
-			vscode.Uri.joinPath(
-				this._extensionUri,
-				"media",
-				"chartjs-adapter-date-fns.bundle.js",
-			),
+			vscode.Uri.joinPath(this._extensionUri, "media", "chartjs-adapter-date-fns.bundle.js"),
 		);
 
 		const nonce = getNonce();

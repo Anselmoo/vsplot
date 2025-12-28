@@ -1,6 +1,6 @@
-import * as assert from "assert";
-import * as fs from "fs";
-import * as path from "path";
+import * as assert from "node:assert";
+import * as fs from "node:fs";
+import * as path from "node:path";
 import * as vscode from "vscode";
 import { getNonce, loadHtmlTemplate } from "../providers/webviewUtils";
 
@@ -12,11 +12,7 @@ suite("Webview Utils Tests", () => {
 	test("getNonce should generate a 32-character string", () => {
 		const nonce = getNonce();
 		assert.strictEqual(nonce.length, 32, "Nonce should be 32 characters long");
-		assert.match(
-			nonce,
-			/^[A-Za-z0-9]+$/,
-			"Nonce should contain only alphanumeric characters",
-		);
+		assert.match(nonce, /^[A-Za-z0-9]+$/, "Nonce should contain only alphanumeric characters");
 	});
 
 	test("getNonce should generate unique values", () => {
@@ -24,21 +20,9 @@ suite("Webview Utils Tests", () => {
 		const nonce2 = getNonce();
 		const nonce3 = getNonce();
 
-		assert.notStrictEqual(
-			nonce1,
-			nonce2,
-			"Consecutive nonces should be different",
-		);
-		assert.notStrictEqual(
-			nonce2,
-			nonce3,
-			"Consecutive nonces should be different",
-		);
-		assert.notStrictEqual(
-			nonce1,
-			nonce3,
-			"Consecutive nonces should be different",
-		);
+		assert.notStrictEqual(nonce1, nonce2, "Consecutive nonces should be different");
+		assert.notStrictEqual(nonce2, nonce3, "Consecutive nonces should be different");
+		assert.notStrictEqual(nonce1, nonce3, "Consecutive nonces should be different");
 	});
 
 	test("loadHtmlTemplate should replace single placeholder", async function () {
@@ -57,7 +41,7 @@ suite("Webview Utils Tests", () => {
 		try {
 			const ext = vscode.extensions.getExtension(EXTENSION_ID);
 			assert.ok(ext, "Extension should be available");
-			const extensionUri = vscode.Uri.file(ext!.extensionPath);
+			const extensionUri = vscode.Uri.file(ext?.extensionPath);
 
 			const result = loadHtmlTemplate(extensionUri, templatePath, {
 				MESSAGE: "Hello World",
@@ -72,7 +56,7 @@ suite("Webview Utils Tests", () => {
 			// Clean up
 			try {
 				await fs.promises.unlink(fullPath);
-			} catch (e) {
+			} catch (_e) {
 				// Ignore cleanup errors
 			}
 		}
@@ -94,7 +78,7 @@ suite("Webview Utils Tests", () => {
 		try {
 			const ext = vscode.extensions.getExtension(EXTENSION_ID);
 			assert.ok(ext, "Extension should be available");
-			const extensionUri = vscode.Uri.file(ext!.extensionPath);
+			const extensionUri = vscode.Uri.file(ext?.extensionPath);
 
 			const result = loadHtmlTemplate(extensionUri, templatePath, {
 				TITLE: "Test Page",
@@ -111,7 +95,7 @@ suite("Webview Utils Tests", () => {
 			// Clean up
 			try {
 				await fs.promises.unlink(fullPath);
-			} catch (e) {
+			} catch (_e) {
 				// Ignore cleanup errors
 			}
 		}
@@ -125,15 +109,14 @@ suite("Webview Utils Tests", () => {
 
 		const templatePath = `${TEST_DATA_DIR}/template-repeated.html`;
 		const fullPath = path.join(__dirname, "../..", templatePath);
-		const templateContent =
-			"<div>{{VALUE}}</div><div>{{VALUE}}</div><div>{{VALUE}}</div>";
+		const templateContent = "<div>{{VALUE}}</div><div>{{VALUE}}</div><div>{{VALUE}}</div>";
 
 		await fs.promises.writeFile(fullPath, templateContent, "utf8");
 
 		try {
 			const ext = vscode.extensions.getExtension(EXTENSION_ID);
 			assert.ok(ext, "Extension should be available");
-			const extensionUri = vscode.Uri.file(ext!.extensionPath);
+			const extensionUri = vscode.Uri.file(ext?.extensionPath);
 
 			const result = loadHtmlTemplate(extensionUri, templatePath, {
 				VALUE: "42",
@@ -148,7 +131,7 @@ suite("Webview Utils Tests", () => {
 			// Clean up
 			try {
 				await fs.promises.unlink(fullPath);
-			} catch (e) {
+			} catch (_e) {
 				// Ignore cleanup errors
 			}
 		}
@@ -169,7 +152,7 @@ suite("Webview Utils Tests", () => {
 		try {
 			const ext = vscode.extensions.getExtension(EXTENSION_ID);
 			assert.ok(ext, "Extension should be available");
-			const extensionUri = vscode.Uri.file(ext!.extensionPath);
+			const extensionUri = vscode.Uri.file(ext?.extensionPath);
 
 			const result = loadHtmlTemplate(extensionUri, templatePath, {
 				EMPTY: "",
@@ -184,7 +167,7 @@ suite("Webview Utils Tests", () => {
 			// Clean up
 			try {
 				await fs.promises.unlink(fullPath);
-			} catch (e) {
+			} catch (_e) {
 				// Ignore cleanup errors
 			}
 		}

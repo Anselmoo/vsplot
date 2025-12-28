@@ -2,7 +2,7 @@
 	"name": "vsplot",
 	"displayName": "VSPlot - Data Visualization Extension",
 	"description": "Preview and visualize CSV, JSON, and other data files with interactive charts",
-	"version": "0.2.3",
+	"version": "0.2.4",
 	"publisher": "AnselmHahn",
 	"engines": {
 		"vscode": "^1.104.0"
@@ -173,6 +173,7 @@
 		"lint": "biome check .",
 		"format": "biome format --write .",
 		"ci:lint": "biome ci .",
+		"lint-staged": "lint-staged",
 		"prepare": "husky install",
 		"test": "vscode-test --label tests",
 		"test:junit": "mkdir -p artifacts/test-results && vscode-test --label junit",

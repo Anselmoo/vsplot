@@ -1,10 +1,7 @@
-import * as assert from "assert";
-import * as path from "path";
+import * as assert from "node:assert";
+import * as path from "node:path";
 import * as vscode from "vscode";
-import type {
-	ChartTestConfig,
-	ChartTestState,
-} from "../providers/chartViewProvider";
+import type { ChartTestConfig, ChartTestState } from "../providers/chartViewProvider";
 import { EXTENSION_ID, VALID_AGGREGATION_TYPES } from "./testUtils";
 
 suite("Error Handling and Edge Case Tests", () => {
@@ -52,7 +49,7 @@ suite("Error Handling and Edge Case Tests", () => {
 			// Clean up
 			try {
 				await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-			} catch (e) {
+			} catch (_e) {
 				// Ignore cleanup errors
 			}
 		});
@@ -80,10 +77,7 @@ suite("Error Handling and Edge Case Tests", () => {
 				chartType: "bar",
 			};
 
-			await vscode.commands.executeCommand(
-				"vsplot.test.applyChartConfig",
-				config,
-			);
+			await vscode.commands.executeCommand("vsplot.test.applyChartConfig", config);
 
 			// Verify the config was applied
 			const state = (await vscode.commands.executeCommand(
@@ -103,10 +97,7 @@ suite("Error Handling and Edge Case Tests", () => {
 
 			const content = "A,B,C\n,\n,\n,";
 			const tmpPath = path.join(__dirname, "../../test-data/empty-rows.csv");
-			await vscode.workspace.fs.writeFile(
-				vscode.Uri.file(tmpPath),
-				Buffer.from(content, "utf8"),
-			);
+			await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 			const uri = vscode.Uri.file(tmpPath);
 
@@ -117,7 +108,7 @@ suite("Error Handling and Edge Case Tests", () => {
 			// Clean up
 			try {
 				await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-			} catch (e) {
+			} catch (_e) {
 				// Ignore cleanup errors
 			}
 		});
@@ -125,27 +116,24 @@ suite("Error Handling and Edge Case Tests", () => {
 		test("should handle CSV with very long header names", async function () {
 			this.timeout(10000);
 
-			const longHeader = "Column_" + "X".repeat(500);
+			const longHeader = `Column_${"X".repeat(500)}`;
 			const content = `${longHeader},${longHeader}2,${longHeader}3\n1,2,3\n4,5,6`;
 			const tmpPath = path.join(__dirname, "../../test-data/long-headers.csv");
-			await vscode.workspace.fs.writeFile(
-				vscode.Uri.file(tmpPath),
-				Buffer.from(content, "utf8"),
-			);
+			await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 			const uri = vscode.Uri.file(tmpPath);
 
 			try {
 				await vscode.commands.executeCommand("vsplot.previewData", uri);
 				assert.ok(true, "Preview handled long headers");
-			} catch (error) {
-				assert.fail(`Preview failed with long headers: ${error}`);
+			} catch (_error) {
+				assert.fail(`Preview failed with long headers: ${_error}`);
 			}
 
 			// Clean up
 			try {
 				await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-			} catch (e) {
+			} catch (_e) {
 				// Ignore cleanup errors
 			}
 		});
@@ -154,32 +142,27 @@ suite("Error Handling and Edge Case Tests", () => {
 			this.timeout(10000);
 
 			// Create a CSV with 100 columns
-			const headers = Array.from({ length: 100 }, (_, i) => `Col${i + 1}`).join(
-				",",
-			);
+			const headers = Array.from({ length: 100 }, (_, i) => `Col${i + 1}`).join(",");
 			const row1 = Array.from({ length: 100 }, (_, i) => i + 1).join(",");
 			const row2 = Array.from({ length: 100 }, (_, i) => (i + 1) * 2).join(",");
 			const content = `${headers}\n${row1}\n${row2}`;
 
 			const tmpPath = path.join(__dirname, "../../test-data/many-columns.csv");
-			await vscode.workspace.fs.writeFile(
-				vscode.Uri.file(tmpPath),
-				Buffer.from(content, "utf8"),
-			);
+			await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 			const uri = vscode.Uri.file(tmpPath);
 
 			try {
 				await vscode.commands.executeCommand("vsplot.previewData", uri);
 				assert.ok(true, "Preview handled many columns");
-			} catch (error) {
-				assert.fail(`Preview failed with many columns: ${error}`);
+			} catch (_error) {
+				assert.fail(`Preview failed with many columns: ${_error}`);
 			}
 
 			// Clean up
 			try {
 				await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-			} catch (e) {
+			} catch (_e) {
 				// Ignore cleanup errors
 			}
 		});
@@ -196,24 +179,21 @@ suite("Error Handling and Edge Case Tests", () => {
 			const content = JSON.stringify(objects);
 
 			const tmpPath = path.join(__dirname, "../../test-data/many-objects.json");
-			await vscode.workspace.fs.writeFile(
-				vscode.Uri.file(tmpPath),
-				Buffer.from(content, "utf8"),
-			);
+			await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 			const uri = vscode.Uri.file(tmpPath);
 
 			try {
 				await vscode.commands.executeCommand("vsplot.previewData", uri);
 				assert.ok(true, "Preview handled many objects");
-			} catch (error) {
-				assert.fail(`Preview failed with many objects: ${error}`);
+			} catch (_error) {
+				assert.fail(`Preview failed with many objects: ${_error}`);
 			}
 
 			// Clean up
 			try {
 				await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-			} catch (e) {
+			} catch (_e) {
 				// Ignore cleanup errors
 			}
 		});
@@ -223,10 +203,7 @@ suite("Error Handling and Edge Case Tests", () => {
 
 			const content = '[{"outer": {"inner": {"deep": "value"}}, "simple": 1}]';
 			const tmpPath = path.join(__dirname, "../../test-data/nested-json.json");
-			await vscode.workspace.fs.writeFile(
-				vscode.Uri.file(tmpPath),
-				Buffer.from(content, "utf8"),
-			);
+			await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 			const uri = vscode.Uri.file(tmpPath);
 
@@ -238,7 +215,7 @@ suite("Error Handling and Edge Case Tests", () => {
 			// Clean up
 			try {
 				await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-			} catch (e) {
+			} catch (_e) {
 				// Ignore cleanup errors
 			}
 		});
@@ -252,14 +229,8 @@ suite("Error Handling and Edge Case Tests", () => {
 			this.timeout(15000);
 
 			const content = "X,Y\n-10,-20\n-5,-10\n0,0\n5,10\n10,20";
-			const tmpPath = path.join(
-				__dirname,
-				"../../test-data/negative-values.csv",
-			);
-			await vscode.workspace.fs.writeFile(
-				vscode.Uri.file(tmpPath),
-				Buffer.from(content, "utf8"),
-			);
+			const tmpPath = path.join(__dirname, "../../test-data/negative-values.csv");
+			await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 			const uri = vscode.Uri.file(tmpPath);
 
@@ -271,10 +242,7 @@ suite("Error Handling and Edge Case Tests", () => {
 				y: 1,
 			};
 
-			await vscode.commands.executeCommand(
-				"vsplot.test.applyChartConfig",
-				config,
-			);
+			await vscode.commands.executeCommand("vsplot.test.applyChartConfig", config);
 
 			const state = (await vscode.commands.executeCommand(
 				"vsplot.test.requestChartState",
@@ -286,7 +254,7 @@ suite("Error Handling and Edge Case Tests", () => {
 			// Clean up
 			try {
 				await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-			} catch (e) {
+			} catch (_e) {
 				// Ignore cleanup errors
 			}
 		});
@@ -296,10 +264,7 @@ suite("Error Handling and Edge Case Tests", () => {
 
 			const content = "X,Y\n1e10,2e10\n3e10,4e10\n5e10,6e10";
 			const tmpPath = path.join(__dirname, "../../test-data/large-values.csv");
-			await vscode.workspace.fs.writeFile(
-				vscode.Uri.file(tmpPath),
-				Buffer.from(content, "utf8"),
-			);
+			await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 			const uri = vscode.Uri.file(tmpPath);
 
@@ -311,10 +276,7 @@ suite("Error Handling and Edge Case Tests", () => {
 				y: 1,
 			};
 
-			await vscode.commands.executeCommand(
-				"vsplot.test.applyChartConfig",
-				config,
-			);
+			await vscode.commands.executeCommand("vsplot.test.applyChartConfig", config);
 
 			const state = (await vscode.commands.executeCommand(
 				"vsplot.test.requestChartState",
@@ -326,7 +288,7 @@ suite("Error Handling and Edge Case Tests", () => {
 			// Clean up
 			try {
 				await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-			} catch (e) {
+			} catch (_e) {
 				// Ignore cleanup errors
 			}
 		});
@@ -336,10 +298,7 @@ suite("Error Handling and Edge Case Tests", () => {
 
 			const content = "X,Y\n1e-10,2e-10\n3e-10,4e-10\n5e-10,6e-10";
 			const tmpPath = path.join(__dirname, "../../test-data/small-values.csv");
-			await vscode.workspace.fs.writeFile(
-				vscode.Uri.file(tmpPath),
-				Buffer.from(content, "utf8"),
-			);
+			await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 			const uri = vscode.Uri.file(tmpPath);
 
@@ -351,10 +310,7 @@ suite("Error Handling and Edge Case Tests", () => {
 				y: 1,
 			};
 
-			await vscode.commands.executeCommand(
-				"vsplot.test.applyChartConfig",
-				config,
-			);
+			await vscode.commands.executeCommand("vsplot.test.applyChartConfig", config);
 
 			const state = (await vscode.commands.executeCommand(
 				"vsplot.test.requestChartState",
@@ -366,7 +322,7 @@ suite("Error Handling and Edge Case Tests", () => {
 			// Clean up
 			try {
 				await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-			} catch (e) {
+			} catch (_e) {
 				// Ignore cleanup errors
 			}
 		});
@@ -376,10 +332,7 @@ suite("Error Handling and Edge Case Tests", () => {
 
 			const content = "Category,Value\nA,10\nB,20\nC,text\nD,30";
 			const tmpPath = path.join(__dirname, "../../test-data/mixed-types.csv");
-			await vscode.workspace.fs.writeFile(
-				vscode.Uri.file(tmpPath),
-				Buffer.from(content, "utf8"),
-			);
+			await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 			const uri = vscode.Uri.file(tmpPath);
 
@@ -392,10 +345,7 @@ suite("Error Handling and Edge Case Tests", () => {
 				agg: "sum",
 			};
 
-			await vscode.commands.executeCommand(
-				"vsplot.test.applyChartConfig",
-				config,
-			);
+			await vscode.commands.executeCommand("vsplot.test.applyChartConfig", config);
 
 			const state = (await vscode.commands.executeCommand(
 				"vsplot.test.requestChartState",
@@ -406,7 +356,7 @@ suite("Error Handling and Edge Case Tests", () => {
 			// Clean up
 			try {
 				await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-			} catch (e) {
+			} catch (_e) {
 				// Ignore cleanup errors
 			}
 		});
@@ -432,20 +382,13 @@ suite("Error Handling and Edge Case Tests", () => {
 					agg: aggType,
 				};
 
-				await vscode.commands.executeCommand(
-					"vsplot.test.applyChartConfig",
-					config,
-				);
+				await vscode.commands.executeCommand("vsplot.test.applyChartConfig", config);
 
 				const state = (await vscode.commands.executeCommand(
 					"vsplot.test.requestChartState",
 				)) as ChartTestState;
 
-				assert.strictEqual(
-					state.agg,
-					aggType,
-					`Aggregation should be ${aggType}`,
-				);
+				assert.strictEqual(state.agg, aggType, `Aggregation should be ${aggType}`);
 			}
 		});
 	});
@@ -458,28 +401,22 @@ suite("Error Handling and Edge Case Tests", () => {
 			this.timeout(10000);
 
 			const content = "A;B;C\n1;2;3\n4;5;6";
-			const tmpPath = path.join(
-				__dirname,
-				"../../test-data/semicolon-delim.dat",
-			);
-			await vscode.workspace.fs.writeFile(
-				vscode.Uri.file(tmpPath),
-				Buffer.from(content, "utf8"),
-			);
+			const tmpPath = path.join(__dirname, "../../test-data/semicolon-delim.dat");
+			await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 			const uri = vscode.Uri.file(tmpPath);
 
 			try {
 				await vscode.commands.executeCommand("vsplot.previewData", uri);
 				assert.ok(true, "DAT file with semicolon parsed");
-			} catch (error) {
-				assert.fail(`DAT file parsing failed: ${error}`);
+			} catch (_error) {
+				assert.fail(`DAT file parsing failed: ${_error}`);
 			}
 
 			// Clean up
 			try {
 				await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-			} catch (e) {
+			} catch (_e) {
 				// Ignore cleanup errors
 			}
 		});
@@ -489,24 +426,21 @@ suite("Error Handling and Edge Case Tests", () => {
 
 			const content = "A B C\n1 2 3\n4 5 6";
 			const tmpPath = path.join(__dirname, "../../test-data/space-delim.out");
-			await vscode.workspace.fs.writeFile(
-				vscode.Uri.file(tmpPath),
-				Buffer.from(content, "utf8"),
-			);
+			await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 			const uri = vscode.Uri.file(tmpPath);
 
 			try {
 				await vscode.commands.executeCommand("vsplot.previewData", uri);
 				assert.ok(true, "OUT file with space delimiter parsed");
-			} catch (error) {
-				assert.fail(`OUT file parsing failed: ${error}`);
+			} catch (_error) {
+				assert.fail(`OUT file parsing failed: ${_error}`);
 			}
 
 			// Clean up
 			try {
 				await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-			} catch (e) {
+			} catch (_e) {
 				// Ignore cleanup errors
 			}
 		});
@@ -516,24 +450,21 @@ suite("Error Handling and Edge Case Tests", () => {
 
 			const content = "A:B:C\n1:2:3\n4:5:6";
 			const tmpPath = path.join(__dirname, "../../test-data/colon-delim.data");
-			await vscode.workspace.fs.writeFile(
-				vscode.Uri.file(tmpPath),
-				Buffer.from(content, "utf8"),
-			);
+			await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 			const uri = vscode.Uri.file(tmpPath);
 
 			try {
 				await vscode.commands.executeCommand("vsplot.previewData", uri);
 				assert.ok(true, "DATA file with colon delimiter parsed");
-			} catch (error) {
-				assert.fail(`DATA file parsing failed: ${error}`);
+			} catch (_error) {
+				assert.fail(`DATA file parsing failed: ${_error}`);
 			}
 
 			// Clean up
 			try {
 				await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-			} catch (e) {
+			} catch (_e) {
 				// Ignore cleanup errors
 			}
 		});
@@ -543,24 +474,21 @@ suite("Error Handling and Edge Case Tests", () => {
 
 			const content = "A,B,C\n1,2,3\n4,5,6";
 			const tmpPath = path.join(__dirname, "../../test-data/comma-delim.tab");
-			await vscode.workspace.fs.writeFile(
-				vscode.Uri.file(tmpPath),
-				Buffer.from(content, "utf8"),
-			);
+			await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 			const uri = vscode.Uri.file(tmpPath);
 
 			try {
 				await vscode.commands.executeCommand("vsplot.previewData", uri);
 				assert.ok(true, "TAB file with comma delimiter parsed");
-			} catch (error) {
-				assert.fail(`TAB file parsing failed: ${error}`);
+			} catch (_error) {
+				assert.fail(`TAB file parsing failed: ${_error}`);
 			}
 
 			// Clean up
 			try {
 				await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
-			} catch (e) {
+			} catch (_e) {
 				// Ignore cleanup errors
 			}
 		});
