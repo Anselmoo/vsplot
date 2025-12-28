@@ -182,7 +182,10 @@ suite("DataPreviewProvider Unit Tests", () => {
 			deps,
 		);
 		assert.strictEqual(result.success, true);
-		assert.ok(calledUri && calledUri.fsPath && calledUri.fsPath.endsWith("file.csv"));
+		assert.ok(calledUri);
+		if (calledUri) {
+			assert.ok((calledUri as any).fsPath.endsWith("file.csv"));
+		}
 	});
 
 	test("handleCreateChart uses default filename when none provided", async () => {
@@ -217,7 +220,10 @@ suite("DataPreviewProvider Unit Tests", () => {
 			deps,
 		);
 		assert.strictEqual(result.success, true);
-		assert.ok(calledUri && calledUri.path && calledUri.path.includes("preview"));
+		assert.ok(calledUri);
+		if (calledUri) {
+			assert.ok((calledUri as any).path.includes("preview"));
+		}
 	});
 
 	test("handleCreateChart returns error when chartProvider.showChart throws", async () => {

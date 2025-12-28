@@ -42,7 +42,7 @@ export interface ExportDataMessage {
 
 export interface CreateChartMessage {
 	type: "createChart";
-	data: ParsedData & { fileName?: string };
+	data: Omit<ParsedData, "fileName"> & { fileName?: string };
 }
 
 export interface ReparseMessage {
@@ -108,7 +108,7 @@ export async function handleCreateChart(
 		}
 
 		const uri = currentUri ?? vscode.Uri.file(message.data.fileName || "preview");
-		await chartProvider.showChart(uri, message.data);
+		await chartProvider.showChart(uri, message.data as ParsedData);
 		return { success: true };
 	} catch (_e) {
 		const errorMsg = `Failed to create chart: ${_e instanceof Error ? _e.message : String(_e)}`;
