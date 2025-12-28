@@ -5,6 +5,8 @@ import type {
 	ChartTestConfig,
 	ChartTestState,
 } from "../providers/chartViewProvider";
+import { ChartViewProvider } from "../providers/chartViewProvider";
+import { DataPreviewProvider } from "../providers/dataPreviewProvider";
 
 // Keep the test in sync with package.json publisher + name
 const EXTENSION_ID = "AnselmHahn.vsplot";
@@ -351,5 +353,142 @@ suite("Extension Test Suite", () => {
 
 		await vscode.commands.executeCommand("vsplot.previewData", uri);
 		assert.ok(true);
+	});
+
+	// Error handling wrapper tests for newly changed catch blocks
+	test("previewData wrapper shows error when provider throws", async function () {
+		this.timeout(10000);
+		const ext = vscode.extensions.getExtension(EXTENSION_ID);
+		const basePath = ext ? ext.extensionPath : "";
+		const uri = vscode.Uri.file(path.join(basePath, "sample-data", "iris.csv"));
+
+		// Make the provider throw
+		const origShowPreview = (DataPreviewProvider as any).prototype.showPreview;
+		(DataPreviewProvider as any).prototype.showPreview = async () => {
+			throw new Error("preview-fail");
+		};
+
+		let shown = "";
+		const origErr = vscode.window.showErrorMessage;
+		(vscode.window.showErrorMessage as any) = (m: string) => {
+			shown = m;
+		};
+
+		try {
+			await vscode.commands.executeCommand("vsplot.previewData", uri);
+			// allow async handler to run
+			await new Promise((r) => setTimeout(r, 20));
+			assert.ok(shown.includes("Failed to preview data"));
+		} finally {
+			(DataPreviewProvider as any).prototype.showPreview = origShowPreview;
+			(vscode.window.showErrorMessage as any) = origErr;
+		}
+	});
+
+	test("plotData wrapper shows error when chart provider throws", async function () {
+		this.timeout(10000);
+		const ext = vscode.extensions.getExtension(EXTENSION_ID);
+		const basePath = ext ? ext.extensionPath : "";
+		const uri = vscode.Uri.file(path.join(basePath, "sample-data", "iris.csv"));
+
+		// Make the chart provider throw
+		const origShowChart = (ChartViewProvider as any).prototype.showChart;
+		(ChartViewProvider as any).prototype.showChart = async () => {
+			throw new Error("chart-fail");
+		};
+
+		let shown = "";
+		const origErr = vscode.window.showErrorMessage;
+		(vscode.window.showErrorMessage as any) = (m: string) => {
+			shown = m;
+		};
+
+		try {
+			await vscode.commands.executeCommand("vsplot.plotData", uri);
+			await new Promise((r) => setTimeout(r, 20));
+			assert.ok(shown.includes("Failed to plot data"));
+		} finally {
+			(ChartViewProvider as any).prototype.showChart = origShowChart;
+			(vscode.window.showErrorMessage as any) = origErr;
+		}
+	});
+
+	test("openDataViewer wrapper shows error when findFiles throws", async function () {
+		this.timeout(10000);
+
+		// Replace createDefaultDependencies temporarily so the registered command uses a failing findWorkspaceFiles
+		const dataCommands = await import("../commands/dataCommands");
+		const origCreate = dataCommands.createDefaultDependencies;
+
+		let shown = "";
+		const origErr = vscode.window.showErrorMessage;
+		(vscode.window.showErrorMessage as any) = (m: string) => {
+			shown = m;
+		};
+
+		const fakeContext: any = { subscriptions: [] };
+
+		try {
+			(dataCommands as any).createDefaultDependencies = () => ({
+				getActiveEditorUri: () => undefined,
+				parseDataFile: async () => null,
+				showErrorMessage: (m: string) => {
+					shown = m;
+				},
+				showInfoMessage: () => {},
+				findWorkspaceFiles: async () => {
+					throw new Error("boom");
+				},
+				showQuickPick: async () => undefined,
+				getWorkspaceFolders: () => [{ uri: vscode.Uri.file("/tmp") } as any],
+				asRelativePath: (_: vscode.Uri) => "x",
+			});
+
+			// Register commands with our faulty deps
+			dataCommands.registerDataCommands(
+				fakeContext,
+				{ showPreview: async () => {} } as any,
+				{} as any,
+			);
+
+			await vscode.commands.executeCommand("vsplot.openDataViewer");
+			await new Promise((r) => setTimeout(r, 20));
+			assert.ok(shown.includes("Failed to open data viewer"));
+		} finally {
+			(dataCommands as any).createDefaultDependencies = origCreate;
+			(vscode.window.showErrorMessage as any) = origErr;
+			for (const d of fakeContext.subscriptions) {
+				try {
+					d.dispose();
+				} catch (_e) {
+					/* ignore */
+				}
+			}
+		}
+	});
+
+	test("applyChartConfig wrapper shows error when provider throws", async function () {
+		this.timeout(10000);
+		const origApply = (ChartViewProvider as any).prototype.applyChartConfig;
+		(ChartViewProvider as any).prototype.applyChartConfig = async () => {
+			throw new Error("cfg-fail");
+		};
+
+		let shown = "";
+		const origErr = vscode.window.showErrorMessage;
+		(vscode.window.showErrorMessage as any) = (m: string) => {
+			shown = m;
+		};
+
+		try {
+			await vscode.commands.executeCommand("vsplot.test.applyChartConfig", {
+				chartType: "line",
+			});
+			await new Promise((r) => setTimeout(r, 20));
+			assert.ok(shown.includes("Error") || shown.includes("cfg-fail"));
+		} finally {
+			(ChartViewProvider as any).prototype.applyChartConfig = origApply;
+			(vscode.window.showErrorMessage as any) = origErr;
+		}
 	});
 });
