@@ -1,6 +1,7 @@
 import * as assert from "node:assert";
 import * as vscode from "vscode";
 import {
+	handleCreateChart,
 	handleExportData,
 	handleReparse,
 	toCSV,
@@ -85,5 +86,61 @@ suite("DataPreviewProvider Unit Tests", () => {
 		);
 		assert.strictEqual(result.success, true);
 		assert.strictEqual(posted?.type, "showData");
+	});
+
+	test("handleCreateChart returns error when chartProvider is undefined", async () => {
+		let shownError = "";
+		const deps = {
+			showSaveDialog: async () => undefined,
+			writeFile: async () => {},
+			showInfoMessage: () => {},
+			showErrorMessage: (m: string) => {
+				shownError = m;
+			},
+			parseDataFile: async () => null,
+		};
+
+		const result = await handleCreateChart(
+			{
+				type: "createChart",
+				data: {
+					headers: ["a"],
+					rows: [["b"]],
+					totalRows: 1,
+					detectedDelimiter: ",",
+					fileName: "f.csv",
+					fileType: "csv",
+				},
+			},
+			undefined,
+			undefined,
+			deps as any,
+		);
+		assert.strictEqual(result.success, false);
+		assert.ok(shownError.includes("Chart provider not available"));
+	});
+
+	test("handleReparse returns error when currentUri is undefined", async () => {
+		let shownError = "";
+		const deps = {
+			showSaveDialog: async () => undefined,
+			writeFile: async () => {},
+			showInfoMessage: () => {},
+			showErrorMessage: (m: string) => {
+				shownError = m;
+			},
+			parseDataFile: async () => null,
+		};
+
+		const postMessage = async (_m: any) => true;
+
+		const result = await handleReparse(
+			{ type: "reparse", delimiter: "auto" },
+			undefined,
+			postMessage,
+			deps as any,
+		);
+		assert.strictEqual(result.success, false);
+		assert.ok(shownError.includes("Cannot reparse"));
 	});
 });
