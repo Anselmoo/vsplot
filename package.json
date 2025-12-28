@@ -173,6 +173,7 @@
 		"lint": "biome check .",
 		"format": "biome format --write .",
 		"ci:lint": "biome ci .",
+		"lint-staged": "lint-staged",
 		"prepare": "husky install",
 		"test": "vscode-test --label tests",
 		"test:junit": "mkdir -p artifacts/test-results && vscode-test --label junit",
