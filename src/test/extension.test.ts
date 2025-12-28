@@ -1,6 +1,11 @@
 import * as assert from "node:assert";
 import * as path from "node:path";
 import * as vscode from "vscode";
+import * as dataCommands from "../commands/dataCommands";
+import {
+	createDefaultDependencies,
+	registerDataCommands,
+} from "../commands/dataCommands";
 import type {
 	ChartTestConfig,
 	ChartTestState,
@@ -416,20 +421,15 @@ suite("Extension Test Suite", () => {
 	test("openDataViewer wrapper shows error when findFiles throws", async function () {
 		this.timeout(10000);
 
-		// Replace createDefaultDependencies temporarily so the registered command uses a failing findWorkspaceFiles
-		const dataCommands = await import("../commands/dataCommands");
-		const origCreate = dataCommands.createDefaultDependencies;
-
 		let shown = "";
 		const origErr = vscode.window.showErrorMessage;
 		(vscode.window.showErrorMessage as any) = (m: string) => {
 			shown = m;
 		};
 
-		const fakeContext: any = { subscriptions: [] };
-
 		try {
-			(dataCommands as any).createDefaultDependencies = () => ({
+			// Create deps that throw when findWorkspaceFiles is called
+			const fakeDeps: any = {
 				getActiveEditorUri: () => undefined,
 				parseDataFile: async () => null,
 				showErrorMessage: (m: string) => {
@@ -442,28 +442,16 @@ suite("Extension Test Suite", () => {
 				showQuickPick: async () => undefined,
 				getWorkspaceFolders: () => [{ uri: vscode.Uri.file("/tmp") } as any],
 				asRelativePath: (_: vscode.Uri) => "x",
-			});
+			};
 
-			// Register commands with our faulty deps
-			dataCommands.registerDataCommands(
-				fakeContext,
-				{ showPreview: async () => {} } as any,
-				{} as any,
-			);
+			const handler = dataCommands.makeOpenDataViewerHandler(fakeDeps, {
+				showPreview: async () => {},
+			} as any);
 
-			await vscode.commands.executeCommand("vsplot.openDataViewer");
+			await handler();
 			await new Promise((r) => setTimeout(r, 20));
 			assert.ok(shown.includes("Failed to open data viewer"));
 		} finally {
-			(dataCommands as any).createDefaultDependencies = origCreate;
-			(vscode.window.showErrorMessage as any) = origErr;
-			for (const d of fakeContext.subscriptions) {
-				try {
-					d.dispose();
-				} catch (_e) {
-					/* ignore */
-				}
-			}
 		}
 	});
 

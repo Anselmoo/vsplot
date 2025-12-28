@@ -218,6 +218,29 @@ export async function executeOpenDataViewer(
 	return { success: true };
 }
 
+// Factory to create handler for opening data viewer (extracted for testability)
+export function makeOpenDataViewerHandler(
+	deps: CommandDependencies,
+	previewProvider: {
+		showPreview: (uri: vscode.Uri, data: ParsedData) => Promise<void>;
+	},
+) {
+	return async () => {
+		try {
+			const result = await executeOpenDataViewer(deps, previewProvider);
+			if (!result.success && result.error) {
+				deps.showErrorMessage(result.error);
+			} else if (result.info) {
+				deps.showInfoMessage(result.info);
+			}
+		} catch (_error: unknown) {
+			deps.showErrorMessage(
+				`Failed to open data viewer: ${_error instanceof Error ? _error.message : String(_error)}`,
+			);
+		}
+	};
+}
+
 // --- Command Registration (Thin Wrapper) ---
 
 /**
@@ -268,20 +291,7 @@ export function registerDataCommands(
 	// Register open data viewer command
 	const openDataViewerCommand = vscode.commands.registerCommand(
 		"vsplot.openDataViewer",
-		async () => {
-			try {
-				const result = await executeOpenDataViewer(deps, previewProvider);
-				if (!result.success && result.error) {
-					deps.showErrorMessage(result.error);
-				} else if (result.info) {
-					deps.showInfoMessage(result.info);
-				}
-			} catch (_error: unknown) {
-				deps.showErrorMessage(
-					`Failed to open data viewer: ${_error instanceof Error ? _error.message : String(_error)}`,
-				);
-			}
-		},
+		makeOpenDataViewerHandler(deps, previewProvider),
 	);
 
 	context.subscriptions.push(
