@@ -4,6 +4,7 @@ import {
 	executeOpenDataViewer,
 	executePlotData,
 	executePreviewData,
+	makeOpenDataViewerHandler,
 	resolveUri,
 } from "../commands/dataCommands";
 
@@ -31,11 +32,7 @@ suite("DataCommands Unit Tests", () => {
 				called = true;
 			},
 		};
-		const result = await executePreviewData(
-			undefined as any,
-			deps as any,
-			previewProvider,
-		);
+		const result = await executePreviewData(undefined as any, deps as any, previewProvider);
 		assert.strictEqual(result.success, false);
 		assert.strictEqual(called, false);
 	});
@@ -57,11 +54,7 @@ suite("DataCommands Unit Tests", () => {
 				called = true;
 			},
 		};
-		const result = await executePlotData(
-			undefined as any,
-			deps as any,
-			chartProvider,
-		);
+		const result = await executePlotData(undefined as any, deps as any, chartProvider);
 		assert.strictEqual(result.success, false);
 		assert.strictEqual(called, false);
 	});
@@ -80,9 +73,7 @@ suite("DataCommands Unit Tests", () => {
 		const previewProvider = { showPreview: async () => {} };
 		const result = await executeOpenDataViewer(deps as any, previewProvider);
 		assert.strictEqual(result.success, false);
-		assert.ok(
-			result.error && result.error.includes("No workspace folder open."),
-		);
+		assert.ok(result.error && result.error.includes("No workspace folder open."));
 	});
 
 	test("executeOpenDataViewer returns info when no files found", async () => {
@@ -135,5 +126,28 @@ suite("DataCommands Unit Tests", () => {
 		const result = await executeOpenDataViewer(deps as any, previewProvider);
 		assert.strictEqual(result.success, false);
 		assert.strictEqual(result.error, "Failed to parse selected data file");
+	});
+
+	test("makeOpenDataViewerHandler calls showInfoMessage when no files found", async () => {
+		let infoShown = "";
+		const fakeDeps: any = {
+			getWorkspaceFolders: () => [{ uri: vscode.Uri.file("/tmp") } as any],
+			findWorkspaceFiles: async () => [],
+			showQuickPick: async () => undefined,
+			asRelativePath: (_: vscode.Uri) => "x",
+			getActiveEditorUri: () => undefined,
+			parseDataFile: async () => null,
+			showErrorMessage: (_: string) => {},
+			showInfoMessage: (m: string) => {
+				infoShown = m;
+			},
+		};
+
+		const handler = makeOpenDataViewerHandler(
+			fakeDeps as any,
+			{ showPreview: async () => {} } as any,
+		);
+		await handler();
+		assert.ok(infoShown.includes("No data files found in workspace."));
 	});
 });

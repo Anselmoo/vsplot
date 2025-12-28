@@ -7,14 +7,8 @@ suite("JSON Parsing Tests", () => {
 	test("JSON array of primitives (strings) should parse", async function () {
 		this.timeout(10000);
 		const content = '["apple", "banana", "cherry"]';
-		const tmpPath = path.join(
-			__dirname,
-			"../../test-data/json-string-array.json",
-		);
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8"),
-		);
+		const tmpPath = path.join(__dirname, "../../test-data/json-string-array.json");
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 		const data = await parseDataFile(uri);
@@ -23,21 +17,9 @@ suite("JSON Parsing Tests", () => {
 		assert.strictEqual(data?.headers.length, 1, "Should have 1 column (Value)");
 		assert.strictEqual(data?.headers[0], "Value", "Header should be 'Value'");
 		assert.strictEqual(data?.rows.length, 3, "Should have 3 rows");
-		assert.strictEqual(
-			data?.rows[0][0],
-			"apple",
-			"First row should be 'apple'",
-		);
-		assert.strictEqual(
-			data?.rows[1][0],
-			"banana",
-			"Second row should be 'banana'",
-		);
-		assert.strictEqual(
-			data?.rows[2][0],
-			"cherry",
-			"Third row should be 'cherry'",
-		);
+		assert.strictEqual(data?.rows[0][0], "apple", "First row should be 'apple'");
+		assert.strictEqual(data?.rows[1][0], "banana", "Second row should be 'banana'");
+		assert.strictEqual(data?.rows[2][0], "cherry", "Third row should be 'cherry'");
 
 		// Clean up
 		try {
@@ -50,14 +32,8 @@ suite("JSON Parsing Tests", () => {
 	test("JSON array of primitives (numbers) should parse", async function () {
 		this.timeout(10000);
 		const content = "[1, 2, 3, 4, 5]";
-		const tmpPath = path.join(
-			__dirname,
-			"../../test-data/json-number-array.json",
-		);
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8"),
-		);
+		const tmpPath = path.join(__dirname, "../../test-data/json-number-array.json");
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 		const data = await parseDataFile(uri);
@@ -79,14 +55,8 @@ suite("JSON Parsing Tests", () => {
 	test("JSON array of primitives (mixed) should parse", async function () {
 		this.timeout(10000);
 		const content = '["text", 42, true, null, 3.14]';
-		const tmpPath = path.join(
-			__dirname,
-			"../../test-data/json-mixed-array.json",
-		);
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8"),
-		);
+		const tmpPath = path.join(__dirname, "../../test-data/json-mixed-array.json");
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 		const data = await parseDataFile(uri);
@@ -111,14 +81,8 @@ suite("JSON Parsing Tests", () => {
 	test("JSON single object should parse as one row", async function () {
 		this.timeout(10000);
 		const content = '{"name": "John", "age": 30, "city": "NYC"}';
-		const tmpPath = path.join(
-			__dirname,
-			"../../test-data/json-single-object.json",
-		);
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8"),
-		);
+		const tmpPath = path.join(__dirname, "../../test-data/json-single-object.json");
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 		const data = await parseDataFile(uri);
@@ -142,14 +106,8 @@ suite("JSON Parsing Tests", () => {
 	test("JSON empty array should throw error", async function () {
 		this.timeout(10000);
 		const content = "[]";
-		const tmpPath = path.join(
-			__dirname,
-			"../../test-data/json-empty-array.json",
-		);
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8"),
-		);
+		const tmpPath = path.join(__dirname, "../../test-data/json-empty-array.json");
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 
@@ -157,11 +115,7 @@ suite("JSON Parsing Tests", () => {
 		const data = await parseDataFile(uri);
 		// Based on the code, empty array gives us headers: ['Value'] and rows: []
 		assert.ok(data, "Data should be parsed even for empty array");
-		assert.strictEqual(
-			data?.rows.length,
-			0,
-			"Should have 0 rows for empty array",
-		);
+		assert.strictEqual(data?.rows.length, 0, "Should have 0 rows for empty array");
 
 		// Clean up
 		try {
@@ -175,14 +129,8 @@ suite("JSON Parsing Tests", () => {
 		this.timeout(10000);
 		const content =
 			'[{"name": "Alice", "age": 25}, {"name": "Bob", "age": null}, {"name": null, "age": 35}]';
-		const tmpPath = path.join(
-			__dirname,
-			"../../test-data/json-null-values.json",
-		);
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8"),
-		);
+		const tmpPath = path.join(__dirname, "../../test-data/json-null-values.json");
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 		const data = await parseDataFile(uri);
@@ -190,11 +138,7 @@ suite("JSON Parsing Tests", () => {
 		assert.ok(data, "Data should be parsed");
 		assert.strictEqual(data?.headers.length, 2, "Should have 2 columns");
 		assert.strictEqual(data?.rows.length, 3, "Should have 3 rows");
-		assert.strictEqual(
-			data?.rows[0][0],
-			"Alice",
-			"First row name should be 'Alice'",
-		);
+		assert.strictEqual(data?.rows[0][0], "Alice", "First row name should be 'Alice'");
 		assert.strictEqual(data?.rows[1][1], null, "Second row age should be null");
 		assert.strictEqual(data?.rows[2][0], null, "Third row name should be null");
 
@@ -210,10 +154,7 @@ suite("JSON Parsing Tests", () => {
 		this.timeout(10000);
 		const content = "{invalid json}";
 		const tmpPath = path.join(__dirname, "../../test-data/json-invalid.json");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8"),
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 		const data = await parseDataFile(uri);
@@ -233,10 +174,7 @@ suite("JSON Parsing Tests", () => {
 		this.timeout(10000);
 		const content = '"just a string"';
 		const tmpPath = path.join(__dirname, "../../test-data/json-primitive.json");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8"),
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 		const data = await parseDataFile(uri);
@@ -255,14 +193,8 @@ suite("JSON Parsing Tests", () => {
 	test("JSON number primitive should throw error", async function () {
 		this.timeout(10000);
 		const content = "42";
-		const tmpPath = path.join(
-			__dirname,
-			"../../test-data/json-number-primitive.json",
-		);
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8"),
-		);
+		const tmpPath = path.join(__dirname, "../../test-data/json-number-primitive.json");
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 		const data = await parseDataFile(uri);
@@ -295,20 +227,13 @@ suite("JSON Parsing Tests", () => {
 		assert.ok(data?.headers.includes("x"), "Should have 'x' header");
 		assert.ok(data?.headers.includes("y"), "Should have 'y' header");
 		assert.ok(data?.headers.includes("z"), "Should have 'z' header");
-		assert.ok(
-			data?.headers.includes("category"),
-			"Should have 'category' header",
-		);
+		assert.ok(data?.headers.includes("category"), "Should have 'category' header");
 		assert.ok(data?.headers.includes("value"), "Should have 'value' header");
 		assert.strictEqual(data?.rows.length, 10, "Should have 10 rows");
 		// First row should have: x=1.2, y=2.3, z=3.1, category="A", value=10
 		const xIdx = data?.headers.indexOf("x") ?? 0;
 		const categoryIdx = data?.headers.indexOf("category") ?? 0;
 		assert.strictEqual(data?.rows[0][xIdx], 1.2, "First row x should be 1.2");
-		assert.strictEqual(
-			data?.rows[0][categoryIdx],
-			"A",
-			"First row category should be 'A'",
-		);
+		assert.strictEqual(data?.rows[0][categoryIdx], "A", "First row category should be 'A'");
 	});
 });

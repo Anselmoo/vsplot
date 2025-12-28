@@ -21,10 +21,7 @@ export interface CommandDependencies {
 	parseDataFile: (uri: vscode.Uri) => Promise<ParsedData | null>;
 	showErrorMessage: (msg: string) => void;
 	showInfoMessage: (msg: string) => void;
-	findWorkspaceFiles: (
-		pattern: string,
-		exclude?: string,
-	) => Thenable<vscode.Uri[]>;
+	findWorkspaceFiles: (pattern: string, exclude?: string) => Thenable<vscode.Uri[]>;
 	showQuickPick: (
 		items: FileQuickPickItem[],
 		options?: vscode.QuickPickOptions,
@@ -46,10 +43,8 @@ export function createDefaultDependencies(): CommandDependencies {
 		showInfoMessage: (msg) => {
 			vscode.window.showInformationMessage(msg);
 		},
-		findWorkspaceFiles: (pattern, exclude) =>
-			vscode.workspace.findFiles(pattern, exclude),
-		showQuickPick: (items, options) =>
-			vscode.window.showQuickPick(items, options),
+		findWorkspaceFiles: (pattern, exclude) => vscode.workspace.findFiles(pattern, exclude),
+		showQuickPick: (items, options) => vscode.window.showQuickPick(items, options),
 		getWorkspaceFolders: () => vscode.workspace.workspaceFolders,
 		asRelativePath: (uri) => vscode.workspace.asRelativePath(uri),
 	};
@@ -294,9 +289,5 @@ export function registerDataCommands(
 		makeOpenDataViewerHandler(deps, previewProvider),
 	);
 
-	context.subscriptions.push(
-		previewDataCommand,
-		plotDataCommand,
-		openDataViewerCommand,
-	);
+	context.subscriptions.push(previewDataCommand, plotDataCommand, openDataViewerCommand);
 }

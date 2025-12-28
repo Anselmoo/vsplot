@@ -1,5 +1,10 @@
 import * as assert from "node:assert";
 import * as vscode from "vscode";
+import type { ParsedData } from "../data/load";
+import type {
+	ChartProviderLike,
+	MessageHandlerDependencies,
+} from "../providers/dataPreviewProvider";
 import {
 	handleCreateChart,
 	handleExportData,
@@ -10,18 +15,18 @@ import {
 suite("DataPreviewProvider Unit Tests", () => {
 	test("toCSV escapes commas, quotes and newlines", () => {
 		const headers = ["h1", "h2"];
-		const rows = [
+		const rows: (string | number)[][] = [
 			["simple", 'with "quote"'],
 			["mult\nline", 42],
 		];
-		const csv = toCSV(headers, rows as any);
+		const csv = toCSV(headers, rows);
 		assert.ok(csv.includes('"with ""quote"""'));
 		assert.ok(csv.includes('"mult\nline"'));
 	});
 
 	test("handleExportData returns error when writeFile throws", async () => {
 		let shownError = "";
-		const deps = {
+		const deps: MessageHandlerDependencies = {
 			showSaveDialog: async () => vscode.Uri.file("/tmp/out.csv"),
 			writeFile: async (_uri: vscode.Uri, _content: Uint8Array) => {
 				throw new Error("disk full");
@@ -35,7 +40,7 @@ suite("DataPreviewProvider Unit Tests", () => {
 
 		const result = await handleExportData(
 			{ type: "exportData", data: { headers: ["a"], rows: [["b"]] } },
-			deps as any,
+			deps,
 		);
 		assert.strictEqual(result.success, false);
 		assert.ok(shownError.includes("Failed to export data"));
@@ -58,8 +63,8 @@ suite("DataPreviewProvider Unit Tests", () => {
 	});
 
 	test("handleReparse posts showData when parseDataFile returns data", async () => {
-		let posted: any = null;
-		const deps = {
+		let posted: unknown = null;
+		const deps: MessageHandlerDependencies = {
 			showSaveDialog: async () => undefined,
 			writeFile: async () => {},
 			showInfoMessage: () => {},
@@ -70,10 +75,10 @@ suite("DataPreviewProvider Unit Tests", () => {
 					rows: [[1]],
 					totalRows: 1,
 					detectedDelimiter: ",",
-				}) as any,
+				}) as ParsedData,
 		};
 
-		const postMessage = async (m: any) => {
+		const postMessage = async (m: unknown) => {
 			posted = m;
 			return true;
 		};
@@ -82,15 +87,15 @@ suite("DataPreviewProvider Unit Tests", () => {
 			{ type: "reparse", delimiter: "auto" },
 			vscode.Uri.file("/tmp/foo.csv"),
 			postMessage,
-			deps as any,
+			deps,
 		);
 		assert.strictEqual(result.success, true);
-		assert.strictEqual(posted?.type, "showData");
+		assert.strictEqual((posted as any)?.type, "showData");
 	});
 
 	test("handleCreateChart returns error when chartProvider is undefined", async () => {
 		let shownError = "";
-		const deps = {
+		const deps: MessageHandlerDependencies = {
 			showSaveDialog: async () => undefined,
 			writeFile: async () => {},
 			showInfoMessage: () => {},
@@ -114,7 +119,7 @@ suite("DataPreviewProvider Unit Tests", () => {
 			},
 			undefined,
 			undefined,
-			deps as any,
+			deps,
 		);
 		assert.strictEqual(result.success, false);
 		assert.ok(shownError.includes("Chart provider not available"));
@@ -142,5 +147,114 @@ suite("DataPreviewProvider Unit Tests", () => {
 		);
 		assert.strictEqual(result.success, false);
 		assert.ok(shownError.includes("Cannot reparse"));
+	});
+
+	test("handleCreateChart uses fileName when currentUri is undefined", async () => {
+		let calledUri: vscode.Uri | null = null;
+		const chartProvider: ChartProviderLike = {
+			showChart: async (uri: vscode.Uri, _data: ParsedData) => {
+				calledUri = uri;
+			},
+		};
+
+		const deps: MessageHandlerDependencies = {
+			showSaveDialog: async () => undefined,
+			writeFile: async () => {},
+			showInfoMessage: () => {},
+			showErrorMessage: (_: string) => {},
+			parseDataFile: async () => null,
+		};
+
+		const result = await handleCreateChart(
+			{
+				type: "createChart",
+				data: {
+					headers: ["a"],
+					rows: [["b"]],
+					totalRows: 1,
+					detectedDelimiter: ",",
+					fileName: "file.csv",
+					fileType: "csv",
+				},
+			},
+			undefined,
+			chartProvider,
+			deps,
+		);
+		assert.strictEqual(result.success, true);
+		assert.ok(calledUri && calledUri.fsPath && calledUri.fsPath.endsWith("file.csv"));
+	});
+
+	test("handleCreateChart uses default filename when none provided", async () => {
+		let calledUri: vscode.Uri | null = null;
+		const chartProvider: ChartProviderLike = {
+			showChart: async (uri: vscode.Uri, _data: ParsedData) => {
+				calledUri = uri;
+			},
+		};
+
+		const deps: MessageHandlerDependencies = {
+			showSaveDialog: async () => undefined,
+			writeFile: async () => {},
+			showInfoMessage: () => {},
+			showErrorMessage: (_: string) => {},
+			parseDataFile: async () => null,
+		};
+
+		const result = await handleCreateChart(
+			{
+				type: "createChart",
+				data: {
+					headers: ["a"],
+					rows: [["b"]],
+					totalRows: 1,
+					detectedDelimiter: ",",
+					fileType: "csv",
+				},
+			},
+			undefined,
+			chartProvider,
+			deps,
+		);
+		assert.strictEqual(result.success, true);
+		assert.ok(calledUri && calledUri.path && calledUri.path.includes("preview"));
+	});
+
+	test("handleCreateChart returns error when chartProvider.showChart throws", async () => {
+		let shownError = "";
+		const chartProvider: ChartProviderLike = {
+			showChart: async () => {
+				throw new Error("chart-fail");
+			},
+		};
+
+		const deps: MessageHandlerDependencies = {
+			showSaveDialog: async () => undefined,
+			writeFile: async () => {},
+			showInfoMessage: () => {},
+			showErrorMessage: (m: string) => {
+				shownError = m;
+			},
+			parseDataFile: async () => null,
+		};
+
+		const result = await handleCreateChart(
+			{
+				type: "createChart",
+				data: {
+					headers: ["a"],
+					rows: [["b"]],
+					totalRows: 1,
+					detectedDelimiter: ",",
+					fileName: "file.csv",
+					fileType: "csv",
+				},
+			},
+			undefined,
+			chartProvider,
+			deps,
+		);
+		assert.strictEqual(result.success, false);
+		assert.ok(shownError.includes("Failed to create chart"));
 	});
 });

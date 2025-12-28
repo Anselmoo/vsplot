@@ -2,14 +2,8 @@ import * as assert from "node:assert";
 import * as path from "node:path";
 import * as vscode from "vscode";
 import * as dataCommands from "../commands/dataCommands";
-import {
-	createDefaultDependencies,
-	registerDataCommands,
-} from "../commands/dataCommands";
-import type {
-	ChartTestConfig,
-	ChartTestState,
-} from "../providers/chartViewProvider";
+import { createDefaultDependencies, registerDataCommands } from "../commands/dataCommands";
+import type { ChartTestConfig, ChartTestState } from "../providers/chartViewProvider";
 import { ChartViewProvider } from "../providers/chartViewProvider";
 import { DataPreviewProvider } from "../providers/dataPreviewProvider";
 
@@ -89,10 +83,7 @@ suite("Extension Test Suite", () => {
 		assert.strictEqual(state.x, 4);
 		assert.strictEqual(state.agg, "avg");
 		// species has 3 categories
-		assert.ok(
-			state.labelsCount === 3,
-			`expected 3 categories, got ${state.labelsCount}`,
-		);
+		assert.ok(state.labelsCount === 3, `expected 3 categories, got ${state.labelsCount}`);
 	});
 
 	test("Scatter enforces numeric axes and builds dataset", async function () {
@@ -176,9 +167,7 @@ suite("Extension Test Suite", () => {
 		// Regression test for issue #30: https://github.com/Anselmoo/vsplot/issues/30
 		// Test data contributed by @JerryJohnsonLee: index (0,1,2...), label (decimals), predictions (decimals)
 		// Downloaded by scripts/setup-test-data.sh to avoid license issues with committed test data
-		const uri = vscode.Uri.file(
-			path.join(basePath, "test-data", "scatter-numeric-regression.csv"),
-		);
+		const uri = vscode.Uri.file(path.join(basePath, "test-data", "scatter-numeric-regression.csv"));
 		const doc = await vscode.workspace.openTextDocument(uri);
 		await vscode.window.showTextDocument(doc);
 		await vscode.commands.executeCommand("vsplot.plotData", uri);
@@ -189,14 +178,8 @@ suite("Extension Test Suite", () => {
 			"vsplot.test.requestChartState",
 		)) as ChartTestState;
 		assert.strictEqual(state.chartType, "scatter");
-		assert.ok(
-			state.datasetLens.length >= 1,
-			"should have at least one dataset",
-		);
-		assert.ok(
-			state.datasetLens[0] === 100,
-			`expected 100 points, got ${state.datasetLens[0]}`,
-		);
+		assert.ok(state.datasetLens.length >= 1, "should have at least one dataset");
+		assert.ok(state.datasetLens[0] === 100, `expected 100 points, got ${state.datasetLens[0]}`);
 	});
 
 	test("Doughnut with count aggregation on species", async function () {
@@ -240,10 +223,7 @@ suite("Extension Test Suite", () => {
 			y: 1,
 			curveSmoothing: true,
 		};
-		await vscode.commands.executeCommand(
-			"vsplot.test.applyChartConfig",
-			cfgSmooth,
-		);
+		await vscode.commands.executeCommand("vsplot.test.applyChartConfig", cfgSmooth);
 		const stateSmooth = (await vscode.commands.executeCommand(
 			"vsplot.test.requestChartState",
 		)) as ChartTestState;
@@ -257,10 +237,7 @@ suite("Extension Test Suite", () => {
 			y: 1,
 			curveSmoothing: false,
 		};
-		await vscode.commands.executeCommand(
-			"vsplot.test.applyChartConfig",
-			cfgLinear,
-		);
+		await vscode.commands.executeCommand("vsplot.test.applyChartConfig", cfgLinear);
 		const stateLinear = (await vscode.commands.executeCommand(
 			"vsplot.test.requestChartState",
 		)) as ChartTestState;
@@ -287,9 +264,7 @@ suite("Extension Test Suite", () => {
 				state.stylePreset === "vibrant",
 		);
 		assert.strictEqual(typeof state.decimals, "number");
-		assert.ok(
-			state.decimals === 0 || state.decimals === 1 || state.decimals === 2,
-		);
+		assert.ok(state.decimals === 0 || state.decimals === 1 || state.decimals === 2);
 	});
 
 	test("Preview TSV file without error", async function () {

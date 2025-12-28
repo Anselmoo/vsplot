@@ -13,10 +13,7 @@ suite("Data Commands Tests", () => {
 		// Create an unsupported file type
 		const content = "Some random content";
 		const tmpPath = path.join(__dirname, "../../test-data/unsupported.xyz");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8"),
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 
@@ -103,14 +100,8 @@ suite("Data Commands Tests", () => {
 
 		// Create a file that will fail to parse (empty CSV)
 		const content = "";
-		const tmpPath = path.join(
-			__dirname,
-			"../../test-data/empty-parse-test.csv",
-		);
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8"),
-		);
+		const tmpPath = path.join(__dirname, "../../test-data/empty-parse-test.csv");
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 
@@ -137,10 +128,7 @@ suite("Data Commands Tests", () => {
 		// Create a file that will fail to parse (empty CSV)
 		const content = "";
 		const tmpPath = path.join(__dirname, "../../test-data/empty-plot-test.csv");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8"),
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 
@@ -192,14 +180,8 @@ suite("Data Commands Tests", () => {
 
 		// Create an unsupported file type
 		const content = "Some random content";
-		const tmpPath = path.join(
-			__dirname,
-			"../../test-data/unsupported-plot.xyz",
-		);
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8"),
-		);
+		const tmpPath = path.join(__dirname, "../../test-data/unsupported-plot.xyz");
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 
@@ -248,10 +230,7 @@ suite("Data Commands Tests", () => {
 
 		const content = "Name\tAge\tScore\nAlice\t25\t95\nBob\t30\t87";
 		const tmpPath = path.join(__dirname, "../../test-data/tab-separated.tsv");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8"),
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 
@@ -276,10 +255,7 @@ suite("Data Commands Tests", () => {
 
 		const content = "X\tY\tZ\n1\t2\t3\n4\t5\t6\n7\t8\t9";
 		const tmpPath = path.join(__dirname, "../../test-data/tab-file.tab");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8"),
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 
@@ -304,10 +280,7 @@ suite("Data Commands Tests", () => {
 
 		const content = "Step|Value|Status\n1|100|OK\n2|200|OK\n3|300|OK";
 		const tmpPath = path.join(__dirname, "../../test-data/output.out");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8"),
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 
@@ -329,13 +302,9 @@ suite("Data Commands Tests", () => {
 	test("plotData with DATA file should parse correctly", async function () {
 		this.timeout(10000);
 
-		const content =
-			"Time,Temperature,Humidity\n08:00,20.5,45\n09:00,21.0,43\n10:00,22.5,40";
+		const content = "Time,Temperature,Humidity\n08:00,20.5,45\n09:00,21.0,43\n10:00,22.5,40";
 		const tmpPath = path.join(__dirname, "../../test-data/measurements.data");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8"),
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 
@@ -359,10 +328,7 @@ suite("Data Commands Tests", () => {
 
 		const content = '[{"id": 1, "name": "Item1"}, {"id": 2, "name": "Item2"}]';
 		const tmpPath = path.join(__dirname, "../../test-data/objects.json");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8"),
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 
@@ -385,14 +351,8 @@ suite("Data Commands Tests", () => {
 		this.timeout(10000);
 
 		const content = "# Comment 1\n# Comment 2\n# Comment 3";
-		const tmpPath = path.join(
-			__dirname,
-			"../../test-data/comments-only-cmd.csv",
-		);
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8"),
-		);
+		const tmpPath = path.join(__dirname, "../../test-data/comments-only-cmd.csv");
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 
@@ -418,10 +378,7 @@ suite("Data Commands Tests", () => {
 
 		const content = "   \n\t\n   \n\t\t\t";
 		const tmpPath = path.join(__dirname, "../../test-data/whitespace-cmd.csv");
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8"),
-		);
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 
@@ -446,14 +403,8 @@ suite("Data Commands Tests", () => {
 		this.timeout(10000);
 
 		const content = "{invalid json content}";
-		const tmpPath = path.join(
-			__dirname,
-			"../../test-data/invalid-json-cmd.json",
-		);
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8"),
-		);
+		const tmpPath = path.join(__dirname, "../../test-data/invalid-json-cmd.json");
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 
@@ -478,14 +429,8 @@ suite("Data Commands Tests", () => {
 		this.timeout(10000);
 
 		const content = "not valid json at all";
-		const tmpPath = path.join(
-			__dirname,
-			"../../test-data/invalid-json-plot.json",
-		);
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8"),
-		);
+		const tmpPath = path.join(__dirname, "../../test-data/invalid-json-plot.json");
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 
@@ -510,14 +455,8 @@ suite("Data Commands Tests", () => {
 		this.timeout(10000);
 
 		const content = '"just a string"';
-		const tmpPath = path.join(
-			__dirname,
-			"../../test-data/json-primitive-cmd.json",
-		);
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8"),
-		);
+		const tmpPath = path.join(__dirname, "../../test-data/json-primitive-cmd.json");
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 
@@ -541,14 +480,8 @@ suite("Data Commands Tests", () => {
 		this.timeout(10000);
 
 		const content = '{"name": "Test", "value": 42, "active": true}';
-		const tmpPath = path.join(
-			__dirname,
-			"../../test-data/single-object-cmd.json",
-		);
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8"),
-		);
+		const tmpPath = path.join(__dirname, "../../test-data/single-object-cmd.json");
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 
@@ -571,14 +504,8 @@ suite("Data Commands Tests", () => {
 		this.timeout(10000);
 
 		const content = '{"x": 1, "y": 2, "z": 3}';
-		const tmpPath = path.join(
-			__dirname,
-			"../../test-data/single-object-plot.json",
-		);
-		await vscode.workspace.fs.writeFile(
-			vscode.Uri.file(tmpPath),
-			Buffer.from(content, "utf8"),
-		);
+		const tmpPath = path.join(__dirname, "../../test-data/single-object-plot.json");
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
 		const uri = vscode.Uri.file(tmpPath);
 

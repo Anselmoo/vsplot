@@ -148,13 +148,7 @@ function renderChartImage(width, height, outFile) {
 	const margin = Math.max(12, Math.round(Math.min(width, height) * 0.12));
 	const baseY = height - margin;
 	fillVerticalGradient(png, width, colors.bgTop, colors.bgBottom);
-	drawGrid(
-		png,
-		width,
-		margin,
-		colors.grid,
-		Math.max(6, Math.round((height - margin * 2) / 4)),
-	);
+	drawGrid(png, width, margin, colors.grid, Math.max(6, Math.round((height - margin * 2) / 4)));
 	drawAxes(
 		png,
 		width,
@@ -166,11 +160,7 @@ function renderChartImage(width, height, outFile) {
 	const drawableH = baseY - margin;
 	const barsNorm = [0.36, 0.56, 0.22];
 	const barHeightsPx = barsNorm.map((v) => Math.round(v * drawableH));
-	drawBars(png, width, margin, baseY, barHeightsPx, [
-		colors.bar1,
-		colors.bar2,
-		colors.bar3,
-	]);
+	drawBars(png, width, margin, baseY, barHeightsPx, [colors.bar1, colors.bar2, colors.bar3]);
 
 	const linePts = [
 		{

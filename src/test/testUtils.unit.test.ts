@@ -32,11 +32,7 @@ suite("Test Utils Unit Tests", () => {
 
 	test("deleteTempFile handles missing file gracefully", async () => {
 		const fake = vscode.Uri.file(
-			path.join(
-				getExtensionBasePath(),
-				"test-data",
-				"definitely-not-exists-12345.txt",
-			),
+			path.join(getExtensionBasePath(), "test-data", "definitely-not-exists-12345.txt"),
 		);
 		// Should not throw
 		await deleteTempFile(fake);
