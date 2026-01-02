@@ -96,7 +96,13 @@
             </label>
         </div>
 
-        <button id="updateChart">Update Chart</button>
+        <div class="control-group">
+            <label for="liveUpdatesToggle" style="display:flex;align-items:center;gap:4px;">
+                <input type="checkbox" id="liveUpdatesToggle" checked /> Live updates
+            </label>
+        </div>
+
+        <button id="updateChart" style="display: none;">Update Chart</button>
         <button id="exportChart">Export Chart</button>
     </div>
 
@@ -104,9 +110,11 @@
 
     <div class="chart-container">
         <div class="zoom-controls">
-            <button id="zoomIn" title="Zoom In">+</button>
-            <button id="zoomOut" title="Zoom Out">-</button>
-            <button id="resetZoom" title="Reset Zoom">⌂</button>
+            <button id="zoomIn" title="Zoom In" aria-label="Zoom in">+</button>
+            <button id="zoomOut" title="Zoom Out" aria-label="Zoom out">-</button>
+            <button id="resetZoom" title="Reset Zoom" aria-label="Reset zoom to initial view" style="display: none;">⌂</button>
+            <button id="applyChanges" title="Apply changes" aria-label="Apply chart changes" style="display: none;">✓</button>
+            <button id="exportChartIcon" title="Export chart" aria-label="Export chart as PNG image">💾</button>
         </div>
         <div class="no-data" id="noData">No data to display</div>
         <canvas id="chart" style="display: none;"></canvas>
