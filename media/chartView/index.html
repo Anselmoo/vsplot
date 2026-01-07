@@ -41,7 +41,6 @@
         <div class="control-group">
             <label for="yAxis2">Y2-Axis:</label>
             <select id="yAxis2"></select>
-            <button id="addY2Btn" title="Add secondary Y axis">+ Add Y2</button>
         </div>
 
         <div class="control-group">
@@ -54,9 +53,9 @@
             <input type="color" id="colorPicker" value="#36a2eb" />
         </div>
 
-        <div class="control-group">
+        <div class="control-group sr-only">
             <label for="dragZoomToggle">Drag Zoom:</label>
-            <input type="checkbox" id="dragZoomToggle" />
+            <input type="checkbox" id="dragZoomToggle" checked />
         </div>
 
         <div class="control-group" id="smoothGroup" style="display:none;">
@@ -80,7 +79,6 @@
             <select id="stylePreset">
                 <option value="clean" selected>Clean</option>
                 <option value="soft">Soft</option>
-                <option value="vibrant">Vibrant</option>
             </select>
         </div>
 
@@ -90,24 +88,36 @@
                 <option value="0">0</option>
                 <option value="1">1</option>
                 <option value="2" selected>2</option>
+                <option value="3">3</option>
+                <option value="sci">Scientific</option>
             </select>
             <label style="display:flex;align-items:center;gap:4px;">
                 <input type="checkbox" id="thousands" /> 1,000s
             </label>
         </div>
 
-        <button id="updateChart">Update Chart</button>
-        <button id="exportChart">Export Chart</button>
+        <div class="control-group">
+            <label>Log Scale:</label>
+            <label style="display:flex;align-items:center;gap:4px;">
+                <input type="checkbox" id="logXToggle" /> X
+            </label>
+            <label style="display:flex;align-items:center;gap:4px;">
+                <input type="checkbox" id="logYToggle" /> Y
+            </label>
+        </div>
+
+        <div class="control-group chart-controls-group">
+            <button id="zoomIn" class="chart-control-btn" title="Zoom In" aria-label="Zoom in">+</button>
+            <button id="zoomOut" class="chart-control-btn" title="Zoom Out" aria-label="Zoom out">−</button>
+            <button id="updateChart" class="chart-control-btn" title="Refresh chart" aria-label="Refresh chart">↻</button>
+            <button id="exportChart" class="chart-control-btn" title="Export chart as PNG" aria-label="Export chart">🖪</button>
+        </div>
     </div>
 
     <div id="errorMessage" class="error-message" style="display: none;"></div>
 
     <div class="chart-container">
-        <div class="zoom-controls">
-            <button id="zoomIn" title="Zoom In">+</button>
-            <button id="zoomOut" title="Zoom Out">-</button>
-            <button id="resetZoom" title="Reset Zoom">⌂</button>
-        </div>
+
         <div class="no-data" id="noData">No data to display</div>
         <canvas id="chart" style="display: none;"></canvas>
     </div>
