@@ -19,7 +19,6 @@ let dragOverlay = null;
 let pendingConfig = null;
 let pendingConfigId = null;
 let initialBounds = null;
-let isZoomed = false; // Track if chart has been zoomed
 
 // Get default settings from body data attributes
 const defaultStylePreset = document.body.dataset.defaultStylePreset || "clean";
@@ -250,10 +249,6 @@ function initializeChart() {
 			if (typeof saved.curveSmoothing === "boolean") {
 				document.getElementById("curveToggle").checked = saved.curveSmoothing;
 			}
-			if (typeof saved.liveUpdates === "boolean") {
-				document.getElementById("liveUpdatesToggle").checked = saved.liveUpdates;
-				liveUpdatesEnabled = saved.liveUpdates;
-			}
 			restored = true;
 		} catch (_e) {
 			console.error("Error restoring state:", e);
@@ -268,9 +263,6 @@ function initializeChart() {
 			console.error("Error setting defaults:", e);
 		}
 	}
-
-	// Initialize live updates UI
-	updateLiveUpdatesUI();
 
 	updateY2ToggleUI();
 
@@ -759,18 +751,10 @@ function getChartOptions(
 						enabled: true,
 					},
 					mode: "xy",
-					onZoom: function() {
-						isZoomed = true;
-						updateResetZoomVisibility();
-					}
 				},
 				pan: {
 					enabled: true,
 					mode: "xy",
-					onPan: function() {
-						isZoomed = true;
-						updateResetZoomVisibility();
-					}
 				},
 				limits: {},
 				drag: {
@@ -1102,23 +1086,10 @@ function hideError() {
 
 // ==================== Event Listeners ====================
 
-// Live updates flag - default enabled
-let liveUpdatesEnabled = true;
-
 document.getElementById("updateChart").addEventListener("click", createChart);
-document.getElementById("chartType").addEventListener("change", () => {
-	if (liveUpdatesEnabled) createChart();
-});
-document.getElementById("xAxis").addEventListener("change", () => {
-	if (liveUpdatesEnabled) createChart();
-});
-document.getElementById("yAxis").addEventListener("change", () => {
-	if (liveUpdatesEnabled) createChart();
-});
-document.getElementById("yAxis2").addEventListener("change", () => {
-	updateY2ToggleUI();
-	if (liveUpdatesEnabled) createChart();
-});
+document.getElementById("chartType").addEventListener("change", createChart);
+document.getElementById("xAxis").addEventListener("change", createChart);
+document.getElementById("yAxis").addEventListener("change", createChart);
 
 document.getElementById("legendToggle").addEventListener("change", () => {
 	if (chart) {
@@ -1166,32 +1137,22 @@ document.getElementById("colorPicker").addEventListener("change", () => {
 document.getElementById("zoomIn").addEventListener("click", () => {
 	if (chart && typeof chart.zoom === "function") {
 		chart.zoom(1.2);
-		isZoomed = true;
-		updateResetZoomVisibility();
 	} else if (chart) {
 		programmaticZoom(chart, 0.8);
-		isZoomed = true;
-		updateResetZoomVisibility();
 	}
 });
 
 document.getElementById("zoomOut").addEventListener("click", () => {
 	if (chart && typeof chart.zoom === "function") {
 		chart.zoom(0.8);
-		isZoomed = true;
-		updateResetZoomVisibility();
 	} else if (chart) {
 		programmaticZoom(chart, 1.25);
-		isZoomed = true;
-		updateResetZoomVisibility();
 	}
 });
 
 document.getElementById("resetZoom").addEventListener("click", () => {
 	if (chart && typeof chart.resetZoom === "function") {
 		chart.resetZoom();
-		isZoomed = false;
-		updateResetZoomVisibility();
 	} else if (chart) {
 		resetToInitialBounds(chart);
 	}
@@ -1206,28 +1167,6 @@ document.getElementById("exportChart").addEventListener("click", () => {
 			filename: `chart_${currentData.fileName}_${Date.now()}.png`,
 		});
 	}
-});
-
-// Export icon (compact) - same functionality as Export Chart button
-document.getElementById("exportChartIcon").addEventListener("click", () => {
-	if (chart) {
-		const url = chart.toBase64Image();
-		vscode.postMessage({
-			type: "exportChart",
-			data: url,
-			filename: `chart_${currentData.fileName}_${Date.now()}.png`,
-		});
-	}
-});
-
-// Apply button - triggers chart update when live updates are off
-document.getElementById("applyChanges").addEventListener("click", () => {
-	createChart();
-});
-
-// Live updates toggle
-document.getElementById("liveUpdatesToggle").addEventListener("change", () => {
-	updateLiveUpdatesUI();
 });
 
 // Aggregation change should re-render
@@ -1651,8 +1590,6 @@ function setupManualDrag(enable) {
 							chart.options.scales.y.max = yMax;
 						}
 						chart.update();
-						isZoomed = true;
-						updateResetZoomVisibility();
 					}
 				}
 			} catch (_e) {
@@ -1676,8 +1613,6 @@ function cacheInitialBounds(c) {
 			initialBounds[id] = { min: chartScale.min, max: chartScale.max };
 		}
 	}
-	isZoomed = false;
-	updateResetZoomVisibility();
 }
 
 /**
@@ -1693,52 +1628,4 @@ function resetToInitialBounds(c) {
 		c.options.scales[id].max = initialBounds[id].max;
 	}
 	c.update();
-	isZoomed = false;
-	updateResetZoomVisibility();
-}
-
-/**
- * Update reset zoom button visibility
- */
-function updateResetZoomVisibility() {
-	const resetBtn = document.getElementById("resetZoom");
-	if (resetBtn) {
-		resetBtn.style.display = isZoomed ? "block" : "none";
-	}
-}
-
-/**
- * Update live updates UI state
- */
-function updateLiveUpdatesUI() {
-	const liveUpdates = document.getElementById("liveUpdatesToggle").checked;
-	const updateBtn = document.getElementById("updateChart");
-	const applyBtn = document.getElementById("applyChanges");
-	
-	liveUpdatesEnabled = liveUpdates;
-	
-	// Show/hide update button and apply icon
-	if (liveUpdates) {
-		updateBtn.style.display = "none";
-		applyBtn.style.display = "none";
-	} else {
-		updateBtn.style.display = "inline-block";
-		applyBtn.style.display = "block";
-	}
-	
-	// Persist preference
-	try {
-		const state = vscode.getState && vscode.getState();
-		const byFile = state && state.byFile ? state.byFile : {};
-		if (currentData && currentData.fileName) {
-			byFile[currentData.fileName] = Object.assign(
-				{},
-				byFile[currentData.fileName] || {},
-				{ liveUpdates }
-			);
-			vscode.setState && vscode.setState({ byFile });
-		}
-	} catch (_e) {
-		console.error("Error persisting live updates state:", e);
-	}
 }
