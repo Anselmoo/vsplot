@@ -1106,7 +1106,6 @@ function hideError() {
 
 // ==================== Event Listeners ====================
 
-document.getElementById("updateChart").addEventListener("click", createChart);
 document.getElementById("chartType").addEventListener("change", createChart);
 document.getElementById("xAxis").addEventListener("change", createChart);
 document.getElementById("yAxis").addEventListener("change", createChart);
@@ -1182,6 +1181,7 @@ document.getElementById("resetZoom").addEventListener("click", () => {
 	} else if (chart) {
 		resetToInitialBounds(chart);
 	}
+	createChart();
 });
 
 document.getElementById("exportChart").addEventListener("click", () => {
@@ -1193,6 +1193,10 @@ document.getElementById("exportChart").addEventListener("click", () => {
 			filename: `chart_${currentData.fileName}_${Date.now()}.png`,
 		});
 	}
+});
+
+document.getElementById("previewDataBtn").addEventListener("click", () => {
+	vscode.postMessage({ type: "openPreview" });
 });
 
 // Aggregation change should re-render

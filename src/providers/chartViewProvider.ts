@@ -6,6 +6,7 @@ export class ChartViewProvider implements vscode.WebviewViewProvider {
 	public static readonly viewType = "vsplot.chartView";
 	private _view?: vscode.WebviewView;
 	private _currentWebview?: vscode.Webview;
+	private _currentUri?: vscode.Uri;
 	private _pendingTestResolvers: Map<string, (payload: ChartTestState) => void> = new Map();
 	private _pendingConfigAcks: Map<string, () => void> = new Map();
 
@@ -29,7 +30,8 @@ export class ChartViewProvider implements vscode.WebviewViewProvider {
 		this._currentWebview = webviewView.webview;
 	}
 
-	public async showChart(_uri: vscode.Uri, data: ParsedData) {
+	public async showChart(uri: vscode.Uri, data: ParsedData) {
+		this._currentUri = uri;
 		if (this._view) {
 			this._view.show?.(true);
 			this._view.webview.postMessage({
@@ -64,6 +66,10 @@ export class ChartViewProvider implements vscode.WebviewViewProvider {
 	private _wireMessageHandlers(webview: vscode.Webview) {
 		webview.onDidReceiveMessage(async (message) => {
 			if (!message || typeof message !== "object") {
+				return;
+			}
+			if (message.type === "openPreview") {
+				await this._handleOpenPreviewRequest();
 				return;
 			}
 			if (message.type === "exportChart" && typeof message.data === "string") {
@@ -103,6 +109,19 @@ export class ChartViewProvider implements vscode.WebviewViewProvider {
 				return;
 			}
 		});
+	}
+
+	private async _handleOpenPreviewRequest() {
+		if (!this._currentUri) {
+			vscode.window.showErrorMessage("No source file available for preview.");
+			return;
+		}
+		try {
+			await vscode.commands.executeCommand("vsplot.previewData", this._currentUri);
+		} catch (_error: unknown) {
+			const m = _error instanceof Error ? _error.message : String(_error);
+			vscode.window.showErrorMessage(`Failed to open data preview: ${m}`);
+		}
 	}
 
 	public async requestChartState(): Promise<ChartTestState> {

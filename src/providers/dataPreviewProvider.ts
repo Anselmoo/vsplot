@@ -71,7 +71,7 @@ export async function handleExportData(
 ): Promise<MessageHandlerResult> {
 	try {
 		const uri = await deps.showSaveDialog({
-			saveLabel: "Export Filtered Data",
+			saveLabel: "Export Data",
 			filters: { CSV: ["csv"] },
 			defaultUri: vscode.Uri.file("filtered_data.csv"),
 		});
