@@ -19,6 +19,8 @@ let dragOverlay = null;
 let pendingConfig = null;
 let pendingConfigId = null;
 let initialBounds = null;
+const KEY_PAN_STEP = 0.1;
+let keyPanHandlerAttached = false;
 
 // Get default settings from body data attributes
 const defaultStylePreset = document.body.dataset.defaultStylePreset || "clean";
@@ -52,6 +54,8 @@ try {
 } catch (_e) {
 	// Zoom plugin not available, will use manual zoom fallback
 }
+
+attachKeyboardPanHandler();
 
 /**
  * Message handler for communication with extension
@@ -775,7 +779,7 @@ function getChartOptions(
 				limits: {},
 				drag: {
 					enabled: !!dragEnabled,
-					modifierKey: "shift",
+					modifierKey: null,
 				},
 			},
 			legend: {
@@ -1121,6 +1125,11 @@ document.getElementById("dragZoomToggle").addEventListener("change", () => {
 		const enabled = document.getElementById("dragZoomToggle").checked;
 		chart.options.plugins.zoom.drag = chart.options.plugins.zoom.drag || {};
 		chart.options.plugins.zoom.drag.enabled = enabled;
+		if (enabled) {
+			chart.options.plugins.zoom.drag.modifierKey = null;
+		} else {
+			delete chart.options.plugins.zoom.drag.modifierKey;
+		}
 		chart.update();
 		setupManualDrag(enabled && !pluginAvailable);
 	}
@@ -1482,6 +1491,57 @@ function programmaticZoom(c, factor) {
 	c.update();
 }
 
+function attachKeyboardPanHandler() {
+	if (keyPanHandlerAttached) return;
+	window.addEventListener(
+		"keydown",
+		(e) => {
+			if (!chart) return;
+			if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(e.key)) {
+				return;
+			}
+			const active = document.activeElement;
+			if (
+				active &&
+				["INPUT", "SELECT", "TEXTAREA"].includes(active.tagName) &&
+				!active.readOnly
+			) {
+				return;
+			}
+			e.preventDefault();
+			if (e.key === "ArrowLeft") {
+				panAxis("x", -1);
+			} else if (e.key === "ArrowRight") {
+				panAxis("x", 1);
+			} else if (e.key === "ArrowUp") {
+				panAxis("y", 1);
+			} else if (e.key === "ArrowDown") {
+				panAxis("y", -1);
+			}
+		},
+		{ passive: false },
+	);
+	keyPanHandlerAttached = true;
+}
+
+function panAxis(axis, direction) {
+	if (!chart || !chart.options.scales) return;
+	const chartScale = chart.scales?.[axis];
+	const scaleOptions = chart.options.scales[axis];
+	if (!chartScale || !scaleOptions) return;
+	const scaleType = chartScale.type || chartScale.options?.type;
+	const pannableTypes = ["linear", "time", "logarithmic"];
+	if (!pannableTypes.includes(scaleType)) return;
+	const span = chartScale.max - chartScale.min;
+	if (!isFinite(span) || span === 0) return;
+	const delta = span * KEY_PAN_STEP * direction;
+	const nextMin = chartScale.min + delta;
+	const nextMax = chartScale.max + delta;
+	scaleOptions.min = nextMin;
+	scaleOptions.max = nextMax;
+	chart.update("none");
+}
+
 /**
  * Setup manual drag zoom functionality
  * @param {boolean} enable - Whether to enable manual drag
@@ -1509,7 +1569,7 @@ function setupManualDrag(enable) {
 	container.appendChild(dragOverlay);
 
 	chartCanvas.onmousedown = (e) => {
-		if (!e.shiftKey) return;
+		if (e.button !== 0) return;
 		const rect = chartCanvas.getBoundingClientRect();
 		start = { x: e.clientX - rect.left, y: e.clientY - rect.top };
 		dragOverlay.style.left = e.clientX - rect.left + "px";
