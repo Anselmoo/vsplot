@@ -94,6 +94,41 @@ function isCommentLine(line: string, commentMarkers: string[]): boolean {
 	return commentMarkers.some((marker) => trimmed.startsWith(marker));
 }
 
+/**
+ * Detect delimiter for CSV files (comma or semicolon most common)
+ *
+ * @param firstLine - First line of the file
+ * @param sampleLines - Additional lines to check for consistency
+ * @returns Detected delimiter (comma or semicolon)
+ */
+function detectCSVDelimiter(firstLine: string, sampleLines: string[]): string {
+	const candidates = [",", ";"];
+	let bestDelimiter = ",";
+	let bestScore = -1;
+
+	for (const delimiter of candidates) {
+		const firstLineCount = (firstLine.match(new RegExp(`\\${delimiter}`, "g")) || []).length;
+		if (firstLineCount === 0) continue;
+
+		// Check consistency across sample lines
+		let consistentCount = 0;
+		for (let i = 1; i < sampleLines.length; i++) {
+			const lineCount = (sampleLines[i].match(new RegExp(`\\${delimiter}`, "g")) || []).length;
+			if (lineCount === firstLineCount) {
+				consistentCount++;
+			}
+		}
+
+		const score = firstLineCount * 10 + consistentCount;
+		if (score > bestScore) {
+			bestScore = score;
+			bestDelimiter = delimiter;
+		}
+	}
+
+	return bestDelimiter;
+}
+
 function parseCSV(
 	content: string,
 	fileName: string,
@@ -114,8 +149,11 @@ function parseCSV(
 		throw new Error("File contains only comments or empty lines");
 	}
 
-	// Parse CSV with basic comma separation (could be enhanced with proper CSV parser)
-	const firstRowData = parseCSVLine(nonCommentLines[0]);
+	// Detect delimiter for CSV files (comma or semicolon are most common)
+	const delimiter = detectCSVDelimiter(nonCommentLines[0], nonCommentLines.slice(0, 6));
+
+	// Parse CSV with detected delimiter
+	const firstRowData = parseCSVLine(nonCommentLines[0], delimiter);
 	let headers: string[];
 	let dataStartIndex = 0;
 
@@ -135,7 +173,7 @@ function parseCSV(
 
 	for (let i = dataStartIndex; i < nonCommentLines.length; i++) {
 		if (nonCommentLines[i].trim()) {
-			const raw = parseCSVLine(nonCommentLines[i]);
+			const raw = parseCSVLine(nonCommentLines[i], delimiter);
 			const coerced = raw.map((v) => {
 				const n = Number(v);
 				return !Number.isNaN(n) && v !== "" ? n : v;
@@ -150,10 +188,11 @@ function parseCSV(
 		fileName,
 		fileType: "csv",
 		totalRows: rows.length,
+		detectedDelimiter: delimiter,
 	};
 }
 
-function parseCSVLine(line: string): string[] {
+function parseCSVLine(line: string, delimiter = ","): string[] {
 	const result: string[] = [];
 	let current = "";
 	let inQuotes = false;
@@ -163,7 +202,7 @@ function parseCSVLine(line: string): string[] {
 
 		if (char === '"') {
 			inQuotes = !inQuotes;
-		} else if (char === "," && !inQuotes) {
+		} else if (char === delimiter && !inQuotes) {
 			result.push(current.trim());
 			current = "";
 		} else {
