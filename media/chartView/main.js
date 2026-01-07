@@ -266,19 +266,40 @@ function initializeChart() {
 
 	// Heuristic defaults: prefer first two numeric columns for scatter, else bar
 	const numericCols = getNumericColumnIndexes(currentData.rows);
-	if (!restored && numericCols.length >= 2) {
-		xAxisSelect.selectedIndex = numericCols[0];
-		yAxisSelect.selectedIndex = numericCols[1];
-		const chartTypeSel = document.getElementById("chartType");
-		if (chartTypeSel) {
-			chartTypeSel.value = "scatter";
+	const chartTypeSel = document.getElementById("chartType");
+	const allColumnIndexes = currentData.headers.map((_h, idx) => idx);
+	const categoricalCols = allColumnIndexes.filter((idx) => !numericCols.includes(idx));
+
+	if (!restored) {
+		if (numericCols.length >= 2) {
+			xAxisSelect.selectedIndex = numericCols[0];
+			yAxisSelect.selectedIndex = numericCols[1];
+			if (chartTypeSel) {
+				chartTypeSel.value = "scatter";
+			}
+		} else if (numericCols.length === 1 && currentData.headers.length > 1) {
+			yAxisSelect.selectedIndex = numericCols[0];
+			const fallbackX =
+				categoricalCols.find((idx) => idx !== numericCols[0]) ??
+				allColumnIndexes.find((idx) => idx !== numericCols[0]) ??
+				numericCols[0];
+			xAxisSelect.selectedIndex = fallbackX;
+			if (chartTypeSel) {
+				chartTypeSel.value = "bar";
+			}
+		} else if (currentData.headers.length > 1) {
+			xAxisSelect.selectedIndex = allColumnIndexes[0];
+			yAxisSelect.selectedIndex = allColumnIndexes[1];
+			if (chartTypeSel) {
+				chartTypeSel.value = "bar";
+			}
+		} else if (currentData.headers.length === 1) {
+			xAxisSelect.selectedIndex = 0;
+			yAxisSelect.selectedIndex = 0;
+			if (chartTypeSel && chartTypeSel.value === "line") {
+				chartTypeSel.value = "bar";
+			}
 		}
-	} else if (!restored && currentData.headers.length > 1) {
-		xAxisSelect.selectedIndex = 0;
-		yAxisSelect.selectedIndex = 1;
-	} else if (!restored && currentData.headers.length === 1) {
-		xAxisSelect.selectedIndex = 0;
-		yAxisSelect.selectedIndex = 0;
 	}
 
 	createChart();
