@@ -218,6 +218,9 @@ export interface ChartTestState {
 	stylePreset: string;
 	decimals: number;
 	thousands: boolean;
+	scientific: boolean;
+	logX: boolean;
+	logY: boolean;
 	labelsCount: number;
 	datasetLens: number[];
 	error?: string;
@@ -235,5 +238,8 @@ export type ChartTestConfig = Partial<{
 	agg: string;
 	stylePreset: string;
 	decimals: number;
+	scientific: boolean;
 	thousands: boolean;
+	logX: boolean;
+	logY: boolean;
 }>;

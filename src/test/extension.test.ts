@@ -258,12 +258,9 @@ suite("Extension Test Suite", () => {
 		const state = (await vscode.commands.executeCommand(
 			"vsplot.test.requestChartState",
 		)) as ChartTestState;
-		assert.ok(
-			state.stylePreset === "clean" ||
-				state.stylePreset === "soft" ||
-				state.stylePreset === "vibrant",
-		);
+		assert.ok(state.stylePreset === "clean" || state.stylePreset === "soft");
 		assert.strictEqual(typeof state.decimals, "number");
+		assert.strictEqual(typeof state.scientific, "boolean");
 		assert.ok(state.decimals === 0 || state.decimals === 1 || state.decimals === 2);
 	});
 

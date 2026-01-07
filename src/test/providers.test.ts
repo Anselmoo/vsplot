@@ -253,7 +253,7 @@ suite("Provider Integration Tests", () => {
 			assert.strictEqual(state.thousands, true, "Thousands separator should be enabled");
 		});
 
-		test("applyChartConfig should handle vibrant style preset", async function () {
+		test("applyChartConfig should handle scientific formatting", async function () {
 			this.timeout(20000);
 
 			const ext = vscode.extensions.getExtension(EXTENSION_ID);
@@ -269,8 +269,9 @@ suite("Provider Integration Tests", () => {
 
 			const config: ChartTestConfig = {
 				chartType: "line",
-				stylePreset: "vibrant",
-				decimals: 0,
+				stylePreset: "soft",
+				decimals: 3,
+				scientific: true,
 			};
 
 			await vscode.commands.executeCommand("vsplot.test.applyChartConfig", config);
@@ -279,8 +280,9 @@ suite("Provider Integration Tests", () => {
 				"vsplot.test.requestChartState",
 			)) as ChartTestState;
 
-			assert.strictEqual(state.stylePreset, "vibrant", "Style preset should be vibrant");
-			assert.strictEqual(state.decimals, 0, "Decimals should be 0");
+			assert.strictEqual(state.stylePreset, "soft", "Style preset should be soft");
+			assert.strictEqual(state.decimals, 3, "Decimals should be 3");
+			assert.strictEqual(state.scientific, true, "Scientific formatting should be enabled");
 		});
 
 		test("chart should handle drag zoom toggle", async function () {

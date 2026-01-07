@@ -2,7 +2,7 @@
 	"name": "vsplot",
 	"displayName": "VSPlot - Data Visualization Extension",
 	"description": "Preview and visualize CSV, JSON, and other data files with interactive charts",
-	"version": "0.2.4",
+	"version": "0.2.5",
 	"publisher": "AnselmHahn",
 	"engines": {
 		"vscode": "^1.104.0"
@@ -125,8 +125,7 @@
 					"type": "string",
 					"enum": [
 						"clean",
-						"soft",
-						"vibrant"
+						"soft"
 					],
 					"default": "clean",
 					"description": "Default color style preset for charts"
@@ -136,7 +135,8 @@
 					"enum": [
 						0,
 						1,
-						2
+						2,
+						3
 					],
 					"default": 2,
 					"description": "Default number of decimals for numeric axes and tooltips"

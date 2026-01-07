@@ -114,8 +114,18 @@ function parseCSV(
 		throw new Error("File contains only comments or empty lines");
 	}
 
-	// Parse CSV with basic comma separation (could be enhanced with proper CSV parser)
-	const firstRowData = parseCSVLine(nonCommentLines[0]);
+	// Detect delimiter: semicolon if present and more common than comma, otherwise comma
+	const firstLine = nonCommentLines[0];
+	let delimiter = ",";
+	const semicolonCount = (firstLine.match(/;/g) || []).length;
+	const commaCount = (firstLine.match(/,/g) || []).length;
+	if (semicolonCount > 0 && semicolonCount >= commaCount) {
+		delimiter = ";";
+	}
+
+	// Parse CSV with detected delimiter
+	const firstRowData =
+		delimiter === ";" ? firstLine.split(";").map((s) => s.trim()) : parseCSVLine(firstLine);
 	let headers: string[];
 	let dataStartIndex = 0;
 
@@ -135,7 +145,10 @@ function parseCSV(
 
 	for (let i = dataStartIndex; i < nonCommentLines.length; i++) {
 		if (nonCommentLines[i].trim()) {
-			const raw = parseCSVLine(nonCommentLines[i]);
+			const raw =
+				delimiter === ";"
+					? nonCommentLines[i].split(";").map((s) => s.trim())
+					: parseCSVLine(nonCommentLines[i]);
 			const coerced = raw.map((v) => {
 				const n = Number(v);
 				return !Number.isNaN(n) && v !== "" ? n : v;
@@ -150,6 +163,7 @@ function parseCSV(
 		fileName,
 		fileType: "csv",
 		totalRows: rows.length,
+		detectedDelimiter: delimiter,
 	};
 }
 
