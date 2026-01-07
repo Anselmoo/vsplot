@@ -264,8 +264,6 @@ function initializeChart() {
 		}
 	}
 
-	updateY2ToggleUI();
-
 	// Heuristic defaults: prefer first two numeric columns for scatter, else bar
 	const numericCols = getNumericColumnIndexes(currentData.rows);
 	if (!restored && numericCols.length >= 2) {
@@ -347,9 +345,6 @@ function createChart() {
 		// Show/hide curve smoothing control (only for line charts)
 		const smoothGroup = document.getElementById("smoothGroup");
 		smoothGroup.style.display = chartType === "line" ? "flex" : "none";
-
-		// Reflect Y2 UI state
-		updateY2ToggleUI();
 
 		// Prepare data
 		const chartData = prepareChartData(
@@ -1090,6 +1085,7 @@ document.getElementById("updateChart").addEventListener("click", createChart);
 document.getElementById("chartType").addEventListener("change", createChart);
 document.getElementById("xAxis").addEventListener("change", createChart);
 document.getElementById("yAxis").addEventListener("change", createChart);
+document.getElementById("yAxis2").addEventListener("change", createChart);
 
 document.getElementById("legendToggle").addEventListener("change", () => {
 	if (chart) {
@@ -1265,40 +1261,7 @@ document.getElementById("iconsToggle").addEventListener("change", () => {
 	}
 });
 
-// Y2 quick toggle
-document.getElementById("addY2Btn").addEventListener("click", () => {
-	const y2Sel = document.getElementById("yAxis2");
-	const ySel = document.getElementById("yAxis");
-	const current = parseInt(y2Sel.value);
-	if (isNaN(current) || current < 0) {
-		// add: suggest next numeric column different from Y
-		const numCols = getNumericColumnIndexes(currentData.rows);
-		const yIdx = parseInt(ySel.value);
-		const candidate = numCols.find((i) => i !== yIdx);
-		if (typeof candidate === "number") {
-			y2Sel.value = String(candidate);
-		} else if (numCols.length > 0) {
-			y2Sel.value = String(numCols[0]);
-		} else {
-			y2Sel.value = "-1";
-		}
-	} else {
-		// remove
-		y2Sel.value = "-1";
-	}
-	updateY2ToggleUI();
-	createChart();
-});
 
-/**
- * Update Y2 toggle button text
- */
-function updateY2ToggleUI() {
-	const btn = document.getElementById("addY2Btn");
-	const y2Sel = document.getElementById("yAxis2");
-	const active = !isNaN(parseInt(y2Sel.value)) && parseInt(y2Sel.value) >= 0;
-	btn.textContent = active ? "Remove Y2" : "+ Add Y2";
-}
 
 // ==================== Utility Functions ====================
 
