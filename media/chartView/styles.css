@@ -30,11 +30,56 @@ body {
 	flex-wrap: wrap;
 }
 
+.sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	border: 0;
+}
+
 /* Control group for related controls */
 .control-group {
 	display: flex;
 	gap: 8px;
 	align-items: center;
+}
+
+.chart-controls-group {
+	margin-left: auto;
+	gap: 6px;
+}
+
+.chart-control-btn {
+	background: var(--vscode-button-background);
+	color: var(--vscode-button-foreground);
+	border: 1px solid rgba(52, 211, 153, 0.5);
+	border-radius: 6px;
+	padding: 5px 10px;
+	font-size: 1em;
+	height: 28px;
+	min-width: 28px;
+	cursor: pointer;
+	transition: all 0.15s ease;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.chart-control-btn:hover {
+	background: var(--vscode-button-hoverBackground);
+	border-color: rgba(52, 211, 153, 0.8);
+	box-shadow: 0 2px 6px rgba(52, 211, 153, 0.25);
+	transform: translateY(-1px);
+}
+
+.chart-control-btn:active,
+.chart-control-btn.active {
+	background: var(--vscode-button-background);
+	border-color: rgba(52, 211, 153, 1);
+	box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.15);
+	transform: translateY(0);
 }
 
 /* Labels */
@@ -72,6 +117,17 @@ button:hover {
 	background: var(--vscode-button-hoverBackground);
 }
 
+.action-button {
+	min-width: 120px;
+	font-weight: 600;
+	border-radius: 20px;
+}
+
+.action-button.primary {
+	background: var(--vscode-button-background);
+	color: var(--vscode-button-foreground);
+}
+
 /* Chart container */
 .chart-container {
 	position: relative;
@@ -92,22 +148,6 @@ button:hover {
 	height: 100%;
 	color: var(--vscode-descriptionForeground);
 	font-size: 1.1em;
-}
-
-/* Zoom controls overlay */
-.zoom-controls {
-	position: absolute;
-	top: 24px;
-	right: 24px;
-	display: flex;
-	gap: 8px;
-	z-index: 1000;
-}
-
-.zoom-controls button {
-	padding: 4px 8px;
-	font-size: 0.8em;
-	min-width: auto;
 }
 
 /* Chart statistics cards */

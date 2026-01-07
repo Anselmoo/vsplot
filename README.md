@@ -65,7 +65,7 @@ See `CONTRIBUTING.md` for Husky and lint-staged setup and CI behaviour.
 
 - **Multiple chart types:** Line, bar, scatter, pie, doughnut, and radar with presets for color palettes and number formatting.
 - **Dual-axis & aggregation:** Plot metrics on primary and secondary Y axes, aggregate categorical data (sum, count, avg, min, max), and switch between linear/time scales.
-- **Zoom & navigate:** Scroll-wheel zoom, drag zoom (with fallback for trackpads), and quick reset controls are always visible.
+- **Zoom & navigate:** Scroll-wheel zoom, drag-to-pan with mouse, and keyboard navigation using **Arrow Keys** (←, ↑, →, ↓) to pan the chart in any direction.
 - **Stateful experience:** VSPlot remembers the last configuration per file and exposes hidden `vsplot:test:*` commands for automated workflows.
 - **Export ready:** Save charts as high-resolution PNGs directly from the webview.
 
