@@ -34,8 +34,8 @@
 
 1. **Install VSPlot** from the [Marketplace](https://marketplace.visualstudio.com/items?itemName=Anselmoo.vsplot) or search "VSPlot" inside VS Code.
 2. **Open or right-click a data file** (`.csv`, `.json`, `.tsv`, `.dat`, `.tab`, `.out`, `.data`, `.txt`) and choose **Preview Data**.
-3. **Filter, search, and sort** within the preview webview; then press **Create Chart** to open the Chart view beside it.
-4. Pick an X axis, up to two Y axes, adjust aggregation/zoom presets, and export the chart as a PNG when you are ready.
+3. **Filter, search, and sort** within the preview webview, then press the **Create Chart** button in the toolbar to open the Chart view beside it.
+4. Pick an X axis, up to two Y axes, adjust aggregation/zoom presets, and export the chart as a PNG. Need to go back to the data grid? Hit the new **Preview Data** button inside Chart view to jump right back without leaving the webview stack.
 
 ## Development & Linting
 
@@ -57,7 +57,7 @@ See `CONTRIBUTING.md` for Husky and lint-staged setup and CI behaviour.
 - **Column-aware filtering:** Search across columns, toggle sort order, and paginate large files without waiting.
 - **Row-level insight:** Select specific rows to recompute statistics (count, min, max, mean, median, stddev) on the fly.
 - **Delimiter overrides:** Switch delimiters from the toolbar (`Auto`, `,`, `|`, `;`, `:`, `\t`, space) and the view reparses instantly.
-- **Export what you see:** Download filtered results to CSV for sharing or downstream analysis.
+- **Export Data button:** Save exactly what is visible (including filters) to CSV for sharing or downstream analysis.
 
 ![Data Preview screenshot](images/screenshot-data-preview.png)
 
@@ -65,7 +65,8 @@ See `CONTRIBUTING.md` for Husky and lint-staged setup and CI behaviour.
 
 - **Multiple chart types:** Line, bar, scatter, pie, doughnut, and radar with presets for color palettes and number formatting.
 - **Dual-axis & aggregation:** Plot metrics on primary and secondary Y axes, aggregate categorical data (sum, count, avg, min, max), and switch between linear/time scales.
-- **Zoom & navigate:** Scroll-wheel zoom, drag zoom (with fallback for trackpads), and quick reset controls are always visible.
+- **Zoom & navigate:** Scroll-wheel zoom, drag zoom without modifier keys (plus a fallback drag box), arrow-key panning for both axes, and a quick ↺ reset button that reapplies the current configuration.
+- **Round-trip workflow:** A dedicated **Preview Data** button in Chart view reopens the original data preview so you can tweak filters and regenerate charts without re-running commands.
 - **Stateful experience:** VSPlot remembers the last configuration per file and exposes hidden `vsplot:test:*` commands for automated workflows.
 - **Export ready:** Save charts as high-resolution PNGs directly from the webview.
 

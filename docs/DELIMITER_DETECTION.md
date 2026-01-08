@@ -191,7 +191,7 @@ Files with no delimiters will be parsed as single-column data with comma as the 
 ## Related Features
 
 - **Data Preview**: Visual inspection of parsed data
-- **Export Filtered Data**: Save re-parsed data in CSV format
+- **Export Data**: Save re-parsed data in CSV format
 - **Chart Creation**: Charts use the same delimiter detection
 
 ## Technical Details

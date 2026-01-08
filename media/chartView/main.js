@@ -19,6 +19,8 @@ let dragOverlay = null;
 let pendingConfig = null;
 let pendingConfigId = null;
 let initialBounds = null;
+const KEY_PAN_STEP = 0.1;
+let keyPanHandlerAttached = false;
 
 // Get default settings from body data attributes
 const defaultStylePreset = document.body.dataset.defaultStylePreset || "clean";
@@ -52,6 +54,8 @@ try {
 } catch (_e) {
 	// Zoom plugin not available, will use manual zoom fallback
 }
+
+attachKeyboardPanHandler();
 
 /**
  * Message handler for communication with extension
@@ -264,23 +268,42 @@ function initializeChart() {
 		}
 	}
 
-	updateY2ToggleUI();
-
 	// Heuristic defaults: prefer first two numeric columns for scatter, else bar
 	const numericCols = getNumericColumnIndexes(currentData.rows);
-	if (!restored && numericCols.length >= 2) {
-		xAxisSelect.selectedIndex = numericCols[0];
-		yAxisSelect.selectedIndex = numericCols[1];
-		const chartTypeSel = document.getElementById("chartType");
-		if (chartTypeSel) {
-			chartTypeSel.value = "scatter";
+	const chartTypeSel = document.getElementById("chartType");
+	const allColumnIndexes = currentData.headers.map((_h, idx) => idx);
+	const categoricalCols = allColumnIndexes.filter((idx) => !numericCols.includes(idx));
+
+	if (!restored) {
+		if (numericCols.length >= 2) {
+			xAxisSelect.selectedIndex = numericCols[0];
+			yAxisSelect.selectedIndex = numericCols[1];
+			if (chartTypeSel) {
+				chartTypeSel.value = "scatter";
+			}
+		} else if (numericCols.length === 1 && currentData.headers.length > 1) {
+			yAxisSelect.selectedIndex = numericCols[0];
+			const fallbackX =
+				categoricalCols.find((idx) => idx !== numericCols[0]) ??
+				allColumnIndexes.find((idx) => idx !== numericCols[0]) ??
+				numericCols[0];
+			xAxisSelect.selectedIndex = fallbackX;
+			if (chartTypeSel) {
+				chartTypeSel.value = "bar";
+			}
+		} else if (currentData.headers.length > 1) {
+			xAxisSelect.selectedIndex = allColumnIndexes[0];
+			yAxisSelect.selectedIndex = allColumnIndexes[1];
+			if (chartTypeSel) {
+				chartTypeSel.value = "bar";
+			}
+		} else if (currentData.headers.length === 1) {
+			xAxisSelect.selectedIndex = 0;
+			yAxisSelect.selectedIndex = 0;
+			if (chartTypeSel && chartTypeSel.value === "line") {
+				chartTypeSel.value = "bar";
+			}
 		}
-	} else if (!restored && currentData.headers.length > 1) {
-		xAxisSelect.selectedIndex = 0;
-		yAxisSelect.selectedIndex = 1;
-	} else if (!restored && currentData.headers.length === 1) {
-		xAxisSelect.selectedIndex = 0;
-		yAxisSelect.selectedIndex = 0;
 	}
 
 	createChart();
@@ -347,9 +370,6 @@ function createChart() {
 		// Show/hide curve smoothing control (only for line charts)
 		const smoothGroup = document.getElementById("smoothGroup");
 		smoothGroup.style.display = chartType === "line" ? "flex" : "none";
-
-		// Reflect Y2 UI state
-		updateY2ToggleUI();
 
 		// Prepare data
 		const chartData = prepareChartData(
@@ -759,7 +779,7 @@ function getChartOptions(
 				limits: {},
 				drag: {
 					enabled: !!dragEnabled,
-					modifierKey: "shift",
+					modifierKey: null,
 				},
 			},
 			legend: {
@@ -1086,10 +1106,10 @@ function hideError() {
 
 // ==================== Event Listeners ====================
 
-document.getElementById("updateChart").addEventListener("click", createChart);
 document.getElementById("chartType").addEventListener("change", createChart);
 document.getElementById("xAxis").addEventListener("change", createChart);
 document.getElementById("yAxis").addEventListener("change", createChart);
+document.getElementById("yAxis2").addEventListener("change", createChart);
 
 document.getElementById("legendToggle").addEventListener("change", () => {
 	if (chart) {
@@ -1104,6 +1124,11 @@ document.getElementById("dragZoomToggle").addEventListener("change", () => {
 		const enabled = document.getElementById("dragZoomToggle").checked;
 		chart.options.plugins.zoom.drag = chart.options.plugins.zoom.drag || {};
 		chart.options.plugins.zoom.drag.enabled = enabled;
+		if (enabled) {
+			chart.options.plugins.zoom.drag.modifierKey = null;
+		} else {
+			delete chart.options.plugins.zoom.drag.modifierKey;
+		}
 		chart.update();
 		setupManualDrag(enabled && !pluginAvailable);
 	}
@@ -1156,6 +1181,7 @@ document.getElementById("resetZoom").addEventListener("click", () => {
 	} else if (chart) {
 		resetToInitialBounds(chart);
 	}
+	createChart();
 });
 
 document.getElementById("exportChart").addEventListener("click", () => {
@@ -1167,6 +1193,10 @@ document.getElementById("exportChart").addEventListener("click", () => {
 			filename: `chart_${currentData.fileName}_${Date.now()}.png`,
 		});
 	}
+});
+
+document.getElementById("previewDataBtn").addEventListener("click", () => {
+	vscode.postMessage({ type: "openPreview" });
 });
 
 // Aggregation change should re-render
@@ -1265,40 +1295,7 @@ document.getElementById("iconsToggle").addEventListener("change", () => {
 	}
 });
 
-// Y2 quick toggle
-document.getElementById("addY2Btn").addEventListener("click", () => {
-	const y2Sel = document.getElementById("yAxis2");
-	const ySel = document.getElementById("yAxis");
-	const current = parseInt(y2Sel.value);
-	if (isNaN(current) || current < 0) {
-		// add: suggest next numeric column different from Y
-		const numCols = getNumericColumnIndexes(currentData.rows);
-		const yIdx = parseInt(ySel.value);
-		const candidate = numCols.find((i) => i !== yIdx);
-		if (typeof candidate === "number") {
-			y2Sel.value = String(candidate);
-		} else if (numCols.length > 0) {
-			y2Sel.value = String(numCols[0]);
-		} else {
-			y2Sel.value = "-1";
-		}
-	} else {
-		// remove
-		y2Sel.value = "-1";
-	}
-	updateY2ToggleUI();
-	createChart();
-});
 
-/**
- * Update Y2 toggle button text
- */
-function updateY2ToggleUI() {
-	const btn = document.getElementById("addY2Btn");
-	const y2Sel = document.getElementById("yAxis2");
-	const active = !isNaN(parseInt(y2Sel.value)) && parseInt(y2Sel.value) >= 0;
-	btn.textContent = active ? "Remove Y2" : "+ Add Y2";
-}
 
 // ==================== Utility Functions ====================
 
@@ -1498,6 +1495,57 @@ function programmaticZoom(c, factor) {
 	c.update();
 }
 
+function attachKeyboardPanHandler() {
+	if (keyPanHandlerAttached) return;
+	window.addEventListener(
+		"keydown",
+		(e) => {
+			if (!chart) return;
+			if (!["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(e.key)) {
+				return;
+			}
+			const active = document.activeElement;
+			if (
+				active &&
+				["INPUT", "SELECT", "TEXTAREA"].includes(active.tagName) &&
+				!active.readOnly
+			) {
+				return;
+			}
+			e.preventDefault();
+			if (e.key === "ArrowLeft") {
+				panAxis("x", -1);
+			} else if (e.key === "ArrowRight") {
+				panAxis("x", 1);
+			} else if (e.key === "ArrowUp") {
+				panAxis("y", 1);
+			} else if (e.key === "ArrowDown") {
+				panAxis("y", -1);
+			}
+		},
+		{ passive: false },
+	);
+	keyPanHandlerAttached = true;
+}
+
+function panAxis(axis, direction) {
+	if (!chart || !chart.options.scales) return;
+	const chartScale = chart.scales?.[axis];
+	const scaleOptions = chart.options.scales[axis];
+	if (!chartScale || !scaleOptions) return;
+	const scaleType = chartScale.type || chartScale.options?.type;
+	const pannableTypes = ["linear", "time", "logarithmic"];
+	if (!pannableTypes.includes(scaleType)) return;
+	const span = chartScale.max - chartScale.min;
+	if (!isFinite(span) || span === 0) return;
+	const delta = span * KEY_PAN_STEP * direction;
+	const nextMin = chartScale.min + delta;
+	const nextMax = chartScale.max + delta;
+	scaleOptions.min = nextMin;
+	scaleOptions.max = nextMax;
+	chart.update("none");
+}
+
 /**
  * Setup manual drag zoom functionality
  * @param {boolean} enable - Whether to enable manual drag
@@ -1525,7 +1573,7 @@ function setupManualDrag(enable) {
 	container.appendChild(dragOverlay);
 
 	chartCanvas.onmousedown = (e) => {
-		if (!e.shiftKey) return;
+		if (e.button !== 0) return;
 		const rect = chartCanvas.getBoundingClientRect();
 		start = { x: e.clientX - rect.left, y: e.clientY - rect.top };
 		dragOverlay.style.left = e.clientX - rect.left + "px";

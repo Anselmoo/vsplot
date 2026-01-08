@@ -269,6 +269,62 @@ suite("ChartViewProvider Unit Tests", () => {
 		}
 	});
 
+	test("openPreview message executes preview command when uri is set", async () => {
+		const repoRoot = path.join(__dirname, "../..");
+		const provider = new ChartViewProvider(vscode.Uri.file(repoRoot));
+		const fakeView = new FakeWebviewView() as any;
+		provider.resolveWebviewView(fakeView, {} as any, {} as any);
+
+		const origExec = vscode.commands.executeCommand;
+		let calledArgs: unknown[] | null = null;
+		(vscode.commands.executeCommand as any) = async (...args: unknown[]) => {
+			calledArgs = args;
+		};
+
+		try {
+			await provider.showChart(vscode.Uri.file("/tmp/data.csv"), {
+				headers: ["h"],
+				rows: [[1]],
+				totalRows: 1,
+				fileName: "data.csv",
+				detectedDelimiter: ",",
+			} as any);
+
+			fakeView.webview.simulateIncoming({ type: "openPreview" });
+			await new Promise((resolve) => setTimeout(resolve, 10));
+
+			assert.ok(calledArgs, "executeCommand should be called");
+			if (calledArgs) {
+				assert.strictEqual(calledArgs[0], "vsplot.previewData");
+				const uriArg = calledArgs[1] as vscode.Uri;
+				assert.ok(uriArg.fsPath.endsWith("data.csv"));
+			}
+		} finally {
+			(vscode.commands.executeCommand as any) = origExec;
+		}
+	});
+
+	test("openPreview message shows error when uri is missing", async () => {
+		const repoRoot = path.join(__dirname, "../..");
+		const provider = new ChartViewProvider(vscode.Uri.file(repoRoot));
+		const fakeView = new FakeWebviewView() as any;
+		provider.resolveWebviewView(fakeView, {} as any, {} as any);
+
+		const origError = vscode.window.showErrorMessage;
+		let shown = "";
+		(vscode.window.showErrorMessage as any) = (msg: string) => {
+			shown = msg;
+		};
+
+		try {
+			fakeView.webview.simulateIncoming({ type: "openPreview" });
+			await new Promise((resolve) => setTimeout(resolve, 10));
+			assert.ok(shown.includes("No source file"));
+		} finally {
+			(vscode.window.showErrorMessage as any) = origError;
+		}
+	});
+
 	test("exportChart handles base64 without data prefix", async () => {
 		const repoRoot = path.join(__dirname, "../..");
 		const provider = new ChartViewProvider(vscode.Uri.file(repoRoot));
