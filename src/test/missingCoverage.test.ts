@@ -184,4 +184,45 @@ suite("Missing Coverage Tests", () => {
 			(vscode.window.showErrorMessage as any) = origError;
 		}
 	});
+
+	/**
+	 * Test coverage for exportChart error handling with non-Error thrown value
+	 * Covers chartViewProvider.ts line 90 (String(_error) path in exportChart)
+	 */
+	test("exportChart handles non-Error thrown value in catch block", async () => {
+		const repoRoot = path.join(__dirname, "../..");
+		const provider = new ChartViewProvider(vscode.Uri.file(repoRoot));
+		const fakeView = new FakeWebviewView() as any;
+		provider.resolveWebviewView(fakeView, {} as any, {} as any);
+
+		const origShow = vscode.window.showSaveDialog;
+		const origError = vscode.window.showErrorMessage;
+		let shownError = "";
+
+		// Mock showSaveDialog to throw a non-Error value (e.g., a string)
+		(vscode.window.showSaveDialog as any) = async () => {
+			throw "Dialog operation failed";
+		};
+
+		(vscode.window.showErrorMessage as any) = (msg: string) => {
+			shownError = msg;
+		};
+
+		try {
+			fakeView.webview.simulateIncoming({
+				type: "exportChart",
+				data: "data:image/png;base64,QUJD",
+				filename: "chart.png",
+			});
+
+			await new Promise((r) => setTimeout(r, 20));
+
+			// Verify error message was shown with stringified non-Error value
+			assert.ok(shownError.includes("Failed to save chart image"), "Should show error message");
+			assert.ok(shownError.includes("Dialog operation failed"), "Should include stringified error");
+		} finally {
+			(vscode.window.showSaveDialog as any) = origShow;
+			(vscode.window.showErrorMessage as any) = origError;
+		}
+	});
 });
