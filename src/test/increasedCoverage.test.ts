@@ -123,6 +123,30 @@ suite("Increased Coverage Tests", () => {
 			assert.deepStrictEqual(postedMessage?.data, testData);
 		});
 
+		test("DataPreviewProvider showPreview creates panel when no view exists", async () => {
+			const repoRoot = path.join(__dirname, "../..");
+			const extensionUri = vscode.Uri.file(repoRoot);
+			const provider = new DataPreviewProvider(extensionUri);
+
+			// Don't call resolveWebviewView - simulate no existing view
+
+			const testUri = vscode.Uri.file("/test/data.csv");
+			const testData = {
+				headers: ["h1", "h2"],
+				rows: [["a", "b"]],
+				totalRows: 1,
+				fileName: "data.csv",
+				fileType: "csv" as const,
+				detectedDelimiter: ",",
+			};
+
+			// This should create a new panel instead of using existing view
+			// We can't fully test panel creation in unit tests, but we can verify no errors
+			await provider.showPreview(testUri, testData);
+
+			assert.ok(true, "Should create panel without errors");
+		});
+
 		test("DataPreviewProvider _wireMessageHandlers routes messages correctly", async () => {
 			const repoRoot = path.join(__dirname, "../..");
 			const extensionUri = vscode.Uri.file(repoRoot);
@@ -317,6 +341,212 @@ suite("Increased Coverage Tests", () => {
 			registerDataCommands(mockContext, mockPreviewProvider, mockChartProvider);
 
 			assert.strictEqual(mockContext.subscriptions.length, 3, "Should register 3 commands");
+		});
+
+		test("previewData command handles exceptions in executePreviewData", async function () {
+			this.timeout(5000);
+
+			const repoRoot = path.join(__dirname, "../..");
+			const extensionUri = vscode.Uri.file(repoRoot);
+
+			let errorShown = "";
+			const origShowError = vscode.window.showErrorMessage;
+			(vscode.window.showErrorMessage as any) = (msg: string) => {
+				errorShown = msg;
+			};
+
+			const mockContext: any = {
+				subscriptions: [],
+			};
+
+			// Create a preview provider that throws in showPreview
+			const mockPreviewProvider = new DataPreviewProvider(extensionUri);
+			(mockPreviewProvider as any).showPreview = async () => {
+				throw new Error("Preview error");
+			};
+
+			const mockChartProvider = new ChartViewProvider(extensionUri);
+
+			try {
+				registerDataCommands(mockContext, mockPreviewProvider, mockChartProvider);
+
+				// Execute the preview command with a test file
+				const tmpPath = path.join(__dirname, "../../test-data/test-preview-error.csv");
+				await vscode.workspace.fs.writeFile(
+					vscode.Uri.file(tmpPath),
+					Buffer.from("h1,h2\na,b", "utf8"),
+				);
+
+				await vscode.commands.executeCommand("vsplot.previewData", vscode.Uri.file(tmpPath));
+
+				await new Promise((r) => setTimeout(r, 100));
+
+				assert.ok(
+					errorShown.includes("Failed to preview data") || errorShown.includes("Preview error"),
+				);
+
+				// Cleanup
+				try {
+					await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
+				} catch (_e) {
+					// Ignore cleanup errors
+				}
+			} finally {
+				(vscode.window.showErrorMessage as any) = origShowError;
+			}
+		});
+
+		test("plotData command handles exceptions in executePlotData", async function () {
+			this.timeout(5000);
+
+			const repoRoot = path.join(__dirname, "../..");
+			const extensionUri = vscode.Uri.file(repoRoot);
+
+			let errorShown = "";
+			const origShowError = vscode.window.showErrorMessage;
+			(vscode.window.showErrorMessage as any) = (msg: string) => {
+				errorShown = msg;
+			};
+
+			const mockContext: any = {
+				subscriptions: [],
+			};
+
+			const mockPreviewProvider = new DataPreviewProvider(extensionUri);
+
+			// Create a chart provider that throws in showChart
+			const mockChartProvider = new ChartViewProvider(extensionUri);
+			(mockChartProvider as any).showChart = async () => {
+				throw new Error("Chart error");
+			};
+
+			try {
+				registerDataCommands(mockContext, mockPreviewProvider, mockChartProvider);
+
+				// Execute the plot command with a test file
+				const tmpPath = path.join(__dirname, "../../test-data/test-plot-error.csv");
+				await vscode.workspace.fs.writeFile(
+					vscode.Uri.file(tmpPath),
+					Buffer.from("h1,h2\na,b", "utf8"),
+				);
+
+				await vscode.commands.executeCommand("vsplot.plotData", vscode.Uri.file(tmpPath));
+
+				await new Promise((r) => setTimeout(r, 100));
+
+				assert.ok(errorShown.includes("Failed to plot data") || errorShown.includes("Chart error"));
+
+				// Cleanup
+				try {
+					await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
+				} catch (_e) {
+					// Ignore cleanup errors
+				}
+			} finally {
+				(vscode.window.showErrorMessage as any) = origShowError;
+			}
+		});
+
+		test("previewData command handles non-Error exceptions", async function () {
+			this.timeout(5000);
+
+			const repoRoot = path.join(__dirname, "../..");
+			const extensionUri = vscode.Uri.file(repoRoot);
+
+			let errorShown = "";
+			const origShowError = vscode.window.showErrorMessage;
+			(vscode.window.showErrorMessage as any) = (msg: string) => {
+				errorShown = msg;
+			};
+
+			const mockContext: any = {
+				subscriptions: [],
+			};
+
+			// Create a preview provider that throws non-Error
+			const mockPreviewProvider = new DataPreviewProvider(extensionUri);
+			(mockPreviewProvider as any).showPreview = async () => {
+				throw "String error";
+			};
+
+			const mockChartProvider = new ChartViewProvider(extensionUri);
+
+			try {
+				registerDataCommands(mockContext, mockPreviewProvider, mockChartProvider);
+
+				// Execute the preview command with a test file
+				const tmpPath = path.join(__dirname, "../../test-data/test-preview-string-error.csv");
+				await vscode.workspace.fs.writeFile(
+					vscode.Uri.file(tmpPath),
+					Buffer.from("h1,h2\na,b", "utf8"),
+				);
+
+				await vscode.commands.executeCommand("vsplot.previewData", vscode.Uri.file(tmpPath));
+
+				await new Promise((r) => setTimeout(r, 100));
+
+				assert.ok(errorShown.includes("Failed to preview data"));
+
+				// Cleanup
+				try {
+					await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
+				} catch (_e) {
+					// Ignore cleanup errors
+				}
+			} finally {
+				(vscode.window.showErrorMessage as any) = origShowError;
+			}
+		});
+
+		test("plotData command handles non-Error exceptions", async function () {
+			this.timeout(5000);
+
+			const repoRoot = path.join(__dirname, "../..");
+			const extensionUri = vscode.Uri.file(repoRoot);
+
+			let errorShown = "";
+			const origShowError = vscode.window.showErrorMessage;
+			(vscode.window.showErrorMessage as any) = (msg: string) => {
+				errorShown = msg;
+			};
+
+			const mockContext: any = {
+				subscriptions: [],
+			};
+
+			const mockPreviewProvider = new DataPreviewProvider(extensionUri);
+
+			// Create a chart provider that throws non-Error
+			const mockChartProvider = new ChartViewProvider(extensionUri);
+			(mockChartProvider as any).showChart = async () => {
+				throw "String error in chart";
+			};
+
+			try {
+				registerDataCommands(mockContext, mockPreviewProvider, mockChartProvider);
+
+				// Execute the plot command with a test file
+				const tmpPath = path.join(__dirname, "../../test-data/test-plot-string-error.csv");
+				await vscode.workspace.fs.writeFile(
+					vscode.Uri.file(tmpPath),
+					Buffer.from("h1,h2\na,b", "utf8"),
+				);
+
+				await vscode.commands.executeCommand("vsplot.plotData", vscode.Uri.file(tmpPath));
+
+				await new Promise((r) => setTimeout(r, 100));
+
+				assert.ok(errorShown.includes("Failed to plot data"));
+
+				// Cleanup
+				try {
+					await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
+				} catch (_e) {
+					// Ignore cleanup errors
+				}
+			} finally {
+				(vscode.window.showErrorMessage as any) = origShowError;
+			}
 		});
 
 		test("makeOpenDataViewerHandler calls showErrorMessage on exception", async () => {
