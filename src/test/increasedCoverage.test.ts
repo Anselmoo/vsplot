@@ -802,6 +802,143 @@ suite("Increased Coverage Tests", () => {
 				}
 			}
 		});
+
+		test("parseDataFile handles file with only empty lines", async () => {
+			const tmpPath = path.join(__dirname, "../../test-data/empty-lines-only.csv");
+			const content = "\n\n\n  \n\t\n";
+			await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
+
+			const origError = vscode.window.showErrorMessage;
+			let shownError = "";
+			(vscode.window.showErrorMessage as any) = (msg: string) => {
+				shownError = msg;
+			};
+
+			try {
+				const result = await parseDataFile(vscode.Uri.file(tmpPath));
+				assert.strictEqual(result, null);
+				assert.ok(shownError.includes("Error reading file"));
+			} finally {
+				(vscode.window.showErrorMessage as any) = origError;
+				try {
+					await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
+				} catch (_e) {
+					// Ignore cleanup errors
+				}
+			}
+		});
+
+		test("parseDataFile handles CSV with quoted values containing delimiters", async () => {
+			const tmpPath = path.join(__dirname, "../../test-data/quoted-delimiters.csv");
+			const content = 'Name,Description\nTest,"Contains, comma"\nAnother,"More, values"';
+			await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
+
+			try {
+				const result = await parseDataFile(vscode.Uri.file(tmpPath));
+				assert.ok(result);
+				assert.strictEqual(result?.totalRows, 2);
+			} finally {
+				try {
+					await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
+				} catch (_e) {
+					// Ignore cleanup errors
+				}
+			}
+		});
+
+		test("parseDataFile handles pipe-delimited file", async () => {
+			const tmpPath = path.join(__dirname, "../../test-data/pipe-delimited.txt");
+			const content = "Name|Age|City\nAlice|30|NYC\nBob|25|LA";
+			await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
+
+			try {
+				const result = await parseDataFile(vscode.Uri.file(tmpPath));
+				assert.ok(result);
+				assert.strictEqual(result?.detectedDelimiter, "|");
+				assert.deepStrictEqual(result?.headers, ["Name", "Age", "City"]);
+			} finally {
+				try {
+					await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
+				} catch (_e) {
+					// Ignore cleanup errors
+				}
+			}
+		});
+
+		test("parseDataFile handles colon-delimited file", async () => {
+			const tmpPath = path.join(__dirname, "../../test-data/colon-delimited.dat");
+			const content = "Name:Age:City\nAlice:30:NYC\nBob:25:LA";
+			await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
+
+			try {
+				const result = await parseDataFile(vscode.Uri.file(tmpPath));
+				assert.ok(result);
+				assert.strictEqual(result?.detectedDelimiter, ":");
+				assert.deepStrictEqual(result?.headers, ["Name", "Age", "City"]);
+			} finally {
+				try {
+					await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
+				} catch (_e) {
+					// Ignore cleanup errors
+				}
+			}
+		});
+
+		test("parseDataFile handles space-delimited file", async () => {
+			const tmpPath = path.join(__dirname, "../../test-data/space-delimited.out");
+			const content = "Name Age City\nAlice 30 NYC\nBob 25 LA";
+			await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
+
+			try {
+				const result = await parseDataFile(vscode.Uri.file(tmpPath));
+				assert.ok(result);
+				assert.strictEqual(result?.detectedDelimiter, " ");
+				assert.deepStrictEqual(result?.headers, ["Name", "Age", "City"]);
+			} finally {
+				try {
+					await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
+				} catch (_e) {
+					// Ignore cleanup errors
+				}
+			}
+		});
+
+		test("parseDataFile handles .tab file extension", async () => {
+			const tmpPath = path.join(__dirname, "../../test-data/tab-file.tab");
+			const content = "Name\tAge\tCity\nAlice\t30\tNYC\nBob\t25\tLA";
+			await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
+
+			try {
+				const result = await parseDataFile(vscode.Uri.file(tmpPath));
+				assert.ok(result);
+				assert.strictEqual(result?.fileType, "tab");
+				assert.deepStrictEqual(result?.headers, ["Name", "Age", "City"]);
+			} finally {
+				try {
+					await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
+				} catch (_e) {
+					// Ignore cleanup errors
+				}
+			}
+		});
+
+		test("parseDataFile handles .data file extension", async () => {
+			const tmpPath = path.join(__dirname, "../../test-data/data-file.data");
+			const content = "x,y,z\n1,2,3\n4,5,6";
+			await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
+
+			try {
+				const result = await parseDataFile(vscode.Uri.file(tmpPath));
+				assert.ok(result);
+				assert.strictEqual(result?.fileType, "data");
+			} finally {
+				try {
+					await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
+				} catch (_e) {
+					// Ignore cleanup errors
+				}
+			}
+		});
 	});
 
 	suite("Extension Activation Coverage", () => {
