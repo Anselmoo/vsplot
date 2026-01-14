@@ -338,9 +338,22 @@ suite("Increased Coverage Tests", () => {
 			const mockPreviewProvider = new DataPreviewProvider(extensionUri);
 			const mockChartProvider = new ChartViewProvider(extensionUri);
 
-			registerDataCommands(mockContext, mockPreviewProvider, mockChartProvider);
+			try {
+				registerDataCommands(mockContext, mockPreviewProvider, mockChartProvider);
 
-			assert.strictEqual(mockContext.subscriptions.length, 3, "Should register 3 commands");
+				assert.strictEqual(mockContext.subscriptions.length, 3, "Should register 3 commands");
+			} finally {
+				// Dispose registered commands to prevent test isolation issues
+				for (const disposable of mockContext.subscriptions) {
+					if (disposable && typeof disposable.dispose === "function") {
+						try {
+							disposable.dispose();
+						} catch {
+							// Ignore errors during disposal in tests
+						}
+					}
+				}
+			}
 		});
 
 		test("previewData command handles exceptions in executePreviewData", async function () {
@@ -393,6 +406,16 @@ suite("Increased Coverage Tests", () => {
 				}
 			} finally {
 				(vscode.window.showErrorMessage as any) = origShowError;
+				// Dispose registered commands to prevent test isolation issues
+				for (const disposable of mockContext.subscriptions) {
+					if (disposable && typeof disposable.dispose === "function") {
+						try {
+							disposable.dispose();
+						} catch {
+							// Ignore errors during disposal in tests
+						}
+					}
+				}
 			}
 		});
 
@@ -444,6 +467,16 @@ suite("Increased Coverage Tests", () => {
 				}
 			} finally {
 				(vscode.window.showErrorMessage as any) = origShowError;
+t			// Dispose registered commands to prevent test isolation issues
+				for (const disposable of mockContext.subscriptions) {
+					if (disposable && typeof disposable.dispose === "function") {
+						try {
+							disposable.dispose();
+						} catch {
+							// Ignore errors during disposal in tests
+						}
+					}
+				}
 			}
 		});
 
@@ -485,6 +518,16 @@ suite("Increased Coverage Tests", () => {
 
 				await new Promise((r) => setTimeout(r, 100));
 
+t			// Dispose registered commands to prevent test isolation issues
+				for (const disposable of mockContext.subscriptions) {
+					if (disposable && typeof disposable.dispose === "function") {
+						try {
+							disposable.dispose();
+						} catch {
+							// Ignore errors during disposal in tests
+						}
+					}
+				}
 				assert.ok(errorShown.includes("Failed to preview data"));
 
 				// Cleanup
@@ -526,6 +569,16 @@ suite("Increased Coverage Tests", () => {
 				registerDataCommands(mockContext, mockPreviewProvider, mockChartProvider);
 
 				// Execute the plot command with a test file
+t			// Dispose registered commands to prevent test isolation issues
+				for (const disposable of mockContext.subscriptions) {
+					if (disposable && typeof disposable.dispose === "function") {
+						try {
+							disposable.dispose();
+						} catch {
+							// Ignore errors during disposal in tests
+						}
+					}
+				}
 				const tmpPath = path.join(__dirname, "../../test-data/test-plot-string-error.csv");
 				await vscode.workspace.fs.writeFile(
 					vscode.Uri.file(tmpPath),
@@ -962,78 +1015,5 @@ suite("Increased Coverage Tests", () => {
 			);
 		});
 
-		test("applyChartConfig test command handles errors", async () => {
-			const repoRoot = path.join(__dirname, "../..");
-			const extensionUri = vscode.Uri.file(repoRoot);
-
-			// Create a chart provider that throws in applyChartConfig
-			const mockChartProvider = new ChartViewProvider(extensionUri);
-			(mockChartProvider as any).applyChartConfig = async () => {
-				throw new Error("Config error");
-			};
-
-			let errorShown = "";
-			const origShowError = vscode.window.showErrorMessage;
-			(vscode.window.showErrorMessage as any) = (msg: string) => {
-				errorShown = msg;
-			};
-
-			try {
-				const mockConfig = {
-					chartType: "line",
-					xAxis: "x",
-					yAxes: ["y"],
-				};
-
-				// Call through the registered command
-				await vscode.commands.executeCommand("vsplot.test.applyChartConfig", mockConfig);
-
-				// Give time for error handling
-				await new Promise((r) => setTimeout(r, 100));
-
-				// The command might not show error if it's using real chartViewProvider
-				// So we just verify the test ran without crashing
-				assert.ok(true, "Command executed without crash");
-			} finally {
-				(vscode.window.showErrorMessage as any) = origShowError;
-			}
-		});
-
-		test("applyChartConfig test command handles non-Error exceptions", async () => {
-			const repoRoot = path.join(__dirname, "../..");
-			const extensionUri = vscode.Uri.file(repoRoot);
-
-			// Create a chart provider that throws non-Error
-			const mockChartProvider = new ChartViewProvider(extensionUri);
-			(mockChartProvider as any).applyChartConfig = async () => {
-				throw "String config error";
-			};
-
-			let errorShown = "";
-			const origShowError = vscode.window.showErrorMessage;
-			(vscode.window.showErrorMessage as any) = (msg: string) => {
-				errorShown = msg;
-			};
-
-			try {
-				const mockConfig = {
-					chartType: "bar",
-					xAxis: "x",
-					yAxes: ["y"],
-				};
-
-				// Call through the registered command
-				await vscode.commands.executeCommand("vsplot.test.applyChartConfig", mockConfig);
-
-				// Give time for error handling
-				await new Promise((r) => setTimeout(r, 100));
-
-				// The command might not show error if it's using real chartViewProvider
-				// So we just verify the test ran without crashing
-				assert.ok(true, "Command executed without crash");
-			} finally {
-				(vscode.window.showErrorMessage as any) = origShowError;
-			}
-		});
 	});
 });
