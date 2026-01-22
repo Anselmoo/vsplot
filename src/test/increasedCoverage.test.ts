@@ -467,7 +467,7 @@ suite("Increased Coverage Tests", () => {
 				}
 			} finally {
 				(vscode.window.showErrorMessage as any) = origShowError;
-t			// Dispose registered commands to prevent test isolation issues
+				t; // Dispose registered commands to prevent test isolation issues
 				for (const disposable of mockContext.subscriptions) {
 					if (disposable && typeof disposable.dispose === "function") {
 						try {
@@ -518,7 +518,7 @@ t			// Dispose registered commands to prevent test isolation issues
 
 				await new Promise((r) => setTimeout(r, 100));
 
-t			// Dispose registered commands to prevent test isolation issues
+				t; // Dispose registered commands to prevent test isolation issues
 				for (const disposable of mockContext.subscriptions) {
 					if (disposable && typeof disposable.dispose === "function") {
 						try {
@@ -569,7 +569,7 @@ t			// Dispose registered commands to prevent test isolation issues
 				registerDataCommands(mockContext, mockPreviewProvider, mockChartProvider);
 
 				// Execute the plot command with a test file
-t			// Dispose registered commands to prevent test isolation issues
+				t; // Dispose registered commands to prevent test isolation issues
 				for (const disposable of mockContext.subscriptions) {
 					if (disposable && typeof disposable.dispose === "function") {
 						try {
@@ -1014,6 +1014,5 @@ t			// Dispose registered commands to prevent test isolation issues
 				"Test command should be registered",
 			);
 		});
-
 	});
 });
