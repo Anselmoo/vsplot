@@ -19,14 +19,6 @@ import {
  * Test suite for increasing coverage of uncovered lines
  */
 suite("Increased Coverage Tests", () => {
-	// Ensure global command registrations created by tests are cleaned up after each test
-	teardown(() => {
-		try {
-			resetDataCommandRegistrationsForTests();
-		} catch {
-			// swallow any cleanup errors in test environment
-		}
-	});
 	suite("DataPreviewProvider Class Coverage", () => {
 		test("createDefaultMessageHandlerDeps returns valid dependencies", () => {
 			const deps = createDefaultMessageHandlerDeps();
@@ -390,16 +382,20 @@ suite("Increased Coverage Tests", () => {
 			const mockChartProvider = new ChartViewProvider(extensionUri);
 
 			try {
-				registerDataCommands(mockContext, mockPreviewProvider, mockChartProvider);
+				const handlers = registerDataCommands(mockContext, mockPreviewProvider, mockChartProvider);
 
-				// Execute the preview command with a test file
+				// Execute the preview command handler directly with a test file
 				const tmpPath = path.join(__dirname, "../../test-data/test-preview-error.csv");
 				await vscode.workspace.fs.writeFile(
 					vscode.Uri.file(tmpPath),
 					Buffer.from("h1,h2\na,b", "utf8"),
 				);
 
-				await vscode.commands.executeCommand("vsplot.previewData", vscode.Uri.file(tmpPath));
+				if (handlers?.previewDataHandler) {
+					await handlers.previewDataHandler(vscode.Uri.file(tmpPath));
+				} else {
+					assert.fail("Handlers not returned from registerDataCommands");
+				}
 
 				await new Promise((r) => setTimeout(r, 100));
 
@@ -453,16 +449,20 @@ suite("Increased Coverage Tests", () => {
 			};
 
 			try {
-				registerDataCommands(mockContext, mockPreviewProvider, mockChartProvider);
+				const handlers = registerDataCommands(mockContext, mockPreviewProvider, mockChartProvider);
 
-				// Execute the plot command with a test file
+				// Execute the plot command handler directly with a test file
 				const tmpPath = path.join(__dirname, "../../test-data/test-plot-error.csv");
 				await vscode.workspace.fs.writeFile(
 					vscode.Uri.file(tmpPath),
 					Buffer.from("h1,h2\na,b", "utf8"),
 				);
 
-				await vscode.commands.executeCommand("vsplot.plotData", vscode.Uri.file(tmpPath));
+				if (handlers?.plotDataHandler) {
+					await handlers.plotDataHandler(vscode.Uri.file(tmpPath));
+				} else {
+					assert.fail("Handlers not returned from registerDataCommands");
+				}
 
 				await new Promise((r) => setTimeout(r, 100));
 
@@ -514,16 +514,20 @@ suite("Increased Coverage Tests", () => {
 			const mockChartProvider = new ChartViewProvider(extensionUri);
 
 			try {
-				registerDataCommands(mockContext, mockPreviewProvider, mockChartProvider);
+				const handlers = registerDataCommands(mockContext, mockPreviewProvider, mockChartProvider);
 
-				// Execute the preview command with a test file
+				// Execute the preview command handler directly with a test file
 				const tmpPath = path.join(__dirname, "../../test-data/test-preview-string-error.csv");
 				await vscode.workspace.fs.writeFile(
 					vscode.Uri.file(tmpPath),
 					Buffer.from("h1,h2\na,b", "utf8"),
 				);
 
-				await vscode.commands.executeCommand("vsplot.previewData", vscode.Uri.file(tmpPath));
+				if (handlers?.previewDataHandler) {
+					await handlers.previewDataHandler(vscode.Uri.file(tmpPath));
+				} else {
+					assert.fail("Handlers not returned from registerDataCommands");
+				}
 
 				await new Promise((r) => setTimeout(r, 100));
 

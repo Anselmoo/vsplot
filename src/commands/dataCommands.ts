@@ -271,7 +271,44 @@ export function registerDataCommands(
 			context.subscriptions.push(new vscode.Disposable(() => {}));
 			context.subscriptions.push(new vscode.Disposable(() => {}));
 		}
-		return;
+
+		// Return handler wrappers that use the provided providers so callers/tests
+		// can still invoke handlers directly even when commands were previously
+		// registered elsewhere in the process.
+		return {
+			previewDataHandler: async (uri?: vscode.Uri) => {
+				try {
+					const result = await executePreviewData(
+						uri,
+						createDefaultDependencies(),
+						previewProvider,
+					);
+					if (!result.success && result.error) {
+						createDefaultDependencies().showErrorMessage(result.error);
+					}
+				} catch (e: unknown) {
+					createDefaultDependencies().showErrorMessage(
+						`Failed to preview data: ${e instanceof Error ? e.message : String(e)}`,
+					);
+				}
+			},
+			plotDataHandler: async (uri?: vscode.Uri) => {
+				try {
+					const result = await executePlotData(uri, createDefaultDependencies(), chartProvider);
+					if (!result.success && result.error) {
+						createDefaultDependencies().showErrorMessage(result.error);
+					}
+				} catch (e: unknown) {
+					createDefaultDependencies().showErrorMessage(
+						`Failed to plot data: ${e instanceof Error ? e.message : String(e)}`,
+					);
+				}
+			},
+			openDataViewerHandler: makeOpenDataViewerHandler(
+				createDefaultDependencies(),
+				previewProvider,
+			),
+		};
 	}
 
 	// Helper to attempt registration, falling back to a no-op disposable when
@@ -291,8 +328,8 @@ export function registerDataCommands(
 		}
 	}
 
-	// Register commands defensively
-	tryRegister("vsplot.previewData", async (...args: unknown[]) => {
+	// Create handlers so callers (especially tests) can invoke them directly if needed
+	const previewInner = async (...args: unknown[]) => {
 		const uri = args[0] as vscode.Uri | undefined;
 		try {
 			const result = await executePreviewData(uri, deps, previewProvider);
@@ -304,9 +341,11 @@ export function registerDataCommands(
 				`Failed to preview data: ${_error instanceof Error ? _error.message : String(_error)}`,
 			);
 		}
-	});
+	};
 
-	tryRegister("vsplot.plotData", async (...args: unknown[]) => {
+	const previewHandler = async (uri?: vscode.Uri) => previewInner(uri);
+
+	const plotInner = async (...args: unknown[]) => {
 		const uri = args[0] as vscode.Uri | undefined;
 		try {
 			const result = await executePlotData(uri, deps, chartProvider);
@@ -318,11 +357,25 @@ export function registerDataCommands(
 				`Failed to plot data: ${_error instanceof Error ? _error.message : String(_error)}`,
 			);
 		}
-	});
+	};
 
-	tryRegister("vsplot.openDataViewer", makeOpenDataViewerHandler(deps, previewProvider));
+	const plotHandler = async (uri?: vscode.Uri) => plotInner(uri);
+
+	const openHandler = makeOpenDataViewerHandler(deps, previewProvider);
+
+	// Register commands defensively
+	tryRegister("vsplot.previewData", previewInner);
+	tryRegister("vsplot.plotData", plotInner);
+	tryRegister("vsplot.openDataViewer", openHandler);
 
 	_commandsRegistered = true;
+
+	// Return handlers for tests to call directly when isolation is needed
+	return {
+		previewDataHandler: previewHandler,
+		plotDataHandler: plotHandler,
+		openDataViewerHandler: openHandler,
+	};
 }
 
 /**
