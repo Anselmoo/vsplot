@@ -6,6 +6,7 @@ import {
 	createDefaultDependencies,
 	makeOpenDataViewerHandler,
 	registerDataCommands,
+	resetDataCommandRegistrationsForTests,
 } from "../commands/dataCommands";
 import { parseDataFile } from "../data/load";
 import { ChartViewProvider } from "../providers/chartViewProvider";
@@ -18,6 +19,14 @@ import {
  * Test suite for increasing coverage of uncovered lines
  */
 suite("Increased Coverage Tests", () => {
+	// Ensure global command registrations created by tests are cleaned up after each test
+	teardown(() => {
+		try {
+			resetDataCommandRegistrationsForTests();
+		} catch {
+			// swallow any cleanup errors in test environment
+		}
+	});
 	suite("DataPreviewProvider Class Coverage", () => {
 		test("createDefaultMessageHandlerDeps returns valid dependencies", () => {
 			const deps = createDefaultMessageHandlerDeps();
@@ -467,7 +476,7 @@ suite("Increased Coverage Tests", () => {
 				}
 			} finally {
 				(vscode.window.showErrorMessage as any) = origShowError;
-				t; // Dispose registered commands to prevent test isolation issues
+				// Dispose registered commands to prevent test isolation issues
 				for (const disposable of mockContext.subscriptions) {
 					if (disposable && typeof disposable.dispose === "function") {
 						try {
@@ -518,7 +527,7 @@ suite("Increased Coverage Tests", () => {
 
 				await new Promise((r) => setTimeout(r, 100));
 
-				t; // Dispose registered commands to prevent test isolation issues
+				// Dispose registered commands to prevent test isolation issues
 				for (const disposable of mockContext.subscriptions) {
 					if (disposable && typeof disposable.dispose === "function") {
 						try {
@@ -569,16 +578,6 @@ suite("Increased Coverage Tests", () => {
 				registerDataCommands(mockContext, mockPreviewProvider, mockChartProvider);
 
 				// Execute the plot command with a test file
-				t; // Dispose registered commands to prevent test isolation issues
-				for (const disposable of mockContext.subscriptions) {
-					if (disposable && typeof disposable.dispose === "function") {
-						try {
-							disposable.dispose();
-						} catch {
-							// Ignore errors during disposal in tests
-						}
-					}
-				}
 				const tmpPath = path.join(__dirname, "../../test-data/test-plot-string-error.csv");
 				await vscode.workspace.fs.writeFile(
 					vscode.Uri.file(tmpPath),
@@ -588,6 +587,17 @@ suite("Increased Coverage Tests", () => {
 				await vscode.commands.executeCommand("vsplot.plotData", vscode.Uri.file(tmpPath));
 
 				await new Promise((r) => setTimeout(r, 100));
+
+				// Dispose registered commands to prevent test isolation issues
+				for (const disposable of mockContext.subscriptions) {
+					if (disposable && typeof disposable.dispose === "function") {
+						try {
+							disposable.dispose();
+						} catch {
+							// Ignore errors during disposal in tests
+						}
+					}
+				}
 
 				assert.ok(errorShown.includes("Failed to plot data"));
 
