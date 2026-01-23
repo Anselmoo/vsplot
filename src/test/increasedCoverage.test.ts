@@ -795,7 +795,7 @@ suite("Increased Coverage Tests", () => {
 		});
 
 		test("parseDataFile handles delimited file with single column", async () => {
-			const tmpPath = path.join(__dirname, "../../test-data/single-column.txt");
+			const tmpPath = path.join(__dirname, "../../test-data/single-column-generated.txt");
 			const content = "Value1\nValue2\nValue3";
 			await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 

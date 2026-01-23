@@ -42,14 +42,28 @@ suite("Delimiter Detection Tests", () => {
 
 	test("Handles single column with fallback", async function () {
 		this.timeout(10000);
-		const uri = vscode.Uri.file(path.join(__dirname, "../../test-data/single-column.txt"));
-		const data = await parseDataFile(uri);
+		const tmpPath = path.join(__dirname, "../../test-data/single-column.txt");
+		const uri = vscode.Uri.file(tmpPath);
+		// Ensure fixture exists for test (create if missing)
+		const content = "value\nalpha\nbeta\ngamma";
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
 
-		assert.ok(data, "Data should be parsed");
-		// Single column should fallback to comma delimiter (best default)
-		assert.ok(data?.detectedDelimiter, "Should have a delimiter set");
-		assert.strictEqual(data?.headers.length, 1, "Should have 1 column");
-		assert.strictEqual(data?.rows.length, 3, "Should have 3 data rows");
+		try {
+			const data = await parseDataFile(uri);
+
+			assert.ok(data, "Data should be parsed");
+			// Single column should fallback to comma delimiter (best default)
+			assert.ok(data?.detectedDelimiter, "Should have a delimiter set");
+			assert.strictEqual(data?.headers.length, 1, "Should have 1 column");
+			assert.strictEqual(data?.rows.length, 3, "Should have 3 data rows");
+		} finally {
+			// Clean up fixture to avoid side-effects
+			try {
+				await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
+			} catch (_e) {
+				// ignore
+			}
+		}
 	});
 
 	test("User can override delimiter with pipe", async function () {
