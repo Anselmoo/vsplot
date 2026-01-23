@@ -260,7 +260,7 @@ jobs:
 
       - name: Package VSIX
         run: |
-          npx vsce package --no-dependencies || npx vsce package --yarn=false --no-dependencies
+          npx vsce package
         env:
           NODE_OPTIONS: "--max-old-space-size=4096"
 
