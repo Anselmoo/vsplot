@@ -2,7 +2,7 @@
 	"name": "vsplot",
 	"displayName": "VSPlot - Data Visualization Extension",
 	"description": "Preview and visualize CSV, JSON, and other data files with interactive charts",
-	"version": "0.2.5",
+	"version": "0.2.26",
 	"publisher": "AnselmHahn",
 	"engines": {
 		"vscode": "^1.104.0"
@@ -181,19 +181,19 @@
 		"coverage": "npm run test:coverage"
 	},
 	"devDependencies": {
+		"@biomejs/biome": "^2.3.10",
 		"@types/mocha": "^10.0.6",
 		"@types/node": "18.x",
 		"@types/vscode": "^1.104.0",
 		"@vscode/test-cli": "^0.0.6",
 		"@vscode/test-electron": "^2.3.9",
 		"cross-env": "^7.0.3",
+		"husky": "^8.0.3",
+		"lint-staged": "^16.2.7",
 		"mocha-junit-reporter": "^2.0.0",
 		"pngjs": "^7.0.0",
 		"typescript": "^5.3.3",
-		"vsce": "^2.10.0",
-		"@biomejs/biome": "^2.3.10",
-		"husky": "^8.0.3",
-		"lint-staged": "^16.2.7"
+		"vsce": "^1.97.0"
 	},
 	"lint-staged": {
 		"*.{ts,tsx,js,jsx,json,md,css,html}": [
