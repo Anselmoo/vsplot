@@ -9,6 +9,7 @@ export class ChartViewProvider implements vscode.WebviewViewProvider {
 	private _currentUri?: vscode.Uri;
 	private _pendingTestResolvers: Map<string, (payload: ChartTestState) => void> = new Map();
 	private _pendingConfigAcks: Map<string, () => void> = new Map();
+	private _pendingReadyResolvers: Array<() => void> = [];
 
 	constructor(private readonly _extensionUri: vscode.Uri) {}
 
@@ -38,11 +39,13 @@ export class ChartViewProvider implements vscode.WebviewViewProvider {
 				type: "showChart",
 				data: data,
 			});
+			// Wait for webview to signal readiness (best-effort)
+			await this._waitForWebviewReady(1000);
 		} else {
 			// Create a new webview panel for chart
 			const panel = vscode.window.createWebviewPanel(
 				"chartView",
-				`Chart: ${data.fileName}`,
+				`Chart View: ${data.fileName}`,
 				vscode.ViewColumn.Beside,
 				{
 					enableScripts: true,
@@ -60,12 +63,22 @@ export class ChartViewProvider implements vscode.WebviewViewProvider {
 
 			this._wireMessageHandlers(panel.webview);
 			this._currentWebview = panel.webview;
+			// Wait for webview ready (best-effort)
+			await this._waitForWebviewReady(1000);
 		}
 	}
 
 	private _wireMessageHandlers(webview: vscode.Webview) {
 		webview.onDidReceiveMessage(async (message) => {
 			if (!message || typeof message !== "object") {
+				return;
+			}
+			// Resolve any pending ready waiters if the webview signals readiness
+			if (message.type === "vsplot:test:ready") {
+				for (const r of this._pendingReadyResolvers) {
+					r();
+				}
+				this._pendingReadyResolvers = [];
 				return;
 			}
 			if (message.type === "openPreview") {
@@ -164,6 +177,33 @@ export class ChartViewProvider implements vscode.WebviewViewProvider {
 			payload: config,
 		});
 		await ack;
+	}
+
+	/**
+	 * Wait for the current webview to signal readiness.
+	 * This is best-effort and will timeout after the specified duration.
+	 */
+	private async _waitForWebviewReady(timeoutMs = 1000): Promise<void> {
+		if (!this._currentWebview) {
+			return;
+		}
+		let timer: NodeJS.Timeout | undefined;
+		return new Promise<void>((resolve) => {
+			let resolved = false;
+			const resolver = () => {
+				if (resolved) return;
+				resolved = true;
+				if (timer) clearTimeout(timer);
+				resolve();
+			};
+			this._pendingReadyResolvers.push(resolver);
+			timer = setTimeout(() => {
+				// Remove resolver if still pending
+				const idx = this._pendingReadyResolvers.indexOf(resolver);
+				if (idx >= 0) this._pendingReadyResolvers.splice(idx, 1);
+				resolver();
+			}, timeoutMs);
+		});
 	}
 
 	/**

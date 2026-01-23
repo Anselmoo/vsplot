@@ -579,16 +579,20 @@ suite("Increased Coverage Tests", () => {
 			};
 
 			try {
-				registerDataCommands(mockContext, mockPreviewProvider, mockChartProvider);
+				const handlers = registerDataCommands(mockContext, mockPreviewProvider, mockChartProvider);
 
-				// Execute the plot command with a test file
+				// Execute the plot command handler directly with a test file
 				const tmpPath = path.join(__dirname, "../../test-data/test-plot-string-error.csv");
 				await vscode.workspace.fs.writeFile(
 					vscode.Uri.file(tmpPath),
 					Buffer.from("h1,h2\na,b", "utf8"),
 				);
 
-				await vscode.commands.executeCommand("vsplot.plotData", vscode.Uri.file(tmpPath));
+				if (handlers?.plotDataHandler) {
+					await handlers.plotDataHandler(vscode.Uri.file(tmpPath));
+				} else {
+					assert.fail("Handlers not returned from registerDataCommands");
+				}
 
 				await new Promise((r) => setTimeout(r, 100));
 
