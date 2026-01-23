@@ -157,16 +157,22 @@ function parseCSV(
 	let headers: string[];
 	let dataStartIndex = 0;
 
-	// Check if first line looks like headers (non-numeric)
-	const hasHeaders = firstRowData.some((item) => Number.isNaN(Number(item)) && item !== "");
-
-	if (hasHeaders) {
-		headers = firstRowData;
-		dataStartIndex = 1;
-	} else {
-		// All numeric - generate column headers
-		headers = firstRowData.map((_, index) => `Column ${index + 1}`);
+	// If only one column detected, treat it as data (list) rather than a header
+	if (firstRowData.length === 1) {
+		headers = ["Column 1"];
 		dataStartIndex = 0;
+	} else {
+		// Check if first line looks like headers (non-numeric)
+		const hasHeaders = firstRowData.some((item) => Number.isNaN(Number(item)) && item !== "");
+
+		if (hasHeaders) {
+			headers = firstRowData;
+			dataStartIndex = 1;
+		} else {
+			// All numeric - generate column headers
+			headers = firstRowData.map((_, index) => `Column ${index + 1}`);
+			dataStartIndex = 0;
+		}
 	}
 
 	const rows: (string | number)[][] = [];
@@ -337,15 +343,36 @@ function parseDelimited(
 	let headers: string[];
 	let dataStartIndex = 0;
 
-	// Check if first line looks like headers (non-numeric)
-	const hasHeaders = firstRowData.some((item) => Number.isNaN(Number(item)) && item !== "");
-
-	if (hasHeaders) {
-		headers = firstRowData;
-		dataStartIndex = 1;
+	if (firstRowData.length === 1) {
+		// Heuristic: decide whether the first line is a header or actual data.
+		// Treat it as a header only if it matches common header keywords (case-insensitive)
+		// and there are additional data lines. This avoids misclassifying pure data lists
+		// (e.g., Value1, Value2...) as having a header.
+		const headerCandidates = new Set(["value", "values", "name", "id", "item", "label", "key"]);
+		const firstLower = String(firstRowData[0]).trim().toLowerCase();
+		if (
+			nonCommentLines.length > 1 &&
+			Number.isNaN(Number(firstRowData[0])) &&
+			firstRowData[0] !== "" &&
+			headerCandidates.has(firstLower)
+		) {
+			headers = firstRowData;
+			dataStartIndex = 1;
+		} else {
+			headers = ["Column 1"];
+			dataStartIndex = 0;
+		}
 	} else {
-		headers = firstRowData.map((_, index) => `Column ${index + 1}`);
-		dataStartIndex = 0;
+		// Check if first line looks like headers (non-numeric)
+		const hasHeaders = firstRowData.some((item) => Number.isNaN(Number(item)) && item !== "");
+
+		if (hasHeaders) {
+			headers = firstRowData;
+			dataStartIndex = 1;
+		} else {
+			headers = firstRowData.map((_, index) => `Column ${index + 1}`);
+			dataStartIndex = 0;
+		}
 	}
 
 	const rows: (string | number)[][] = [];

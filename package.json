@@ -207,5 +207,10 @@
 		"chart.js": "^4.5.0",
 		"chartjs-adapter-date-fns": "^3.0.0",
 		"chartjs-plugin-zoom": "^2.2.0"
+	},
+	"__metadata": {
+		"id": "3377da3a-2c9c-464a-a5cd-c58175ce56bb",
+		"publisherDisplayName": "Anselm Hahn",
+		"publisherId": "773138e0-679d-40ec-9ae9-ac986906b809"
 	}
 }
