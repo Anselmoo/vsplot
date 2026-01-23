@@ -4,6 +4,61 @@ All notable changes to the "vsplot" extension will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+### [v0.2.26] - 2026-01-23
+
+**Changed**
+- Bump package version to `0.2.26` and prepare release artifacts. ⚙️
+
+---
+
+### [v0.2.5] - 2026-01-23
+
+**Added**
+- Chart UI improvements: enhanced controls and navigation for better plotting UX. ✨
+- Feature: keyboard panning for charts, improved drag-zoom behavior.
+
+**Changed**
+- Export/UX tweaks: improved labels and data preview behavior.
+- Version bump to `0.2.5` and Biome dependency updates.
+
+**Fixed**
+- Removed non-functional y2 +Add button and corrected axis selection logic.
+- CSV parsing: semicolon delimiter detection added.
+
+**Tests**
+- Large set of test enhancements and coverage increases for provider classes, command wrappers and parsing edge cases (PR #50). ✅
+
+---
+
+### [v0.2.4] - 2025-12-28
+
+**Changed**
+- CI & Tooling: added Biome linting, Husky + lint-staged, format fixes, and Biome workflow improvements (faster, safer checks). 🔧
+- Formatting and housekeeping changes across `src/` (applied Biome fixes).
+
+**Added**
+- Unit tests for `ChartViewProvider` and `DataPreviewProvider` and additional targeted unit tests to improve coverage. ✅
+
+**Fixed**
+- Small type/activity fixes; version bump to `0.2.4`.
+
+---
+
+### [v0.2.3] - 2025-12-18
+
+**Added**
+- Tests: provider panel tests and multiple JSON/edge-case fixtures to raise coverage and reliability. ✅
+
+**Changed**
+- Test strategy and thresholds adjusted (improved overall test strategy; refactor of tests to reach coverage goals).
+- Documentation: updated `TESTING_COVERAGE.md` to reflect new strategy. 📚
+
+**Fixed**
+- Test data handling (avoid committing test data; improved download/fixture handling).
+- PR review fixes and exception coverage improvements.
+
+---
+
 ## [0.2.2] - 2025-12-17
 
 ### Fixed
