@@ -1,5 +1,7 @@
 <p align="center">
-  <img src="images/logo.svg" alt="VSPlot logo" width="140" />
+  <a href="https://marketplace.visualstudio.com/items?itemName=anselmhahn.vsplot">
+    <img src="images/banner-1600x900.png" alt="VSPlot banner" />
+  </a>
 </p>
 
 <h1 align="center">VSPlot — Data preview & charts inside VS Code</h1>
@@ -23,9 +25,7 @@
 </p>
 
 <p align="center">
-  <a href="https://marketplace.visualstudio.com/items?itemName=anselmhahn.vsplot">
-    <img src="images/banner-1600x900.png" alt="VSPlot banner" />
-  </a>
+  <img src="images/logo.svg" alt="VSPlot logo" width="140" />
 </p>
 
 ---
