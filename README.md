@@ -1,10 +1,12 @@
 <p align="center">
-  <img src="images/icon-512.png" alt="VSPlot logo" width="120" />
+  <img src="images/logo.svg" alt="VSPlot logo" width="140" />
 </p>
 
 <h1 align="center">VSPlot — Data preview & charts inside VS Code</h1>
 
 <p align="center"><em>Turn CSV, JSON, TSV, DAT, and scientific flat files into filterable tables and interactive Chart.js dashboards without leaving the editor.</em></p>
+
+<p align="center">Created by <a href="https://github.com/Anselmoo">Anselm Hahn</a> • Looks best with <a href="https://marketplace.visualstudio.com/items?itemName=AnselmHahn.caligo-vscode-theme"><code>caligo-vscode-theme</code></a></p>
 
 <p align="center">
   <a href="https://github.com/Anselmoo/vsplot/actions/workflows/release.yml"><img src="https://img.shields.io/github/actions/workflow/status/Anselmoo/vsplot/release.yml?branch=main&logo=github&label=CI" alt="Release CI" /></a>
@@ -18,6 +20,12 @@
   <a href="https://marketplace.visualstudio.com/items?itemName=anselmhahn.vsplot"><img src="https://img.shields.io/badge/Install%20from%20Marketplace-1D9BF0?style=for-the-badge&logo=visualstudiocode&logoColor=white" alt="Install from Marketplace" /></a>
   <a href="https://github.com/Anselmoo/vsplot/blob/main/docs/WEBVIEW_ARCHITECTURE.md"><img src="https://img.shields.io/badge/Webview%20Docs-6C63FF?style=for-the-badge&logo=readme&logoColor=white" alt="Docs" /></a>
   <a href="https://github.com/Anselmoo/vsplot/blob/main/CHANGELOG.md"><img src="https://img.shields.io/badge/Changelog-00A88B?style=for-the-badge" alt="Changelog" /></a>
+</p>
+
+<p align="center">
+  <a href="https://marketplace.visualstudio.com/items?itemName=anselmhahn.vsplot">
+    <img src="images/banner-1600x900.png" alt="VSPlot banner" />
+  </a>
 </p>
 
 ---
@@ -152,3 +160,21 @@ npm test
 ```
 
 Before packaging, refresh Chart.js bundles with `npm run copy-vendor` to ensure the webviews ship the latest vendor files.
+
+---
+
+## Works best with Caligo
+
+<p align="center">
+  <a href="https://marketplace.visualstudio.com/items?itemName=AnselmHahn.caligo-vscode-theme">
+    <img src="https://img.shields.io/badge/Caligo-Dark%20Theme-6C63FF?style=for-the-badge&logo=visualstudiocode&logoColor=white" alt="Caligo VS Code Theme" />
+  </a>
+</p>
+
+VSPlot is designed to look its best with [**Caligo**](https://github.com/Anselmoo/caligo-vscode-theme) — a professional dark-theme collection for VS Code built on **OKLCH color science**. Caligo ships **50 perceptually uniform themes** (10 seed palettes × 5 harmony modes) with semantic highlighting, APCA-validated contrast, and mathematically harmonious colors that keep your editor — and your data previews — easy on the eyes.
+
+```
+code --install-extension AnselmHahn.caligo-vscode-theme
+```
+
+[Install from Marketplace](https://marketplace.visualstudio.com/items?itemName=AnselmHahn.caligo-vscode-theme) · [Live Gallery](https://anselmoo.github.io/caligo-vscode-theme/#/gallery) · [GitHub](https://github.com/Anselmoo/caligo-vscode-theme)

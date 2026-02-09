@@ -2,7 +2,7 @@
 	"name": "vsplot",
 	"displayName": "VSPlot - Data Visualization Extension",
 	"description": "Preview and visualize CSV, JSON, and other data files with interactive charts",
-	"version": "0.2.26",
+	"version": "0.3.0",
 	"publisher": "AnselmHahn",
 	"engines": {
 		"vscode": "^1.104.0"
@@ -12,7 +12,7 @@
 		"Visualization",
 		"Other"
 	],
-	"icon": "images/icon.png",
+	"icon": "images/logo.png",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/Anselmoo/vsplot.git"

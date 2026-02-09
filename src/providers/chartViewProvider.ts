@@ -230,6 +230,15 @@ export class ChartViewProvider implements vscode.WebviewViewProvider {
 		const scriptUri = webview.asWebviewUri(
 			vscode.Uri.joinPath(this._extensionUri, "media", "chartView", "main.js"),
 		);
+		const faviconSvgUri = webview.asWebviewUri(
+			vscode.Uri.joinPath(this._extensionUri, "images", "logo.svg"),
+		);
+		const faviconPngUri = webview.asWebviewUri(
+			vscode.Uri.joinPath(this._extensionUri, "images", "favicon-32.png"),
+		);
+		const faviconIcoUri = webview.asWebviewUri(
+			vscode.Uri.joinPath(this._extensionUri, "images", "favicon.ico"),
+		);
 
 		// Build URIs for local scripts (Chart.js and plugins)
 		const chartJsUri = webview.asWebviewUri(
@@ -253,6 +262,9 @@ export class ChartViewProvider implements vscode.WebviewViewProvider {
 			NONCE: nonce,
 			STYLES_URI: stylesUri.toString(),
 			SCRIPT_URI: scriptUri.toString(),
+			FAVICON_SVG_URI: faviconSvgUri.toString(),
+			FAVICON_PNG_URI: faviconPngUri.toString(),
+			FAVICON_ICO_URI: faviconIcoUri.toString(),
 			CHARTJS_URI: chartJsUri.toString(),
 			ZOOM_PLUGIN_URI: zoomPluginUri.toString(),
 			DATE_ADAPTER_URI: dateAdapterUri.toString(),
