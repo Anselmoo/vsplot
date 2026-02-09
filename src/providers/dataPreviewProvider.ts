@@ -81,7 +81,8 @@ export async function handleExportData(
 		}
 
 		const csv = toCSV(message.data.headers, message.data.rows);
-		await deps.writeFile(uri, Buffer.from(csv, "utf8"));
+		const encoder = new TextEncoder();
+		await deps.writeFile(uri, encoder.encode(csv));
 		deps.showInfoMessage("Filtered data exported.");
 		return { success: true };
 	} catch (_e) {
@@ -286,11 +287,20 @@ export class DataPreviewProvider implements vscode.WebviewViewProvider {
 		const scriptUri = webview.asWebviewUri(
 			vscode.Uri.joinPath(this._extensionUri, "media", "dataPreview", "main.js"),
 		);
+		const faviconSvgUri = webview.asWebviewUri(
+			vscode.Uri.joinPath(this._extensionUri, "images", "logo.svg"),
+		);
+		const faviconPngUri = webview.asWebviewUri(
+			vscode.Uri.joinPath(this._extensionUri, "images", "favicon-32.png"),
+		);
+		const faviconIcoUri = webview.asWebviewUri(
+			vscode.Uri.joinPath(this._extensionUri, "images", "favicon.ico"),
+		);
 
 		const nonce = getNonce();
 
 		// Build HTML with external resources
-		const csp = `default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}' ${webview.cspSource};`;
+		const csp = `default-src 'none'; img-src ${webview.cspSource} data: blob:; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}' ${webview.cspSource};`;
 
 		// Load HTML template and replace placeholders
 		return loadHtmlTemplate(this._extensionUri, "media/dataPreview/index.html", {
@@ -298,6 +308,9 @@ export class DataPreviewProvider implements vscode.WebviewViewProvider {
 			NONCE: nonce,
 			STYLES_URI: stylesUri.toString(),
 			SCRIPT_URI: scriptUri.toString(),
+			FAVICON_SVG_URI: faviconSvgUri.toString(),
+			FAVICON_PNG_URI: faviconPngUri.toString(),
+			FAVICON_ICO_URI: faviconIcoUri.toString(),
 			ROWS_PER_PAGE: String(rowsPerPage),
 		});
 	}

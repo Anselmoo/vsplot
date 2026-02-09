@@ -1,0 +1,190 @@
+<svg width="1280" height="640" viewBox="0 0 1280 640" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1280" y2="640" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#080B12" />
+      <stop offset="0.4" stop-color="#0B0F17" />
+      <stop offset="1" stop-color="#141D30" />
+    </linearGradient>
+    <linearGradient id="bgBand" x1="-120" y1="0" x2="1400" y2="640" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#141A2B" stop-opacity="0.85" />
+      <stop offset="1" stop-color="#0B0F17" stop-opacity="0" />
+    </linearGradient>
+    <linearGradient id="accentLine" x1="0" y1="0" x2="1280" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#36A2EB" stop-opacity="0" />
+      <stop offset="0.3" stop-color="#36A2EB" stop-opacity="0.6" />
+      <stop offset="0.7" stop-color="#8B5CF6" stop-opacity="0.6" />
+      <stop offset="1" stop-color="#8B5CF6" stop-opacity="0" />
+    </linearGradient>
+    <linearGradient id="curvePath" x1="0" y1="300" x2="1280" y2="400" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#36A2EB" stop-opacity="0" />
+      <stop offset="0.2" stop-color="#36A2EB" stop-opacity="0.12" />
+      <stop offset="0.8" stop-color="#8B5CF6" stop-opacity="0.12" />
+      <stop offset="1" stop-color="#8B5CF6" stop-opacity="0" />
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="240" y2="180" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#36A2EB" />
+      <stop offset="0.5" stop-color="#6366F1" />
+      <stop offset="1" stop-color="#8B5CF6" />
+    </linearGradient>
+    <linearGradient id="bars" x1="0" y1="200" x2="220" y2="0" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#22C55E" />
+      <stop offset="0.6" stop-color="#10B981" />
+      <stop offset="1" stop-color="#34D399" />
+    </linearGradient>
+    <linearGradient id="barsRed" x1="350" y1="360" x2="400" y2="200" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F43F5E" />
+      <stop offset="0.5" stop-color="#EF4444" />
+      <stop offset="1" stop-color="#FB7185" />
+    </linearGradient>
+    <linearGradient id="titleGrad" x1="420" y1="200" x2="1000" y2="340" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF" />
+      <stop offset="0.5" stop-color="#E0E7FF" />
+      <stop offset="1" stop-color="#A5B4FC" />
+    </linearGradient>
+    <linearGradient id="subGrad" x1="420" y1="310" x2="980" y2="390" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#C7D2FE" />
+      <stop offset="0.5" stop-color="#A5B4FC" />
+      <stop offset="1" stop-color="#818CF8" />
+    </linearGradient>
+    <linearGradient id="frameBorder" x1="96" y1="96" x2="1184" y2="544" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#36A2EB" stop-opacity="0.35" />
+      <stop offset="0.5" stop-color="#8B5CF6" stop-opacity="0.2" />
+      <stop offset="1" stop-color="#36A2EB" stop-opacity="0.35" />
+    </linearGradient>
+    <linearGradient id="dotGrad" x1="144" y1="256" x2="392" y2="180" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F8FAFC" />
+      <stop offset="1" stop-color="#C7D2FE" />
+    </linearGradient>
+    <filter id="logoShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="10" stdDeviation="18" flood-color="#0B0F17" flood-opacity="0.7" />
+    </filter>
+    <filter id="logoGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="24" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+    <filter id="textShadow" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#0B0F17" flood-opacity="0.7" />
+    </filter>
+    <filter id="particleGlow" x="-100%" y="-100%" width="300%" height="300%">
+      <feGaussianBlur stdDeviation="3" />
+    </filter>
+    <filter id="frameGlow" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur stdDeviation="4" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+    <radialGradient id="logoBackGlow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#36A2EB" stop-opacity="0.12" />
+      <stop offset="0.5" stop-color="#8B5CF6" stop-opacity="0.06" />
+      <stop offset="1" stop-color="#0B0F17" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1280" height="640" fill="url(#bg)" />
+  <rect x="-80" y="80" width="720" height="520" rx="140" fill="url(#bgBand)" />
+  <rect x="560" y="-20" width="800" height="680" rx="200" fill="url(#bgBand)" opacity="0.45" />
+
+  <!-- Flowing data curves in background -->
+  <path d="M0 420 Q320 350 640 400 T1280 360" stroke="url(#curvePath)" stroke-width="2" fill="none" />
+  <path d="M0 480 Q400 430 800 460 T1280 420" stroke="url(#curvePath)" stroke-width="1.5" fill="none" />
+  <path d="M0 520 Q360 490 720 510 T1280 490" stroke="url(#curvePath)" stroke-width="1" fill="none" />
+
+  <!-- Scattered data particles -->
+  <g filter="url(#particleGlow)">
+    <circle cx="680" cy="140" r="2" fill="#36A2EB" opacity="0.5" />
+    <circle cx="820" cy="100" r="1.5" fill="#8B5CF6" opacity="0.4" />
+    <circle cx="960" cy="160" r="2.5" fill="#22C55E" opacity="0.35" />
+    <circle cx="1100" cy="120" r="1.8" fill="#FBBF24" opacity="0.4" />
+    <circle cx="750" cy="520" r="2" fill="#8B5CF6" opacity="0.3" />
+    <circle cx="900" cy="540" r="1.5" fill="#36A2EB" opacity="0.35" />
+    <circle cx="1050" cy="500" r="2" fill="#F43F5E" opacity="0.3" />
+    <circle cx="1150" cy="560" r="1.5" fill="#22C55E" opacity="0.3" />
+    <circle cx="500" cy="90" r="1.8" fill="#A78BFA" opacity="0.3" />
+    <circle cx="1200" cy="200" r="2" fill="#36A2EB" opacity="0.25" />
+  </g>
+
+  <!-- Mini scatter dots forming a subtle trend line in top-right -->
+  <g opacity="0.15">
+    <circle cx="880" cy="190" r="2.5" fill="#36A2EB" />
+    <circle cx="920" cy="175" r="2" fill="#36A2EB" />
+    <circle cx="960" cy="185" r="3" fill="#36A2EB" />
+    <circle cx="1000" cy="165" r="2.5" fill="#36A2EB" />
+    <circle cx="1040" cy="170" r="2" fill="#36A2EB" />
+    <circle cx="1080" cy="155" r="2.5" fill="#36A2EB" />
+    <circle cx="1120" cy="160" r="2" fill="#36A2EB" />
+  </g>
+
+  <!-- Horizontal accent line -->
+  <line x1="0" y1="560" x2="1280" y2="560" stroke="url(#accentLine)" stroke-width="1" />
+
+  <!-- Logo back-glow -->
+  <ellipse cx="230" cy="330" rx="180" ry="180" fill="url(#logoBackGlow)" />
+
+  <!-- Logo -->
+  <g filter="url(#logoShadow)" transform="translate(72 108) scale(0.56)">
+    <rect x="32" y="32" width="448" height="448" rx="96" fill="#0F111A" />
+    <rect x="56" y="56" width="400" height="400" rx="80" stroke="#2B3245" stroke-width="4" />
+    <g opacity="0.3" stroke="#2B3245" stroke-width="1.5">
+      <line x1="120" y1="152" x2="392" y2="152" />
+      <line x1="120" y1="224" x2="392" y2="224" />
+      <line x1="120" y1="296" x2="392" y2="296" />
+      <line x1="120" y1="368" x2="392" y2="368" />
+    </g>
+    <g fill="url(#bars)">
+      <rect x="140" y="272" width="40" height="116" rx="8" />
+      <rect x="210" y="240" width="40" height="148" rx="8" />
+      <rect x="280" y="208" width="40" height="180" rx="8" />
+      <rect x="350" y="248" width="40" height="140" rx="8" fill="url(#barsRed)" />
+    </g>
+    <path d="M144 256 L208 216 L272 244 L336 180 L392 208" stroke="url(#accent)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
+    <g fill="url(#dotGrad)">
+      <circle cx="144" cy="256" r="8" />
+      <circle cx="208" cy="216" r="8" />
+      <circle cx="272" cy="244" r="8" />
+      <circle cx="336" cy="180" r="8" />
+      <circle cx="392" cy="208" r="8" />
+    </g>
+  </g>
+
+  <!-- Text block -->
+  <g filter="url(#textShadow)">
+    <text x="420" y="250" fill="url(#titleGrad)" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="92" font-weight="800" letter-spacing="1.5">
+      VSPlot
+    </text>
+    <text x="420" y="330" fill="url(#subGrad)" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="36" font-weight="600" letter-spacing="0.3">
+      Data Preview &amp; Charts in VS Code
+    </text>
+    <text x="420" y="390" fill="#94A3B8" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="24" font-weight="500" letter-spacing="2">
+      CSV · JSON · TSV · DAT · TXT
+    </text>
+  </g>
+
+  <!-- Version badge -->
+  <g transform="translate(420 415)">
+    <rect width="90" height="28" rx="14" fill="#1E293B" stroke="#334155" stroke-width="1" />
+    <text x="45" y="19" fill="#94A3B8" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="600" text-anchor="middle" letter-spacing="0.5">
+      Chart.js
+    </text>
+  </g>
+  <g transform="translate(520 415)">
+    <rect width="100" height="28" rx="14" fill="#1E293B" stroke="#334155" stroke-width="1" />
+    <text x="50" y="19" fill="#94A3B8" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="600" text-anchor="middle" letter-spacing="0.5">
+      Interactive
+    </text>
+  </g>
+  <g transform="translate(630 415)">
+    <rect width="110" height="28" rx="14" fill="#1E293B" stroke="#334155" stroke-width="1" />
+    <text x="55" y="19" fill="#94A3B8" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="13" font-weight="600" text-anchor="middle" letter-spacing="0.5">
+      Smart Parse
+    </text>
+  </g>
+
+  <!-- Glowing frame -->
+  <rect x="96" y="96" width="1088" height="448" rx="28" stroke="url(#frameBorder)" stroke-width="2" filter="url(#frameGlow)" />
+</svg>

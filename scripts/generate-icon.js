@@ -1,12 +1,14 @@
 // Generates colored chart images at multiple sizes under images/
 const fs = require("node:fs");
 const path = require("node:path");
+const { spawnSync } = require("node:child_process");
 const { PNG } = require("pngjs");
 
 const imagesDir = path.join(__dirname, "..", "images");
 if (!fs.existsSync(imagesDir)) {
 	fs.mkdirSync(imagesDir, { recursive: true });
 }
+const logoSvgPath = path.join(imagesDir, "logo.svg");
 
 // Palette
 const colors = {
@@ -15,9 +17,13 @@ const colors = {
 	grid: { r: 255, g: 255, b: 255, a: 26 }, // ~10% white
 	axes: { r: 220, g: 224, b: 229, a: 255 }, // light gray
 	line: { r: 79, g: 195, b: 247, a: 255 }, // #4FC3F7 accent
+	lineGlow: { r: 99, g: 210, b: 255, a: 110 },
 	bar1: { r: 74, g: 222, b: 128, a: 255 }, // #4ADE80 green
 	bar2: { r: 245, g: 158, b: 11, a: 255 }, // #F59E0B orange
 	bar3: { r: 167, g: 139, b: 250, a: 255 }, // #A78BFA violet
+	bar1Glow: { r: 90, g: 235, b: 150, a: 110 },
+	bar2Glow: { r: 255, g: 178, b: 70, a: 110 },
+	bar3Glow: { r: 185, g: 160, b: 255, a: 110 },
 };
 
 function createPNG(width, height) {
@@ -29,6 +35,19 @@ function setPixel(png, width, x, y, c) {
 		return;
 	}
 	const idx = (width * y + x) << 2;
+	if (c.a < 255) {
+		const srcA = c.a / 255;
+		const dstA = png.data[idx + 3] / 255;
+		const outA = srcA + dstA * (1 - srcA);
+		const outR = (c.r * srcA + png.data[idx] * dstA * (1 - srcA)) / outA;
+		const outG = (c.g * srcA + png.data[idx + 1] * dstA * (1 - srcA)) / outA;
+		const outB = (c.b * srcA + png.data[idx + 2] * dstA * (1 - srcA)) / outA;
+		png.data[idx] = Math.round(outR);
+		png.data[idx + 1] = Math.round(outG);
+		png.data[idx + 2] = Math.round(outB);
+		png.data[idx + 3] = Math.round(outA * 255);
+		return;
+	}
 	png.data[idx] = c.r;
 	png.data[idx + 1] = c.g;
 	png.data[idx + 2] = c.b;
@@ -100,6 +119,25 @@ function drawBars(png, width, margin, baseY, barHeightsPx, barColors) {
 	}
 }
 
+function drawBarsGlow(png, width, margin, baseY, barHeightsPx, barColors, spread) {
+	const drawableW = width - margin * 2;
+	const n = barHeightsPx.length;
+	const gap = Math.max(4, Math.round(drawableW * 0.06));
+	const totalGaps = gap * (n - 1);
+	const barWidth = Math.max(6, Math.round((drawableW - totalGaps) / n));
+	let x = margin + Math.round((drawableW - (barWidth * n + gap * (n - 1))) / 2);
+	for (let i = 0; i < n; i++) {
+		const h = Math.max(2, barHeightsPx[i]);
+		const glowWidth = barWidth + spread * 2;
+		for (let xi = x - spread; xi < x - spread + glowWidth; xi++) {
+			for (let y = baseY + spread; y > baseY - h - spread; y--) {
+				setPixel(png, width, xi, y, barColors[i]);
+			}
+		}
+		x += barWidth + gap;
+	}
+}
+
 function drawLine(png, width, p1, p2, color) {
 	let x0 = p1.x,
 		y0 = p1.y;
@@ -143,6 +181,11 @@ function drawLinePath(png, width, points, color, thickness) {
 	}
 }
 
+function drawLinePathGlow(png, width, points, color, thickness) {
+	drawLinePath(png, width, points, color, thickness + 4);
+	drawLinePath(png, width, points, color, Math.max(2, thickness + 2));
+}
+
 function renderChartImage(width, height, outFile) {
 	const png = createPNG(width, height);
 	const margin = Math.max(12, Math.round(Math.min(width, height) * 0.12));
@@ -160,6 +203,16 @@ function renderChartImage(width, height, outFile) {
 	const drawableH = baseY - margin;
 	const barsNorm = [0.36, 0.56, 0.22];
 	const barHeightsPx = barsNorm.map((v) => Math.round(v * drawableH));
+	const glowSpread = Math.max(3, Math.round(Math.min(width, height) * 0.015));
+	drawBarsGlow(
+		png,
+		width,
+		margin,
+		baseY,
+		barHeightsPx,
+		[colors.bar1Glow, colors.bar2Glow, colors.bar3Glow],
+		glowSpread,
+	);
 	drawBars(png, width, margin, baseY, barHeightsPx, [colors.bar1, colors.bar2, colors.bar3]);
 
 	const linePts = [
@@ -180,13 +233,9 @@ function renderChartImage(width, height, outFile) {
 			y: baseY - Math.round(drawableH * 0.45),
 		},
 	];
-	drawLinePath(
-		png,
-		width,
-		linePts,
-		colors.line,
-		Math.max(1, Math.round(Math.min(width, height) * 0.01)),
-	);
+	const lineThickness = Math.max(1, Math.round(Math.min(width, height) * 0.01));
+	drawLinePathGlow(png, width, linePts, colors.lineGlow, lineThickness);
+	drawLinePath(png, width, linePts, colors.line, lineThickness);
 
 	return new Promise((resolve) => {
 		const outPath = path.join(imagesDir, outFile);
@@ -200,8 +249,58 @@ function renderChartImage(width, height, outFile) {
 	});
 }
 
+function tryRasterizeLogo(size, outFile) {
+	if (!fs.existsSync(logoSvgPath)) {
+		return false;
+	}
+	const outPath = path.join(imagesDir, outFile);
+	const result = spawnSync(
+		"rsvg-convert",
+		["-w", String(size), "-h", String(size), logoSvgPath, "-o", outPath],
+		{ stdio: "pipe" },
+	);
+	if (result.error || result.status !== 0) {
+		return false;
+	}
+	console.log("Wrote", outPath);
+	return true;
+}
+
+function tryGenerateIco() {
+	if (!fs.existsSync(logoSvgPath)) {
+		return false;
+	}
+	const outPath = path.join(imagesDir, "favicon.ico");
+	const result = spawnSync(
+		"magick",
+		["convert", logoSvgPath, "-define", "icon:auto-resize=16,32,48,64", outPath],
+		{ stdio: "pipe" },
+	);
+	if (result.error || result.status !== 0) {
+		return false;
+	}
+	console.log("Wrote", outPath);
+	return true;
+}
+
 (async () => {
-	await renderChartImage(128, 128, "icon.png");
-	await renderChartImage(512, 512, "icon-512.png");
+	const hasSvg = fs.existsSync(logoSvgPath);
+	if (!hasSvg) {
+		throw new Error(`Missing ${logoSvgPath}. Add the logo SVG before building icons.`);
+	}
+
+	const rasterOk =
+		tryRasterizeLogo(128, "logo.png") &&
+		tryRasterizeLogo(512, "logo-512.png") &&
+		tryRasterizeLogo(32, "favicon-32.png") &&
+		tryRasterizeLogo(16, "favicon-16.png");
+	const icoOk = tryGenerateIco();
+
+	if (!rasterOk || !icoOk) {
+		throw new Error(
+			"Failed to rasterize logo.svg. Install `librsvg` (rsvg-convert) and ImageMagick (magick) to generate PNG/ICO assets.",
+		);
+	}
+
 	await renderChartImage(1200, 630, "banner-1200x630.png");
 })();
