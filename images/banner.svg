@@ -1,193 +1,210 @@
-<svg width="1600" height="900" viewBox="0 0 1600 900" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1600" y2="900" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#080B12" />
-      <stop offset="0.35" stop-color="#0B0F17" />
-      <stop offset="1" stop-color="#141D30" />
-    </linearGradient>
-    <linearGradient id="bgBand" x1="-160" y1="0" x2="1780" y2="900" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#141A2B" stop-opacity="0.85" />
-      <stop offset="1" stop-color="#0B0F17" stop-opacity="0" />
-    </linearGradient>
-    <linearGradient id="accentLine" x1="0" y1="0" x2="1600" y2="0" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#36A2EB" stop-opacity="0" />
-      <stop offset="0.25" stop-color="#36A2EB" stop-opacity="0.5" />
-      <stop offset="0.75" stop-color="#8B5CF6" stop-opacity="0.5" />
-      <stop offset="1" stop-color="#8B5CF6" stop-opacity="0" />
-    </linearGradient>
-    <linearGradient id="curvePath" x1="0" y1="400" x2="1600" y2="550" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#36A2EB" stop-opacity="0" />
-      <stop offset="0.2" stop-color="#36A2EB" stop-opacity="0.1" />
-      <stop offset="0.8" stop-color="#8B5CF6" stop-opacity="0.1" />
-      <stop offset="1" stop-color="#8B5CF6" stop-opacity="0" />
-    </linearGradient>
-    <linearGradient id="accent" x1="0" y1="0" x2="240" y2="180" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#36A2EB" />
-      <stop offset="0.5" stop-color="#6366F1" />
-      <stop offset="1" stop-color="#8B5CF6" />
-    </linearGradient>
-    <linearGradient id="bars" x1="0" y1="200" x2="220" y2="0" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#22C55E" />
-      <stop offset="0.6" stop-color="#10B981" />
-      <stop offset="1" stop-color="#34D399" />
-    </linearGradient>
-    <linearGradient id="barsRed" x1="350" y1="360" x2="400" y2="200" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#F43F5E" />
-      <stop offset="0.5" stop-color="#EF4444" />
-      <stop offset="1" stop-color="#FB7185" />
-    </linearGradient>
-    <linearGradient id="titleGrad" x1="580" y1="280" x2="1350" y2="470" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#FFFFFF" />
-      <stop offset="0.5" stop-color="#E0E7FF" />
-      <stop offset="1" stop-color="#A5B4FC" />
-    </linearGradient>
-    <linearGradient id="subGrad" x1="580" y1="430" x2="1300" y2="520" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#C7D2FE" />
-      <stop offset="0.5" stop-color="#A5B4FC" />
-      <stop offset="1" stop-color="#818CF8" />
-    </linearGradient>
-    <linearGradient id="frameBorder" x1="100" y1="100" x2="1500" y2="800" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#36A2EB" stop-opacity="0.3" />
-      <stop offset="0.5" stop-color="#8B5CF6" stop-opacity="0.15" />
-      <stop offset="1" stop-color="#36A2EB" stop-opacity="0.3" />
-    </linearGradient>
-    <linearGradient id="dotGrad" x1="144" y1="256" x2="392" y2="180" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#F8FAFC" />
-      <stop offset="1" stop-color="#C7D2FE" />
-    </linearGradient>
-    <filter id="logoShadow" x="-50%" y="-50%" width="200%" height="200%">
-      <feDropShadow dx="0" dy="12" stdDeviation="22" flood-color="#0B0F17" flood-opacity="0.7" />
-    </filter>
-    <filter id="textShadow" x="-40%" y="-40%" width="180%" height="180%">
-      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#0B0F17" flood-opacity="0.7" />
-    </filter>
-    <filter id="particleGlow" x="-100%" y="-100%" width="300%" height="300%">
-      <feGaussianBlur stdDeviation="3.5" />
-    </filter>
-    <filter id="frameGlow" x="-10%" y="-10%" width="120%" height="120%">
-      <feGaussianBlur stdDeviation="5" result="blur" />
-      <feMerge>
-        <feMergeNode in="blur" />
-        <feMergeNode in="SourceGraphic" />
-      </feMerge>
-    </filter>
-    <radialGradient id="logoBackGlow" cx="0.5" cy="0.5" r="0.5">
-      <stop offset="0" stop-color="#36A2EB" stop-opacity="0.1" />
-      <stop offset="0.5" stop-color="#8B5CF6" stop-opacity="0.05" />
-      <stop offset="1" stop-color="#0B0F17" stop-opacity="0" />
-    </radialGradient>
-  </defs>
 
-  <!-- Background -->
-  <rect width="1600" height="900" fill="url(#bg)" />
-  <rect x="-100" y="100" width="860" height="700" rx="160" fill="url(#bgBand)" />
-  <rect x="700" y="-30" width="1000" height="960" rx="240" fill="url(#bgBand)" opacity="0.4" />
-
-  <!-- Flowing data curves -->
-  <path d="M0 580 Q400 480 800 540 T1600 500" stroke="url(#curvePath)" stroke-width="2.5" fill="none" />
-  <path d="M0 650 Q500 590 1000 630 T1600 580" stroke="url(#curvePath)" stroke-width="2" fill="none" />
-  <path d="M0 720 Q450 680 900 700 T1600 670" stroke="url(#curvePath)" stroke-width="1.5" fill="none" />
-  <path d="M0 780 Q380 750 760 770 T1600 740" stroke="url(#curvePath)" stroke-width="1" fill="none" />
-
-  <!-- Scattered data particles -->
-  <g filter="url(#particleGlow)">
-    <circle cx="800" cy="160" r="2.5" fill="#36A2EB" opacity="0.5" />
-    <circle cx="980" cy="120" r="2" fill="#8B5CF6" opacity="0.4" />
-    <circle cx="1150" cy="180" r="3" fill="#22C55E" opacity="0.35" />
-    <circle cx="1340" cy="140" r="2" fill="#FBBF24" opacity="0.45" />
-    <circle cx="860" cy="740" r="2.5" fill="#8B5CF6" opacity="0.3" />
-    <circle cx="1050" cy="760" r="2" fill="#36A2EB" opacity="0.35" />
-    <circle cx="1250" cy="720" r="2.5" fill="#F43F5E" opacity="0.3" />
-    <circle cx="1400" cy="780" r="2" fill="#22C55E" opacity="0.3" />
-    <circle cx="600" cy="100" r="2" fill="#A78BFA" opacity="0.3" />
-    <circle cx="1480" cy="220" r="2.5" fill="#36A2EB" opacity="0.25" />
-    <circle cx="700" cy="800" r="2" fill="#FBBF24" opacity="0.25" />
-    <circle cx="1100" cy="90" r="1.8" fill="#36A2EB" opacity="0.3" />
-  </g>
-
-  <!-- Mini scatter trend in upper right -->
-  <g opacity="0.12">
-    <circle cx="1050" cy="240" r="3" fill="#36A2EB" />
-    <circle cx="1100" cy="220" r="2.5" fill="#36A2EB" />
-    <circle cx="1150" cy="230" r="3.5" fill="#36A2EB" />
-    <circle cx="1200" cy="210" r="2.5" fill="#36A2EB" />
-    <circle cx="1250" cy="215" r="2" fill="#36A2EB" />
-    <circle cx="1300" cy="195" r="3" fill="#36A2EB" />
-    <circle cx="1350" cy="200" r="2.5" fill="#36A2EB" />
-    <circle cx="1400" cy="185" r="2" fill="#36A2EB" />
-  </g>
-
-  <!-- Horizontal accent line -->
-  <line x1="0" y1="770" x2="1600" y2="770" stroke="url(#accentLine)" stroke-width="1" />
-
-  <!-- Logo back-glow -->
-  <ellipse cx="320" cy="450" rx="240" ry="240" fill="url(#logoBackGlow)" />
-
-  <!-- Logo -->
-  <g filter="url(#logoShadow)" transform="translate(96 150) scale(0.7)">
-    <rect x="32" y="32" width="448" height="448" rx="96" fill="#0F111A" />
-    <rect x="56" y="56" width="400" height="400" rx="80" stroke="#2B3245" stroke-width="4" />
-    <g opacity="0.3" stroke="#2B3245" stroke-width="1.5">
-      <line x1="120" y1="152" x2="392" y2="152" />
-      <line x1="120" y1="224" x2="392" y2="224" />
-      <line x1="120" y1="296" x2="392" y2="296" />
-      <line x1="120" y1="368" x2="392" y2="368" />
+<svg width="1600" height="400" viewBox="100 240 1600 400" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <defs>
+        <linearGradient x1="0%" y1="34.1796875%" x2="100%" y2="65.8203125%" id="linearGradient-01gtqs9iq6-1">
+            <stop stop-color="#080B12" offset="0%"></stop>
+            <stop stop-color="#0B0F17" offset="35%"></stop>
+            <stop stop-color="#141D30" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="-6.97674419%" y1="7.40941049%" x2="218.604651%" y2="92.5905895%" id="linearGradient-01gtqs9iq6-2">
+            <stop stop-color="#141A2B" stop-opacity="0.85" offset="0%"></stop>
+            <stop stop-color="#0B0F17" stop-opacity="0" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="-86%" y1="6.8%" x2="108%" y2="93.2%" id="linearGradient-01gtqs9iq6-3">
+            <stop stop-color="#141A2B" stop-opacity="0.85" offset="0%"></stop>
+            <stop stop-color="#0B0F17" stop-opacity="0" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="0%" y1="49.5625%" x2="100%" y2="50.03125%" id="linearGradient-01gtqs9iq6-4">
+            <stop stop-color="#36A2EB" stop-opacity="0" offset="0%"></stop>
+            <stop stop-color="#36A2EB" stop-opacity="0.1" offset="20%"></stop>
+            <stop stop-color="#8B5CF6" stop-opacity="0.1" offset="80%"></stop>
+            <stop stop-color="#8B5CF6" stop-opacity="0" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="0%" y1="49.4121094%" x2="100%" y2="49.8222656%" id="linearGradient-01gtqs9iq6-5">
+            <stop stop-color="#36A2EB" stop-opacity="0" offset="0%"></stop>
+            <stop stop-color="#36A2EB" stop-opacity="0.1" offset="20%"></stop>
+            <stop stop-color="#8B5CF6" stop-opacity="0.1" offset="80%"></stop>
+            <stop stop-color="#8B5CF6" stop-opacity="0" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="0%" y1="49.4238281%" x2="100%" y2="49.7167969%" id="linearGradient-01gtqs9iq6-6">
+            <stop stop-color="#36A2EB" stop-opacity="0" offset="0%"></stop>
+            <stop stop-color="#36A2EB" stop-opacity="0.1" offset="20%"></stop>
+            <stop stop-color="#8B5CF6" stop-opacity="0.1" offset="80%"></stop>
+            <stop stop-color="#8B5CF6" stop-opacity="0" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="0%" y1="49.4375%" x2="100%" y2="49.671875%" id="linearGradient-01gtqs9iq6-7">
+            <stop stop-color="#36A2EB" stop-opacity="0" offset="0%"></stop>
+            <stop stop-color="#36A2EB" stop-opacity="0.1" offset="20%"></stop>
+            <stop stop-color="#8B5CF6" stop-opacity="0.1" offset="80%"></stop>
+            <stop stop-color="#8B5CF6" stop-opacity="0" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="0%" y1="-76950%" x2="100%" y2="-76950%" id="linearGradient-01gtqs9iq6-8">
+            <stop stop-color="#36A2EB" stop-opacity="0" offset="0%"></stop>
+            <stop stop-color="#36A2EB" stop-opacity="0.5" offset="25%"></stop>
+            <stop stop-color="#8B5CF6" stop-opacity="0.5" offset="75%"></stop>
+            <stop stop-color="#8B5CF6" stop-opacity="0" offset="100%"></stop>
+        </linearGradient>
+        <radialGradient cx="50%" cy="50%" fx="50%" fy="50%" r="50%" id="radialGradient-01gtqs9iq6-9">
+            <stop stop-color="#36A2EB" stop-opacity="0.1" offset="0%"></stop>
+            <stop stop-color="#8B5CF6" stop-opacity="0.05" offset="50%"></stop>
+            <stop stop-color="#0B0F17" stop-opacity="0" offset="100%"></stop>
+        </radialGradient>
+        <linearGradient x1="2.43757432%" y1="-62.0689655%" x2="67.8359096%" y2="-234.482759%" id="linearGradient-01gtqs9iq6-10">
+            <stop stop-color="#22C55E" offset="0%"></stop>
+            <stop stop-color="#10B981" offset="60%"></stop>
+            <stop stop-color="#34D399" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="7.99853908%" y1="-27.027027%" x2="48.1738495%" y2="-162.162162%" id="linearGradient-01gtqs9iq6-11">
+            <stop stop-color="#22C55E" offset="0%"></stop>
+            <stop stop-color="#10B981" offset="60%"></stop>
+            <stop stop-color="#34D399" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="12.962963%" y1="-4.44444444%" x2="40.1234568%" y2="-115.555556%" id="linearGradient-01gtqs9iq6-12">
+            <stop stop-color="#22C55E" offset="0%"></stop>
+            <stop stop-color="#10B981" offset="60%"></stop>
+            <stop stop-color="#34D399" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="45.9183673%" y1="80%" x2="56.122449%" y2="-34.2857143%" id="linearGradient-01gtqs9iq6-13">
+            <stop stop-color="#F43F5E" offset="0%"></stop>
+            <stop stop-color="#EF4444" offset="50%"></stop>
+            <stop stop-color="#FB7185" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="-58.0645161%" y1="23.0619147%" x2="38.7096774%" y2="45.3043704%" id="linearGradient-01gtqs9iq6-14">
+            <stop stop-color="#36A2EB" offset="0%"></stop>
+            <stop stop-color="#6366F1" offset="50%"></stop>
+            <stop stop-color="#8B5CF6" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="50%" y1="50%" x2="1600%" y2="-425%" id="linearGradient-01gtqs9iq6-15">
+            <stop stop-color="#F8FAFC" offset="0%"></stop>
+            <stop stop-color="#C7D2FE" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="-350%" y1="300%" x2="1200%" y2="-175%" id="linearGradient-01gtqs9iq6-16">
+            <stop stop-color="#F8FAFC" offset="0%"></stop>
+            <stop stop-color="#C7D2FE" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="-750%" y1="125%" x2="800%" y2="-350%" id="linearGradient-01gtqs9iq6-17">
+            <stop stop-color="#F8FAFC" offset="0%"></stop>
+            <stop stop-color="#C7D2FE" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="-1150%" y1="525%" x2="400%" y2="50%" id="linearGradient-01gtqs9iq6-18">
+            <stop stop-color="#F8FAFC" offset="0%"></stop>
+            <stop stop-color="#C7D2FE" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="-1500%" y1="350%" x2="50%" y2="-125%" id="linearGradient-01gtqs9iq6-19">
+            <stop stop-color="#F8FAFC" offset="0%"></stop>
+            <stop stop-color="#C7D2FE" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="0%" y1="35.4066023%" x2="185.990338%" y2="51.4804896%" id="linearGradient-01gtqs9iq6-20">
+            <stop stop-color="#FFFFFF" offset="0%"></stop>
+            <stop stop-color="#E0E7FF" offset="50%"></stop>
+            <stop stop-color="#A5B4FC" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="0%" y1="49.2513259%" x2="103.896104%" y2="50.2070801%" id="linearGradient-01gtqs9iq6-21">
+            <stop stop-color="#C7D2FE" offset="0%"></stop>
+            <stop stop-color="#A5B4FC" offset="50%"></stop>
+            <stop stop-color="#818CF8" offset="100%"></stop>
+        </linearGradient>
+        <linearGradient x1="0%" y1="37.5%" x2="100%" y2="62.5%" id="linearGradient-01gtqs9iq6-22">
+            <stop stop-color="#36A2EB" stop-opacity="0.3" offset="0%"></stop>
+            <stop stop-color="#8B5CF6" stop-opacity="0.15" offset="50%"></stop>
+            <stop stop-color="#36A2EB" stop-opacity="0.3" offset="100%"></stop>
+        </linearGradient>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="banner">
+            <rect id="Rectangle" fill="url(#linearGradient-01gtqs9iq6-1)" fill-rule="nonzero" x="100" y="30" width="1600" height="900"></rect>
+            <rect id="Rectangle" fill="url(#linearGradient-01gtqs9iq6-2)" fill-rule="nonzero" x="0" y="130" width="860" height="700" rx="160"></rect>
+            <rect id="Rectangle" fill="url(#linearGradient-01gtqs9iq6-3)" fill-rule="nonzero" opacity="0.4" x="800" y="0" width="1000" height="960" rx="240"></rect>
+            <path d="M100,610 C366.666667,543.333333 633.333333,530 900,570 C1166.66667,610 1433.33333,596.666667 1700,530" id="Path" stroke="url(#linearGradient-01gtqs9iq6-4)" stroke-width="2.5"></path>
+            <path d="M100,680 C433.333333,640 766.666667,633.333333 1100,660 C1433.33333,686.666667 1633.33333,670 1700,610" id="Path" stroke="url(#linearGradient-01gtqs9iq6-5)" stroke-width="2"></path>
+            <path d="M100,750 C400,723.333333 700,716.666667 1000,730 C1300,743.333333 1533.33333,733.333333 1700,700" id="Path" stroke="url(#linearGradient-01gtqs9iq6-6)" stroke-width="1.5"></path>
+            <path d="M100,810 C353.333333,790 606.666667,786.666667 860,800 C1113.33333,813.333333 1393.33333,803.333333 1700,770" id="Path" stroke="url(#linearGradient-01gtqs9iq6-7)"></path>
+            <g id="Group" transform="translate(916.800000, 118.200000)" fill-rule="nonzero">
+                <circle id="Oval" fill="#36A2EB" opacity="0.5" cx="202" cy="71.8" r="2.5"></circle>
+                <circle id="Oval" fill="#8B5CF6" opacity="0.4" cx="382" cy="31.8" r="2"></circle>
+                <circle id="Oval" fill="#22C55E" opacity="0.35" cx="552" cy="91.8" r="3"></circle>
+                <circle id="Oval" fill="#FBBF24" opacity="0.45" cx="742" cy="51.8" r="2"></circle>
+                <circle id="Oval" fill="#8B5CF6" opacity="0.3" cx="262" cy="651.8" r="2.5"></circle>
+                <circle id="Oval" fill="#36A2EB" opacity="0.35" cx="452" cy="671.8" r="2"></circle>
+                <circle id="Oval" fill="#F43F5E" opacity="0.3" cx="652" cy="631.8" r="2.5"></circle>
+                <circle id="Oval" fill="#22C55E" opacity="0.3" cx="802" cy="691.8" r="2"></circle>
+                <circle id="Oval" fill="#A78BFA" opacity="0.3" cx="2" cy="11.8" r="2"></circle>
+                <circle id="Oval" fill="#36A2EB" opacity="0.25" cx="882" cy="131.8" r="2.5"></circle>
+                <circle id="Oval" fill="#FBBF24" opacity="0.25" cx="102" cy="711.8" r="2"></circle>
+                <circle id="Oval" fill="#36A2EB" opacity="0.3" cx="502" cy="1.8" r="1.8"></circle>
+            </g>
+            <g id="Group" opacity="0.12" transform="translate(1365.800000, 213.000000)" fill="#36A2EB" fill-rule="nonzero">
+                <circle id="Oval" cx="3" cy="57" r="3"></circle>
+                <circle id="Oval" cx="53" cy="37" r="2.5"></circle>
+                <circle id="Oval" cx="103" cy="47" r="3.5"></circle>
+                <circle id="Oval" cx="153" cy="27" r="2.5"></circle>
+                <circle id="Oval" cx="203" cy="32" r="2"></circle>
+                <circle id="Oval" cx="253" cy="12" r="3"></circle>
+                <circle id="Oval" cx="303" cy="17" r="2.5"></circle>
+                <circle id="Oval" cx="353" cy="2" r="2"></circle>
+            </g>
+            <line x1="100" y1="800" x2="1700" y2="800" id="Path" stroke="url(#linearGradient-01gtqs9iq6-8)"></line>
+            <circle id="Oval" fill="url(#radialGradient-01gtqs9iq6-9)" fill-rule="nonzero" cx="420" cy="480" r="240"></circle>
+            <g id="Group" transform="translate(433.200000, 318.400000)">
+                <rect id="Rectangle" fill="#0F111A" fill-rule="nonzero" x="0" y="0" width="313.6" height="313.6" rx="96"></rect>
+                <rect id="Rectangle" stroke="#2B3245" stroke-width="2.8" x="16.8" y="16.8" width="280" height="280" rx="80"></rect>
+                <g opacity="0.3" transform="translate(61.600000, 83.650000)" id="Path" stroke="#2B3245" stroke-width="1.05">
+                    <line x1="0" y1="0.35" x2="190.4" y2="0.35"></line>
+                    <line x1="0" y1="50.75" x2="190.4" y2="50.75"></line>
+                    <line x1="0" y1="101.15" x2="190.4" y2="101.15"></line>
+                    <line x1="0" y1="151.55" x2="190.4" y2="151.55"></line>
+                </g>
+                <g transform="translate(75.600000, 123.200000)" fill-rule="nonzero" id="Rectangle">
+                    <rect fill="url(#linearGradient-01gtqs9iq6-10)" x="0" y="44.8" width="28" height="81.2" rx="8"></rect>
+                    <rect fill="url(#linearGradient-01gtqs9iq6-11)" x="49" y="22.4" width="28" height="103.6" rx="8"></rect>
+                    <rect fill="url(#linearGradient-01gtqs9iq6-12)" x="98" y="0" width="28" height="126" rx="8"></rect>
+                    <rect fill="url(#linearGradient-01gtqs9iq6-13)" x="147" y="28" width="28" height="98" rx="8"></rect>
+                </g>
+                <polyline id="Path" stroke="url(#linearGradient-01gtqs9iq6-14)" stroke-width="8.4" stroke-linecap="round" stroke-linejoin="round" points="78.4 156.8 123.2 128.8 168 148.4 212.8 103.6 252 123.2"></polyline>
+                <g transform="translate(72.800000, 98.000000)" fill-rule="nonzero" id="Oval">
+                    <circle fill="url(#linearGradient-01gtqs9iq6-15)" cx="5.6" cy="58.8" r="5.6"></circle>
+                    <circle fill="url(#linearGradient-01gtqs9iq6-16)" cx="50.4" cy="30.8" r="5.6"></circle>
+                    <circle fill="url(#linearGradient-01gtqs9iq6-17)" cx="95.2" cy="50.4" r="5.6"></circle>
+                    <circle fill="url(#linearGradient-01gtqs9iq6-18)" cx="140" cy="5.6" r="5.6"></circle>
+                    <circle fill="url(#linearGradient-01gtqs9iq6-19)" cx="179.2" cy="25.2" r="5.6"></circle>
+                </g>
+            </g>
+            <g id="Group" transform="translate(898.800000, 294.000000)" fill-rule="nonzero">
+                <text id="VSPlot" fill="url(#linearGradient-01gtqs9iq6-20)" font-family="Inter-Black, Inter" font-size="120" font-weight="800">
+                    <tspan x="0" y="116">VSPlot</tspan>
+                </text>
+                <text id="Data-Preview-&amp;-Charts-in-VS-Code" fill="url(#linearGradient-01gtqs9iq6-21)" font-family="Inter-Bold, Inter" font-size="42" font-weight="bold">
+                    <tspan x="0" y="211">Data Preview &amp; Charts in VS Code</tspan>
+                </text>
+                <text id="CSV-·-JSON-·-TSV-·-DAT-·-TXT" fill="#94A3B8" font-family="Inter-Medium, Inter" font-size="30" font-weight="400">
+                    <tspan x="0" y="276">CSV · JSON · TSV · DAT · TXT</tspan>
+                </text>
+            </g>
+            <g id="Group" transform="translate(898.800000, 600.000000)" fill-rule="nonzero">
+                <rect id="Rectangle" stroke="#334155" fill="#1E293B" x="0" y="0" width="100" height="32" rx="16"></rect>
+                <text id="Chart.js" fill="#94A3B8" font-family="Inter-Bold, Inter" font-size="14" font-weight="bold">
+                    <tspan x="22.5" y="21">Chart.js</tspan>
+                </text>
+            </g>
+            <g id="Group" transform="translate(1010.800000, 600.000000)" fill-rule="nonzero">
+                <rect id="Rectangle" stroke="#334155" fill="#1E293B" x="0" y="0" width="112" height="32" rx="16"></rect>
+                <text id="Interactive" fill="#94A3B8" font-family="Inter-Bold, Inter" font-size="14" font-weight="bold">
+                    <tspan x="19" y="21">Interactive</tspan>
+                </text>
+            </g>
+            <g id="Group" transform="translate(1134.800000, 600.000000)" fill-rule="nonzero">
+                <rect id="Rectangle" stroke="#334155" fill="#1E293B" x="0" y="0" width="120" height="32" rx="16"></rect>
+                <text id="Smart-Parse" fill="#94A3B8" font-family="Inter-Bold, Inter" font-size="14" font-weight="bold">
+                    <tspan x="18" y="21">Smart Parse</tspan>
+                </text>
+            </g>
+            <g id="Group" transform="translate(1266.800000, 600.000000)" fill-rule="nonzero">
+                <rect id="Rectangle" stroke="#334155" fill="#1E293B" x="0" y="0" width="100" height="32" rx="16"></rect>
+                <text id="Export" fill="#94A3B8" font-family="Inter-Bold, Inter" font-size="14" font-weight="bold">
+                    <tspan x="27" y="21">Export</tspan>
+                </text>
+            </g>
+            <rect id="Rectangle" stroke="url(#linearGradient-01gtqs9iq6-22)" stroke-width="2" x="200" y="130" width="1400" height="700" rx="40"></rect>
+        </g>
     </g>
-    <g fill="url(#bars)">
-      <rect x="140" y="272" width="40" height="116" rx="8" />
-      <rect x="210" y="240" width="40" height="148" rx="8" />
-      <rect x="280" y="208" width="40" height="180" rx="8" />
-      <rect x="350" y="248" width="40" height="140" rx="8" fill="url(#barsRed)" />
-    </g>
-    <path d="M144 256 L208 216 L272 244 L336 180 L392 208" stroke="url(#accent)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" />
-    <g fill="url(#dotGrad)">
-      <circle cx="144" cy="256" r="8" />
-      <circle cx="208" cy="216" r="8" />
-      <circle cx="272" cy="244" r="8" />
-      <circle cx="336" cy="180" r="8" />
-      <circle cx="392" cy="208" r="8" />
-    </g>
-  </g>
-
-  <!-- Text block -->
-  <g filter="url(#textShadow)">
-    <text x="580" y="380" fill="url(#titleGrad)" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="120" font-weight="800" letter-spacing="2">
-      VSPlot
-    </text>
-    <text x="580" y="475" fill="url(#subGrad)" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="42" font-weight="600" letter-spacing="0.4">
-      Data Preview &amp; Charts in VS Code
-    </text>
-    <text x="580" y="540" fill="#94A3B8" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="30" font-weight="500" letter-spacing="2.5">
-      CSV · JSON · TSV · DAT · TXT
-    </text>
-  </g>
-
-  <!-- Feature badges -->
-  <g transform="translate(580 570)">
-    <rect width="100" height="32" rx="16" fill="#1E293B" stroke="#334155" stroke-width="1" />
-    <text x="50" y="21" fill="#94A3B8" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" font-weight="600" text-anchor="middle" letter-spacing="0.5">
-      Chart.js
-    </text>
-  </g>
-  <g transform="translate(692 570)">
-    <rect width="112" height="32" rx="16" fill="#1E293B" stroke="#334155" stroke-width="1" />
-    <text x="56" y="21" fill="#94A3B8" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" font-weight="600" text-anchor="middle" letter-spacing="0.5">
-      Interactive
-    </text>
-  </g>
-  <g transform="translate(816 570)">
-    <rect width="120" height="32" rx="16" fill="#1E293B" stroke="#334155" stroke-width="1" />
-    <text x="60" y="21" fill="#94A3B8" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" font-weight="600" text-anchor="middle" letter-spacing="0.5">
-      Smart Parse
-    </text>
-  </g>
-  <g transform="translate(948 570)">
-    <rect width="100" height="32" rx="16" fill="#1E293B" stroke="#334155" stroke-width="1" />
-    <text x="50" y="21" fill="#94A3B8" font-family="Inter, Segoe UI, system-ui, sans-serif" font-size="14" font-weight="600" text-anchor="middle" letter-spacing="0.5">
-      Export
-    </text>
-  </g>
-
-  <!-- Glowing frame -->
-  <rect x="100" y="100" width="1400" height="700" rx="40" stroke="url(#frameBorder)" stroke-width="2" filter="url(#frameGlow)" />
 </svg>

@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://marketplace.visualstudio.com/items?itemName=anselmhahn.vsplot">
-    <img src="images/banner-1600x900.png" alt="VSPlot banner" />
+    <img src="images/banner-1600x400.png" alt="VSPlot banner" />
   </a>
 </p>
 
@@ -25,7 +25,7 @@
 </p>
 
 <p align="center">
-  <img src="images/logo.svg" alt="VSPlot logo" width="140" />
+  <img src="images/logo.png" alt="VSPlot logo" width="140" />
 </p>
 
 ---
