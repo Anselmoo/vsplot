@@ -328,7 +328,7 @@ jobs:
           echo "✅ Tag is correctly based on main branch"
 
       - name: Download VSIX artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: vsix
           path: .
@@ -397,7 +397,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Download VSIX package
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v7
         with:
           name: vsix
           path: dist/
