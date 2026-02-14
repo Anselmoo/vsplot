@@ -2,7 +2,7 @@
 	"name": "vsplot",
 	"displayName": "VSPlot - Data Visualization Extension",
 	"description": "Preview and visualize CSV, JSON, and other data files with interactive charts",
-	"version": "0.3.0",
+	"version": "0.3.1",
 	"publisher": "AnselmHahn",
 	"engines": {
 		"vscode": "^1.104.0"
