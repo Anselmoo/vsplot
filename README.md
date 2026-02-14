@@ -8,8 +8,6 @@
 
 <p align="center"><em>Turn CSV, JSON, TSV, DAT, and scientific flat files into filterable tables and interactive Chart.js dashboards without leaving the editor.</em></p>
 
-<p align="center">Created by <a href="https://github.com/Anselmoo">Anselm Hahn</a> • Looks best with <a href="https://marketplace.visualstudio.com/items?itemName=AnselmHahn.caligo-vscode-theme"><code>caligo-vscode-theme</code></a></p>
-
 <p align="center">
   <a href="https://github.com/Anselmoo/vsplot/actions/workflows/release.yml"><img src="https://img.shields.io/github/actions/workflow/status/Anselmoo/vsplot/release.yml?branch=main&logo=github&label=CI" alt="Release CI" /></a>
   <a href="https://codecov.io/gh/Anselmoo/vsplot"><img src="https://img.shields.io/codecov/c/github/Anselmoo/vsplot?logo=codecov" alt="codecov" /></a>
