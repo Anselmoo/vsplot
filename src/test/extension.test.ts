@@ -2,7 +2,6 @@ import * as assert from "node:assert";
 import * as path from "node:path";
 import * as vscode from "vscode";
 import * as dataCommands from "../commands/dataCommands";
-import { createDefaultDependencies, registerDataCommands } from "../commands/dataCommands";
 import type { ChartTestConfig, ChartTestState } from "../providers/chartViewProvider";
 import { ChartViewProvider } from "../providers/chartViewProvider";
 import { DataPreviewProvider } from "../providers/dataPreviewProvider";
@@ -84,6 +83,117 @@ suite("Extension Test Suite", () => {
 		assert.strictEqual(state.agg, "avg");
 		// species has 3 categories
 		assert.ok(state.labelsCount === 3, `expected 3 categories, got ${state.labelsCount}`);
+	});
+
+	test("sample-bar.json auto-selects stacked group count mode", async function () {
+		this.timeout(20000);
+
+		const ext = vscode.extensions.getExtension(EXTENSION_ID);
+		assert.ok(ext);
+		const basePath = ext ? ext.extensionPath : "";
+		const uri = vscode.Uri.file(path.join(basePath, "sample-data", "sample-bar.json"));
+		const doc = await vscode.workspace.openTextDocument(uri);
+		await vscode.window.showTextDocument(doc);
+		await vscode.commands.executeCommand("vsplot.plotData", uri);
+
+		const state = (await vscode.commands.executeCommand(
+			"vsplot.test.requestChartState",
+		)) as ChartTestState;
+
+		assert.strictEqual(state.chartType, "stackedGroupBar");
+		assert.strictEqual(state.x, 0);
+		assert.strictEqual(state.y, 1);
+		assert.strictEqual(state.y2, -1);
+		assert.strictEqual(state.agg, "count");
+		assert.deepStrictEqual(state.datasetLabels, ["finalize", "invokeSkill", "parallel"]);
+		assert.deepStrictEqual(state.labelsPreview, [
+			"BUILD",
+			"CONTEXT FLOW",
+			"COORDINATION",
+			"DEBUGGING",
+			"DESIGN",
+		]);
+		assert.ok(state.datasetStacks.every((stack) => stack === "stacked-group"));
+		assert.strictEqual(state.xTickRotation, 45);
+	});
+
+	test("Stacked group bar auto-selects for two categorical columns with numeric values", async function () {
+		this.timeout(20000);
+
+		const content =
+			"region,channel,sales\nNorth,Retail,10\nNorth,Wholesale,5\nSouth,Retail,7\nSouth,Wholesale,3\nEast,Retail,4";
+		const tmpPath = path.join(__dirname, "../../test-data/stacked-group-aggregated.csv");
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
+
+		try {
+			const uri = vscode.Uri.file(tmpPath);
+			const doc = await vscode.workspace.openTextDocument(uri);
+			await vscode.window.showTextDocument(doc);
+			await vscode.commands.executeCommand("vsplot.plotData", uri);
+
+			const state = (await vscode.commands.executeCommand(
+				"vsplot.test.requestChartState",
+			)) as ChartTestState;
+
+			assert.strictEqual(state.chartType, "stackedGroupBar");
+			assert.strictEqual(state.x, 0);
+			assert.strictEqual(state.y, 1);
+			assert.strictEqual(state.y2, 2);
+			assert.deepStrictEqual(state.datasetLabels, ["Retail", "Wholesale"]);
+			assert.deepStrictEqual(state.labelsPreview, ["East", "North", "South"]);
+			assert.ok(state.datasetStacks.every((stack) => stack === "stacked-group"));
+		} finally {
+			try {
+				await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
+			} catch (_e) {
+				// Ignore cleanup errors
+			}
+		}
+	});
+
+	test("Stacked group bar supports count mode and flipping categorical orientation", async function () {
+		this.timeout(20000);
+
+		const content = "region,status\nNorth,Open\nNorth,Closed\nSouth,Open\nSouth,Open\nEast,Closed";
+		const tmpPath = path.join(__dirname, "../../test-data/stacked-group-count.csv");
+		await vscode.workspace.fs.writeFile(vscode.Uri.file(tmpPath), Buffer.from(content, "utf8"));
+
+		try {
+			const uri = vscode.Uri.file(tmpPath);
+			const doc = await vscode.workspace.openTextDocument(uri);
+			await vscode.window.showTextDocument(doc);
+			await vscode.commands.executeCommand("vsplot.plotData", uri);
+
+			const initialState = (await vscode.commands.executeCommand(
+				"vsplot.test.requestChartState",
+			)) as ChartTestState;
+			assert.strictEqual(initialState.chartType, "stackedGroupBar");
+			assert.strictEqual(initialState.agg, "count");
+			assert.deepStrictEqual(initialState.labelsPreview, ["East", "North", "South"]);
+			assert.deepStrictEqual(initialState.datasetLabels, ["Closed", "Open"]);
+
+			const flippedConfig: ChartTestConfig = {
+				chartType: "stackedGroupBar",
+				x: 1,
+				y: 0,
+				y2: -1,
+			};
+			await vscode.commands.executeCommand("vsplot.test.applyChartConfig", flippedConfig);
+
+			const flippedState = (await vscode.commands.executeCommand(
+				"vsplot.test.requestChartState",
+			)) as ChartTestState;
+			assert.strictEqual(flippedState.chartType, "stackedGroupBar");
+			assert.strictEqual(flippedState.agg, "count");
+			assert.deepStrictEqual(flippedState.labelsPreview, ["Closed", "Open"]);
+			assert.deepStrictEqual(flippedState.datasetLabels, ["East", "North", "South"]);
+		} finally {
+			try {
+				await vscode.workspace.fs.delete(vscode.Uri.file(tmpPath));
+			} catch (_e) {
+				// Ignore cleanup errors
+			}
+		}
 	});
 
 	test("Scatter enforces numeric axes and builds dataset", async function () {
@@ -453,5 +563,59 @@ suite("Extension Test Suite", () => {
 			(ChartViewProvider as any).prototype.applyChartConfig = origApply;
 			(vscode.window.showErrorMessage as any) = origErr;
 		}
+	});
+
+	test("workflow JSON regression: stacked-group bar with count mode and label rotation", async function () {
+		this.timeout(20000);
+
+		const ext = vscode.extensions.getExtension(EXTENSION_ID);
+		assert.ok(ext);
+		const basePath = ext ? ext.extensionPath : "";
+		const uri = vscode.Uri.file(path.join(basePath, "sample-data", "sample-bar.json"));
+		const doc = await vscode.workspace.openTextDocument(uri);
+		await vscode.window.showTextDocument(doc);
+		await vscode.commands.executeCommand("vsplot.plotData", uri);
+
+		// Get initial state: should auto-select stacked-group count mode for workflow data
+		const state = (await vscode.commands.executeCommand(
+			"vsplot.test.requestChartState",
+		)) as ChartTestState;
+
+		// Verify auto-detected chart type and aggregation mode
+		assert.strictEqual(state.chartType, "stackedGroupBar");
+		assert.strictEqual(state.agg, "count");
+
+		// Verify dataset labels match the distinct "kind" values in the workflow data
+		const expectedKinds = ["finalize", "invokeSkill", "parallel"];
+		assert.deepStrictEqual(state.datasetLabels, expectedKinds);
+
+		// Verify categorical labels preview (first 5 of stepLabel values)
+		const expectedLabelsPreview = ["BUILD", "CONTEXT FLOW", "COORDINATION", "DEBUGGING", "DESIGN"];
+		assert.deepStrictEqual(state.labelsPreview, expectedLabelsPreview);
+
+		// Verify all datasets use stacked-group stacking mode
+		assert.ok(state.datasetStacks.every((stack) => stack === "stacked-group"));
+
+		// Verify x-axis label rotation is applied for categorical axis readability
+		assert.strictEqual(state.xTickRotation, 45);
+
+		// Flip orientation: x=1 (kind), y=0 (stepLabel count)
+		const flippedConfig: ChartTestConfig = {
+			chartType: "stackedGroupBar",
+			x: 1,
+			y: 0,
+			y2: -1,
+		};
+		await vscode.commands.executeCommand("vsplot.test.applyChartConfig", flippedConfig);
+
+		const flippedState = (await vscode.commands.executeCommand(
+			"vsplot.test.requestChartState",
+		)) as ChartTestState;
+
+		// After flipping, verify the axes swap correctly
+		assert.strictEqual(flippedState.chartType, "stackedGroupBar");
+		assert.strictEqual(flippedState.agg, "count");
+		assert.deepStrictEqual(flippedState.labelsPreview, expectedKinds);
+		assert.deepStrictEqual(flippedState.datasetLabels, expectedLabelsPreview.slice(0, 3));
 	});
 });

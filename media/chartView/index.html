@@ -24,6 +24,7 @@
             <select id="chartType">
                 <option value="line">Line</option>
                 <option value="bar">Bar</option>
+                <option value="stackedGroupBar">Stacked Group Bar</option>
                 <option value="scatter">Scatter</option>
                 <option value="pie">Pie</option>
                 <option value="doughnut">Doughnut</option>
@@ -37,13 +38,17 @@
         </div>
 
         <div class="control-group">
-            <label for="yAxis">Y-Axis:</label>
+            <label for="yAxis" id="yAxisLabel">Y-Axis:</label>
             <select id="yAxis"></select>
         </div>
 
         <div class="control-group">
-            <label for="yAxis2">Y2-Axis:</label>
+            <label for="yAxis2" id="yAxis2Label">Y2-Axis:</label>
             <select id="yAxis2"></select>
+        </div>
+
+        <div class="control-group" id="stackedGroupSwapGroup" style="display:none;">
+            <button id="swapStackedGroupAxes" type="button">Flip Categories</button>
         </div>
 
         <div class="control-group">

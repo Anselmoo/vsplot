@@ -5,7 +5,14 @@ import * as vscode from "vscode";
 export const EXTENSION_ID = "AnselmHahn.vsplot";
 
 // Valid configuration constants - these should match the actual values supported by the application
-export const VALID_CHART_TYPES = ["line", "bar", "scatter", "pie", "doughnut"] as const;
+export const VALID_CHART_TYPES = [
+	"line",
+	"bar",
+	"stackedGroupBar",
+	"scatter",
+	"pie",
+	"doughnut",
+] as const;
 export const VALID_STYLE_PRESETS = ["clean", "soft", "vibrant"] as const;
 export const VALID_AGGREGATION_TYPES = ["sum", "avg", "count", "min", "max"] as const;
 

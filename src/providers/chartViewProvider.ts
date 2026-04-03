@@ -291,6 +291,10 @@ export interface ChartTestState {
 	thousands: boolean;
 	labelsCount: number;
 	datasetLens: number[];
+	datasetLabels: string[];
+	datasetStacks: string[];
+	labelsPreview: string[];
+	xTickRotation: number;
 	error?: string;
 }
 
