@@ -297,6 +297,15 @@ function initializeChart() {
 			if (chartTypeSel) {
 				chartTypeSel.value = "bar";
 			}
+			// 2+ headers but zero numeric columns — every column is categorical.
+			// Default aggFunc to "count" so bars/pie slices show frequency counts
+			// rather than 0-height bars from parseFloat("string") → 0.
+			// Applies to all file types (CSV, TSV, JSON, TXT, etc.).
+			// "count" is always a valid option in the aggFunc <select>.
+			const aggFuncEl = document.getElementById("aggFunc");
+			if (aggFuncEl) {
+				aggFuncEl.value = "count";
+			}
 		} else if (currentData.headers.length === 1) {
 			xAxisSelect.selectedIndex = 0;
 			yAxisSelect.selectedIndex = 0;
