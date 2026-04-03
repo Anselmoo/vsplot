@@ -20,6 +20,8 @@ let pendingConfig = null;
 let pendingConfigId = null;
 let initialBounds = null;
 const KEY_PAN_STEP = 0.1;
+const STACKED_GROUP_CHART_TYPE = "stackedGroupBar";
+const STACKED_GROUP_STACK_KEY = "stacked-group";
 let keyPanHandlerAttached = false;
 
 // Get default settings from body data attributes
@@ -128,6 +130,27 @@ window.addEventListener("message", (event) => {
 									Array.isArray(d.data) ? d.data.length : 0,
 								)
 							: [],
+					datasetLabels:
+						chart && chart.data && chart.data.datasets
+							? chart.data.datasets.map((d) => String(d.label ?? ""))
+							: [],
+					datasetStacks:
+						chart && chart.data && chart.data.datasets
+							? chart.data.datasets.map((d) => String(d.stack ?? ""))
+							: [],
+					labelsPreview:
+						chart && chart.data && Array.isArray(chart.data.labels)
+							? chart.data.labels.slice(0, 5).map((label) => String(label))
+							: [],
+					xTickRotation:
+						chart &&
+						chart.options &&
+						chart.options.scales &&
+						chart.options.scales.x &&
+						chart.options.scales.x.ticks &&
+						typeof chart.options.scales.x.ticks.maxRotation === "number"
+							? chart.options.scales.x.ticks.maxRotation
+							: 0,
 				};
 				vscode.postMessage({
 					type: "vsplot:test:state",
@@ -177,6 +200,82 @@ function applyConfig(cfg) {
 		document.getElementById("thousands").checked = !!cfg.thousands;
 		useThousands = !!cfg.thousands;
 	}
+}
+
+function getSelectedChartType() {
+	return document.getElementById("chartType").value;
+}
+
+function getChartRenderType(chartType) {
+	return chartType === STACKED_GROUP_CHART_TYPE ? "bar" : chartType;
+}
+
+function normalizeCategoryValue(value) {
+	return value == null || value === "" ? "(empty)" : String(value);
+}
+
+function finalizeAggregateValue(value, aggFunc) {
+	if (aggFunc === "avg") {
+		return value && typeof value === "object" && "s" in value && "c" in value && value.c
+			? value.s / value.c
+			: 0;
+	}
+	return value ?? 0;
+}
+
+function getCategoryTickOptions() {
+	if (!currentData || detectXScaleType() !== "category") {
+		return {};
+	}
+	const xAxisIndex = parseInt(document.getElementById("xAxis").value);
+	if (Number.isNaN(xAxisIndex) || xAxisIndex < 0) {
+		return {};
+	}
+
+	const distinctLabels = Array.from(
+		new Set(currentData.rows.map((row) => normalizeCategoryValue(row[xAxisIndex]))),
+	);
+	const longestLabel = distinctLabels.reduce(
+		(max, label) => Math.max(max, String(label).length),
+		0,
+	);
+	const shouldRotate =
+		distinctLabels.length > 6 ||
+		longestLabel > 10 ||
+		distinctLabels.some((label) => /\s/.test(label) && String(label).length > 8);
+
+	if (!shouldRotate) {
+		return {};
+	}
+
+	return {
+		minRotation: 45,
+		maxRotation: 45,
+		autoSkip: distinctLabels.length > 20,
+	};
+}
+
+function updateModeSpecificControls(chartType = getSelectedChartType()) {
+	const yAxisLabel = document.getElementById("yAxisLabel");
+	const yAxis2Label = document.getElementById("yAxis2Label");
+	const swapGroup = document.getElementById("stackedGroupSwapGroup");
+	const aggFunc = document.getElementById("aggFunc");
+	const isStackedGroup = chartType === STACKED_GROUP_CHART_TYPE;
+	const valueIndex = parseInt(document.getElementById("yAxis2").value);
+	const hasNumericValue =
+		currentData &&
+		!Number.isNaN(valueIndex) &&
+		valueIndex >= 0 &&
+		!isCategoricalColumn(currentData.rows, valueIndex);
+
+	yAxisLabel.textContent = isStackedGroup ? "Group / Stack By:" : "Y-Axis:";
+	yAxis2Label.textContent = isStackedGroup ? "Value (optional):" : "Y2-Axis:";
+	swapGroup.style.display = isStackedGroup ? "flex" : "none";
+
+	if (isStackedGroup && !hasNumericValue) {
+		aggFunc.value = "count";
+	}
+	aggFunc.disabled = isStackedGroup && !hasNumericValue;
 }
 
 /**
@@ -270,32 +369,86 @@ function initializeChart() {
 
 	// Heuristic defaults: prefer first two numeric columns for scatter, else bar
 	const numericCols = getNumericColumnIndexes(currentData.rows);
+	const usableNumericCols = numericCols.filter(
+		(idx) =>
+			!isCategoricalColumn(currentData.rows, idx) &&
+			!isTimeColumn(currentData.rows, idx),
+	);
 	const chartTypeSel = document.getElementById("chartType");
 	const allColumnIndexes = currentData.headers.map((_h, idx) => idx);
 	const categoricalCols = allColumnIndexes.filter((idx) => !numericCols.includes(idx));
+	const nonTimeCategoricalCols = categoricalCols.filter(
+		(idx) => !isTimeColumn(currentData.rows, idx),
+	);
 
 	if (!restored) {
-		if (numericCols.length >= 2) {
-			xAxisSelect.selectedIndex = numericCols[0];
-			yAxisSelect.selectedIndex = numericCols[1];
+		if (categoricalCols.length >= 2) {
+			const primaryCategory =
+				nonTimeCategoricalCols[0] ?? categoricalCols[0] ?? allColumnIndexes[0];
+			const secondaryCategory =
+				nonTimeCategoricalCols.find((idx) => idx !== primaryCategory) ??
+				categoricalCols.find((idx) => idx !== primaryCategory) ??
+				primaryCategory;
+			xAxisSelect.selectedIndex = primaryCategory;
+			yAxisSelect.selectedIndex = secondaryCategory;
+			document.getElementById("yAxis2").value = String(
+				usableNumericCols.find(
+					(idx) => idx !== primaryCategory && idx !== secondaryCategory,
+				) ?? -1,
+			);
+			if (chartTypeSel) {
+				chartTypeSel.value = STACKED_GROUP_CHART_TYPE;
+			}
+			if (usableNumericCols.length === 0) {
+				const aggFuncEl = document.getElementById("aggFunc");
+				if (aggFuncEl) {
+					aggFuncEl.value = "count";
+				}
+			}
+		} else if (usableNumericCols.length >= 2) {
+			xAxisSelect.selectedIndex = usableNumericCols[0];
+			yAxisSelect.selectedIndex = usableNumericCols[1];
 			if (chartTypeSel) {
 				chartTypeSel.value = "scatter";
 			}
-		} else if (numericCols.length === 1 && currentData.headers.length > 1) {
-			yAxisSelect.selectedIndex = numericCols[0];
+		} else if (usableNumericCols.length === 1 && currentData.headers.length > 1) {
+			yAxisSelect.selectedIndex = usableNumericCols[0];
 			const fallbackX =
-				categoricalCols.find((idx) => idx !== numericCols[0]) ??
-				allColumnIndexes.find((idx) => idx !== numericCols[0]) ??
-				numericCols[0];
+				categoricalCols.find((idx) => idx !== usableNumericCols[0]) ??
+				allColumnIndexes.find((idx) => idx !== usableNumericCols[0]) ??
+				usableNumericCols[0];
 			xAxisSelect.selectedIndex = fallbackX;
 			if (chartTypeSel) {
 				chartTypeSel.value = "bar";
 			}
 		} else if (currentData.headers.length > 1) {
-			xAxisSelect.selectedIndex = allColumnIndexes[0];
-			yAxisSelect.selectedIndex = allColumnIndexes[1];
+			// 2+ headers but zero numeric columns — every column is categorical.
+			// Prefer a non-time column for X so the bar-chart aggregation path
+			// (chartType === "bar" && !xIsTime) is used, which respects aggFunc.
+			// If X were a time column the chart would fall into the xIsTime path
+			// and bypass aggregation, still rendering 0-height bars.
+			const nonTimeCols = allColumnIndexes.filter(
+				(idx) => !isTimeColumn(currentData.rows, idx),
+			);
+			const defaultX =
+				nonTimeCols.length > 0 ? nonTimeCols[0] : allColumnIndexes[0];
+			const defaultY =
+				nonTimeCols.length > 1
+					? nonTimeCols[1]
+					: (allColumnIndexes.find((idx) => idx !== defaultX) ??
+						allColumnIndexes[0]);
+			xAxisSelect.selectedIndex = defaultX;
+			yAxisSelect.selectedIndex = defaultY;
 			if (chartTypeSel) {
 				chartTypeSel.value = "bar";
+			}
+			// Default aggFunc to "count" so bars/pie slices show frequency counts
+			// rather than 0-height bars from parseFloat("string") → 0.
+			// Applies to all file types (CSV, TSV, JSON, TXT, etc.).
+			// "count" is always a valid option in the aggFunc <select>.
+			const aggFuncEl = document.getElementById("aggFunc");
+			if (aggFuncEl) {
+				aggFuncEl.value = "count";
 			}
 		} else if (currentData.headers.length === 1) {
 			xAxisSelect.selectedIndex = 0;
@@ -306,6 +459,7 @@ function initializeChart() {
 		}
 	}
 
+	updateModeSpecificControls();
 	createChart();
 }
 
@@ -314,7 +468,8 @@ function initializeChart() {
  */
 function createChart() {
 	try {
-		const chartType = document.getElementById("chartType").value;
+		const chartType = getSelectedChartType();
+		const isStackedGroup = chartType === STACKED_GROUP_CHART_TYPE;
 		const xAxisIndex = parseInt(document.getElementById("xAxis").value);
 		const yAxisIndex = parseInt(document.getElementById("yAxis").value);
 		const yAxis2Index = parseInt(document.getElementById("yAxis2").value);
@@ -328,10 +483,26 @@ function createChart() {
 		stylePreset = document.getElementById("stylePreset").value || "clean";
 		decimals = parseInt(document.getElementById("decimals").value) || 2;
 		useThousands = document.getElementById("thousands").checked;
+		updateModeSpecificControls(chartType);
 
 		if (isNaN(xAxisIndex) || isNaN(yAxisIndex)) {
 			showError("Please select valid axes");
 			return;
+		}
+
+		if (isStackedGroup) {
+			if (!isCategoricalX || xIsTime || !isCategoricalY) {
+				showError("Stacked Group Bar requires two categorical columns for X and Group.");
+				return;
+			}
+			if (
+				!isNaN(yAxis2Index) &&
+				yAxis2Index >= 0 &&
+				isCategoricalY2
+			) {
+				showError("Value must be numeric or left as - None - for count-based stacked groups.");
+				return;
+			}
 		}
 
 		// Guard: line/scatter require numeric or time X, and numeric Y
@@ -363,6 +534,7 @@ function createChart() {
 		const aggGroup = document.getElementById("aggGroup");
 		const showAgg =
 			(chartType === "bar" && !xIsTime) ||
+			isStackedGroup ||
 			chartType === "pie" ||
 			chartType === "doughnut";
 		aggGroup.style.display = showAgg ? "flex" : "none";
@@ -393,8 +565,13 @@ function createChart() {
 				? document.getElementById("curveToggle").checked
 				: true;
 
+		// Debug: Log final chart data and scale type before Chart.js creation
+		console.log("Chart creation - Chart type:", chartType, "Render type:", getChartRenderType(chartType));
+		console.log("Chart creation - Chart data:", chartData);
+		console.log("Chart creation - X scale type:", detectXScaleType());
+
 		chart = new Chart(ctx, {
-			type: chartType,
+			type: getChartRenderType(chartType),
 			data: chartData,
 			options: getChartOptions(
 				chartType,
@@ -406,6 +583,31 @@ function createChart() {
 				curveSmoothing,
 			),
 		});
+		
+		// Debug: Log Chart.js configuration with detailed data inspection
+		console.log("=== CHART.JS DETAILED DEBUG ===");
+		console.log("Chart type:", getChartRenderType(chartType), "(original:", chartType + ")");
+		console.log("Labels array:", chartData.labels);
+		console.log("Labels length:", chartData.labels?.length);
+		console.log("Datasets count:", chartData.datasets?.length);
+		
+		// Debug each dataset's data alignment with labels
+		chartData.datasets?.forEach((ds, idx) => {
+			console.log(`Dataset ${idx} (${ds.label}):`);
+			console.log("  Data:", ds.data);
+			console.log("  Data length:", ds.data?.length);
+			console.log("  Stack:", ds.stack);
+			console.log("  Data-to-label alignment:");
+			chartData.labels?.forEach((label, labelIdx) => {
+				console.log(`    ${label} -> ${ds.data?.[labelIdx]}`);
+			});
+		});
+		
+		console.log("X-axis scale type:", chart.options?.scales?.x?.type);
+		console.log("X-axis parsing:", chart.options?.scales?.x?.parsing);
+		console.log("X-axis stacked:", chart.options?.scales?.x?.stacked);
+		console.log("Y-axis stacked:", chart.options?.scales?.y?.stacked);
+		console.log("=== END CHART.JS DEBUG ===");
 
 		// Apply compact class to stats cards
 		try {
@@ -473,7 +675,81 @@ function prepareChartData(chartType, xAxisIndex, yAxisIndex, yAxis2Index) {
 	const aggFunc = document.getElementById("aggFunc").value || "sum";
 	const xIsTime = isTimeColumn(currentData.rows, xAxisIndex);
 
-	if (chartType === "pie" || chartType === "doughnut") {
+	if (chartType === STACKED_GROUP_CHART_TYPE) {
+		const hasNumericValue =
+			hasY2 && !isCategoricalColumn(currentData.rows, yAxis2Index);
+		const effectiveAgg = hasNumericValue ? aggFunc : "count";
+		const labels = [];
+		const labelSet = new Set();
+		const series = [];
+		const seriesSet = new Set();
+		const aggregated = {};
+
+		const aggregator = makeAggregator(effectiveAgg);
+		currentData.rows.forEach((row) => {
+			const labelKey = normalizeCategoryValue(row[xAxisIndex]);
+			const seriesKey = normalizeCategoryValue(row[yAxisIndex]);
+			if (!labelSet.has(labelKey)) {
+				labelSet.add(labelKey);
+				labels.push(labelKey);
+			}
+			if (!seriesSet.has(seriesKey)) {
+				seriesSet.add(seriesKey);
+				series.push(seriesKey);
+			}
+			aggregated[labelKey] = aggregated[labelKey] || {};
+			aggregator(
+				aggregated[labelKey],
+				seriesKey,
+				hasNumericValue ? parseFloat(row[yAxis2Index]) || 0 : 1,
+			);
+		});
+
+		labels.sort((a, b) => String(a).localeCompare(String(b)));
+		series.sort((a, b) => String(a).localeCompare(String(b)));
+		const colors = generateColors(series.length);
+		
+		// Debug: Log stackedGroupBar data preparation
+		console.log("stackedGroupBar - X-axis column idx:", xAxisIndex, "Label:", xLabel);
+		console.log("stackedGroupBar - Y-axis column idx:", yAxisIndex, "Label:", yLabel);
+		console.log("stackedGroupBar - Final labels array:", labels);
+		console.log("stackedGroupBar - Series array:", series);
+		console.log("stackedGroupBar - Sample aggregated data:", Object.keys(aggregated).slice(0, 3).map(key => ({
+			label: key,
+			data: aggregated[key]
+		})));
+		
+		const result = {
+			labels,
+			datasets: series.map((seriesKey, index) => ({
+				label: seriesKey,
+				data: labels.map((labelKey) =>
+					finalizeAggregateValue(aggregated[labelKey]?.[seriesKey], effectiveAgg),
+				),
+				backgroundColor: colors[index],
+				borderColor: colors[index],
+				borderWidth: 1,
+				borderRadius: 4,
+				borderSkipped: false,
+				stack: STACKED_GROUP_STACK_KEY,
+			})),
+		};
+		
+		// Debug: Log the prepared data structure
+		console.log("STACKED_GROUP_CHART_TYPE - Prepared data:", {
+			labels: result.labels,
+			datasets: result.datasets.map(ds => ({
+				label: ds.label,
+				data: ds.data
+			}))
+		});
+		result.__xLabel = xLabel;
+		result.__yLabel = hasNumericValue
+			? `${effectiveAgg.toUpperCase()} ${y2Label}`
+			: "Count";
+		result.__hasY2 = false;
+		return result;
+	} else if (chartType === "pie" || chartType === "doughnut") {
 		// For pie charts, aggregate data by x-axis values
 		const aggregatedData = {};
 		const aggregator = makeAggregator(aggFunc);
@@ -799,10 +1075,17 @@ function getChartOptions(
 		baseOptions.scales = {
 			x: {
 				type: detectXScaleType(),
+				// For categorical data, enable parsing so Chart.js can use labels array with simple data arrays
+				// For linear/time data, disable parsing for better performance with pre-parsed numeric data
+				...(detectXScaleType() === "category" ? {} : { parsing: false }),
 				ticks: {
 					color: fg,
-					callback: (v) => {
+					...getCategoryTickOptions(),
+					callback: function(v) {
 						try {
+							if (detectXScaleType() === "category") {
+								return this.getLabelForValue(v);
+							}
 							return formatTick("x", v);
 						} catch (_e) {
 							return v;
@@ -839,6 +1122,10 @@ function getChartOptions(
 				},
 			},
 		};
+		if (chartType === STACKED_GROUP_CHART_TYPE) {
+			baseOptions.scales.x.stacked = true;
+			baseOptions.scales.y.stacked = true;
+		}
 		if (hasY2) {
 			baseOptions.scales.y2 = {
 				position: "right",
@@ -875,10 +1162,24 @@ function getChartOptions(
  */
 function detectXScaleType() {
 	const idx = parseInt(document.getElementById("xAxis").value);
-	if (isTimeColumn(currentData.rows, idx)) return "time";
-	const chartType = document.getElementById("chartType").value;
-	if (chartType === "scatter") return "linear";
-	return undefined;
+	const scaleType = (() => {
+		if (isTimeColumn(currentData.rows, idx)) return "time";
+		const chartType = document.getElementById("chartType").value;
+		if (chartType === "scatter") return "linear";
+		
+		// For categorical columns (non-numeric, non-time), use category scale
+		if (isCategoricalColumn(currentData.rows, idx)) {
+			return "category";
+		}
+		
+		return undefined;
+	})();
+	
+	// Debug: Log scale type detection
+	console.log("detectXScaleType - Column idx:", idx, "Scale type:", scaleType, 
+		"Chart type:", document.getElementById("chartType").value);
+	
+	return scaleType;
 }
 
 /**
@@ -976,9 +1277,16 @@ function updateChartStats() {
 	const meta = document.getElementById("chartMeta");
 	const xAxisIndex = parseInt(document.getElementById("xAxis").value);
 	const yAxisIndex = parseInt(document.getElementById("yAxis").value);
+	const yAxis2Index = parseInt(document.getElementById("yAxis2").value);
+	const valueIndex =
+		getSelectedChartType() === STACKED_GROUP_CHART_TYPE &&
+		!Number.isNaN(yAxis2Index) &&
+		yAxis2Index >= 0
+			? yAxis2Index
+			: yAxisIndex;
 
 	const yValues = currentData.rows
-		.map((row) => parseFloat(row[yAxisIndex]))
+		.map((row) => parseFloat(row[valueIndex]))
 		.filter((val) => !isNaN(val));
 
 	if (yValues.length > 0) {
@@ -1148,13 +1456,21 @@ document.getElementById("curveToggle").addEventListener("change", () => {
 // Color picker handling
 document.getElementById("colorPicker").addEventListener("change", () => {
 	if (chart) {
-		const color = document.getElementById("colorPicker").value;
-		const rgba = hexToRgba(color, 0.6);
-		const line = hexToRgba(color, 1);
-		chart.data.datasets.forEach((ds) => {
-			ds.backgroundColor = rgba;
-			ds.borderColor = line;
-		});
+		if (getSelectedChartType() === STACKED_GROUP_CHART_TYPE) {
+			const colors = generateColors(chart.data.datasets.length);
+			chart.data.datasets.forEach((ds, index) => {
+				ds.backgroundColor = colors[index];
+				ds.borderColor = colors[index];
+			});
+		} else {
+			const color = document.getElementById("colorPicker").value;
+			const rgba = hexToRgba(color, 0.6);
+			const line = hexToRgba(color, 1);
+			chart.data.datasets.forEach((ds) => {
+				ds.backgroundColor = rgba;
+				ds.borderColor = line;
+			});
+		}
 		chart.update();
 	}
 });
@@ -1205,12 +1521,13 @@ document.getElementById("stylePreset").addEventListener("change", createChart);
 document.getElementById("decimals").addEventListener("change", () => {
 	decimals = parseInt(document.getElementById("decimals").value) || 2;
 	if (chart) {
+		const chartType = getSelectedChartType();
 		const curveSmoothing =
-			chart.config.type === "line"
+			chartType === "line"
 				? document.getElementById("curveToggle").checked
 				: true;
 		chart.options = getChartOptions(
-			chart.config.type,
+			chartType,
 			chart.options.scales?.x?.title?.text,
 			chart.options.scales?.y?.title?.text,
 			document.getElementById("dragZoomToggle").checked,
@@ -1225,12 +1542,13 @@ document.getElementById("decimals").addEventListener("change", () => {
 document.getElementById("thousands").addEventListener("change", () => {
 	useThousands = document.getElementById("thousands").checked;
 	if (chart) {
+		const chartType = getSelectedChartType();
 		const curveSmoothing =
-			chart.config.type === "line"
+			chartType === "line"
 				? document.getElementById("curveToggle").checked
 				: true;
 		chart.options = getChartOptions(
-			chart.config.type,
+			chartType,
 			chart.options.scales?.x?.title?.text,
 			chart.options.scales?.y?.title?.text,
 			document.getElementById("dragZoomToggle").checked,
@@ -1240,6 +1558,19 @@ document.getElementById("thousands").addEventListener("change", () => {
 		);
 		chart.update();
 	}
+});
+
+document.getElementById("swapStackedGroupAxes").addEventListener("click", () => {
+	const chartType = getSelectedChartType();
+	if (chartType !== STACKED_GROUP_CHART_TYPE) {
+		return;
+	}
+	const xAxis = document.getElementById("xAxis");
+	const yAxis = document.getElementById("yAxis");
+	const nextX = yAxis.value;
+	yAxis.value = xAxis.value;
+	xAxis.value = nextX;
+	createChart();
 });
 
 document.getElementById("compactCardsToggle").addEventListener("change", () => {

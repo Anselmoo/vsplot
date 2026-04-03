@@ -69,8 +69,8 @@ See `CONTRIBUTING.md` for Husky and lint-staged setup and CI behaviour.
 
 ## Build interactive charts with Chart.js
 
-- **Multiple chart types:** Line, bar, scatter, pie, doughnut, and radar with presets for color palettes and number formatting.
-- **Dual-axis & aggregation:** Plot metrics on primary and secondary Y axes, aggregate categorical data (sum, count, avg, min, max), and switch between linear/time scales.
+- **Multiple chart types:** Line, bar, stacked group bar, scatter, pie, doughnut, and radar with presets for color palettes and number formatting.
+- **Dual-axis & aggregation:** Plot metrics on primary and secondary Y axes, auto-open two-category files as stacked group bars, aggregate categorical data (sum, count, avg, min, max), and switch between linear/time scales.
 - **Zoom & navigate:** Scroll-wheel zoom, drag zoom without modifier keys (plus a fallback drag box), arrow-key panning for both axes, and a quick ↺ reset button that reapplies the current configuration.
 - **Round-trip workflow:** A dedicated **Preview Data** button in Chart view reopens the original data preview so you can tweak filters and regenerate charts without re-running commands.
 - **Stateful experience:** VSPlot remembers the last configuration per file and exposes hidden `vsplot:test:*` commands for automated workflows.

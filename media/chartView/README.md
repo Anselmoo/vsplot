@@ -4,7 +4,7 @@ This directory contains the modular webview assets for the VSPlot chart visualiz
 
 ## Purpose
 
-The chart view allows users to create interactive visualizations from their data files. It supports multiple chart types including line, bar, scatter, pie, doughnut, and radar charts.
+The chart view allows users to create interactive visualizations from their data files. It supports multiple chart types including line, bar, stacked group bar, scatter, pie, doughnut, and radar charts.
 
 ## Architecture
 
@@ -27,6 +27,7 @@ The TypeScript provider (`src/providers/chartViewProvider.ts`) loads these files
 
 - **Line**: Time series and trend visualization
 - **Bar**: Category comparison with aggregation support
+- **Stacked Group Bar**: Categorical breakdowns with count-based or aggregated stacked datasets and a flip-categories control
 - **Scatter**: Correlation and distribution analysis
 - **Pie/Doughnut**: Proportion and composition visualization
 - **Radar**: Multi-dimensional comparison
@@ -47,9 +48,10 @@ The TypeScript provider (`src/providers/chartViewProvider.ts`) loads these files
 
 #### Controls
 
-- Chart type selector (line, bar, scatter, pie, doughnut, radar)
+- Chart type selector (line, bar, stacked group bar, scatter, pie, doughnut, radar)
 - X-axis and Y-axis column selectors
-- Optional Y2-axis for dual-axis charts
+- Optional Y2-axis for dual-axis charts or stacked-group values
+- Flip Categories button for stacked-group orientation changes
 - Legend toggle
 - Color picker for primary dataset
 - Drag zoom toggle
@@ -151,6 +153,9 @@ The TypeScript provider (`src/providers/chartViewProvider.ts`) loads these files
       thousands: boolean,
       labelsCount: number,
       datasetLens: number[],
+      datasetLabels: string[],
+      datasetStacks: string[],
+      labelsPreview: string[],
       error?: string
     }
   }

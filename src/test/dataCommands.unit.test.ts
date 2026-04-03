@@ -73,7 +73,7 @@ suite("DataCommands Unit Tests", () => {
 		const previewProvider = { showPreview: async () => {} };
 		const result = await executeOpenDataViewer(deps as any, previewProvider);
 		assert.strictEqual(result.success, false);
-		assert.ok(result.error && result.error.includes("No workspace folder open."));
+		assert.ok(result.error?.includes("No workspace folder open."));
 	});
 
 	test("executeOpenDataViewer returns info when no files found", async () => {
