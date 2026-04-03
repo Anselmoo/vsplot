@@ -292,12 +292,26 @@ function initializeChart() {
 				chartTypeSel.value = "bar";
 			}
 		} else if (currentData.headers.length > 1) {
-			xAxisSelect.selectedIndex = allColumnIndexes[0];
-			yAxisSelect.selectedIndex = allColumnIndexes[1];
+			// 2+ headers but zero numeric columns — every column is categorical.
+			// Prefer a non-time column for X so the bar-chart aggregation path
+			// (chartType === "bar" && !xIsTime) is used, which respects aggFunc.
+			// If X were a time column the chart would fall into the xIsTime path
+			// and bypass aggregation, still rendering 0-height bars.
+			const nonTimeCols = allColumnIndexes.filter(
+				(idx) => !isTimeColumn(currentData.rows, idx),
+			);
+			const defaultX =
+				nonTimeCols.length > 0 ? nonTimeCols[0] : allColumnIndexes[0];
+			const defaultY =
+				nonTimeCols.length > 1
+					? nonTimeCols[1]
+					: (allColumnIndexes.find((idx) => idx !== defaultX) ??
+						allColumnIndexes[0]);
+			xAxisSelect.selectedIndex = defaultX;
+			yAxisSelect.selectedIndex = defaultY;
 			if (chartTypeSel) {
 				chartTypeSel.value = "bar";
 			}
-			// 2+ headers but zero numeric columns — every column is categorical.
 			// Default aggFunc to "count" so bars/pie slices show frequency counts
 			// rather than 0-height bars from parseFloat("string") → 0.
 			// Applies to all file types (CSV, TSV, JSON, TXT, etc.).
