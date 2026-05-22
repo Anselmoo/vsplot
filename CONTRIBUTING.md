@@ -46,7 +46,22 @@ We provide Husky + lint-staged for pre-commit checks. After installing dev depen
 npm run prepare
 ```
 
-CI: a GitHub Actions job (`.github/workflows/biome.yml`) runs Biome on pushes and PRs and will fail when Biome reports diagnostics.
+## Repository Governance (repo-release-tools)
+
+VSPlot enforces release governance with `repo-release-tools` while staying on Husky.
+
+- `.husky/pre-commit` keeps linting (`lint-staged`) and validates branch naming policy.
+- `.husky/commit-msg` validates Conventional Commit subjects.
+- CI also runs the same governance policy checks.
+
+Local runtime for hook checks:
+
+- Preferred: install `uv` (provides `uvx`) for on-demand execution.
+- Alternative: install `repo-release-tools` directly so `rrt-hooks` is available on `PATH`.
+
+The policy source is `.rrt.toml` in the repository root.
+
+CI: the GitHub Actions pipeline (`.github/workflows/release.yml`) runs Biome and governance checks on pushes and PRs and fails when diagnostics or policy checks do not pass.
 
 ## Coding Standards
 - TypeScript strict mode
