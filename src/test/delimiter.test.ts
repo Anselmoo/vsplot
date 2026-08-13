@@ -40,6 +40,27 @@ suite("Delimiter Detection Tests", () => {
 		assert.strictEqual(data?.rows.length, 3, "Should have 3 data rows");
 	});
 
+	test("Handles classic Mac (CR-only) line endings", async function () {
+		this.timeout(10000);
+		const uri = vscode.Uri.file(
+			path.join(__dirname, "../../test-data/cr-line-endings-pseudo-rixs.dat"),
+		);
+		const data = await parseDataFile(uri);
+
+		assert.ok(data, "Data should be parsed");
+		assert.strictEqual(data?.detectedDelimiter, "\t", "Should detect tab delimiter");
+		assert.strictEqual(data?.headers.length, 2, "Should have 2 columns");
+		assert.strictEqual(data?.headers[0], "energy_eV", "First header should be 'energy_eV'");
+		assert.strictEqual(data?.headers[1], "intensity", "Second header should be 'intensity'");
+		assert.strictEqual(data?.rows.length, 8, "Should have 8 data rows, not 1 garbled row");
+		assert.strictEqual(data?.rows[0][0], 700.0, "First row energy should parse as a clean number");
+		assert.strictEqual(
+			data?.rows[0][1],
+			0.05,
+			"First row intensity should parse as a clean number",
+		);
+	});
+
 	test("Handles single column with fallback", async function () {
 		this.timeout(10000);
 		const tmpPath = path.join(__dirname, "../../test-data/single-column.txt");
