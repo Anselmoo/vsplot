@@ -1,5 +1,16 @@
 # Change Log
 
+## [Unreleased]
+
+## [0.5.0] - 2026-08-13
+
+### Added
+- introduce rrt skills and enhance governance checks in CI pipeline (#83)
+
+### Fixed
+- parse files with classic Mac (CR-only) line endings (#92)
+
+
 All notable changes to the "vsplot" extension will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
