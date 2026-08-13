@@ -41,7 +41,7 @@ jobs:
           fetch-depth: 0
 
       - name: Run repo-release-tools policy checks
-        uses: Anselmoo/repo-release-tools@v0.5.0
+        uses: Anselmoo/repo-release-tools@v1.14.1
         with:
           check-branch-name: "true"
           check-commit-subject: "true"

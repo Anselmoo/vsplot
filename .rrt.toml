@@ -11,10 +11,6 @@ path = "package.json"
 kind = "package_json"
 ci_format = "semver_pre"
 
-[[tool.rrt.pin_targets]]
-path = ".github/workflows/release.yml"
-pattern = '(Anselmoo/repo-release-tools@v)(\d+\.\d+\.\d+)()'
-
 [tool.rrt.eol]
 languages = ["node"]
 warn_days = 180
