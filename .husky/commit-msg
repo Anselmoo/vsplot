@@ -1,14 +1,12 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-npm run -s lint-staged
-
 if command -v rrt-hooks >/dev/null 2>&1; then
-	rrt-hooks pre-commit
+	rrt-hooks commit-msg "$1"
 elif command -v uvx >/dev/null 2>&1; then
-	uvx --from repo-release-tools rrt-hooks pre-commit
+	uvx --from repo-release-tools rrt-hooks commit-msg "$1"
 else
-	echo "❌ repo-release-tools is required for governance checks." >&2
+	echo "❌ repo-release-tools is required for commit subject checks." >&2
 	echo "Install one of: rrt-hooks (pip install repo-release-tools) or uvx (for on-demand execution)." >&2
 	exit 1
 fi

@@ -29,11 +29,33 @@ env:
 
 jobs:
   # ============================================================================
+  # Release Governance Policy Checks
+  # ============================================================================
+  governance-checks:
+    name: Governance Checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Run repo-release-tools policy checks
+        uses: Anselmoo/repo-release-tools@v1.6.2
+        with:
+          check-branch-name: "true"
+          check-commit-subject: "true"
+          check-changelog: "true"
+          changelog-strategy: "auto"
+          check-release-health: "true"
+
+  # ============================================================================
   # Linting and Code Quality
   # ============================================================================
   lint-and-quality:
     name: Lint & Code Quality
     runs-on: ubuntu-latest
+    needs: [governance-checks]
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -85,6 +107,7 @@ jobs:
   security-audit:
     name: Security Audit
     runs-on: ubuntu-latest
+    needs: [governance-checks]
     permissions:
       contents: read
     steps:
