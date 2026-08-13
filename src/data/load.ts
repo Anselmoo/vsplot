@@ -80,6 +80,19 @@ export async function parseDataFile(
 }
 
 /**
+ * Split file content into lines, tolerating CRLF and lone-CR (classic Mac)
+ * line endings in addition to LF. Some instrument export software (e.g.
+ * older spectrometer/beamline tools) still emits bare `\r` line endings,
+ * which `String.split("\n")` alone would treat as a single line.
+ *
+ * @param content - Raw file content
+ * @returns Array of lines with line-ending characters removed
+ */
+function splitLines(content: string): string[] {
+	return content.split(/\r\n|\r|\n/);
+}
+
+/**
  * Check if a line is a comment based on configured comment markers
  *
  * @param line - Line to check
@@ -134,7 +147,7 @@ function parseCSV(
 	fileName: string,
 	commentMarkers: string[] = ["#", "%", "//"],
 ): ParsedData {
-	const lines = content.trim().split("\n");
+	const lines = splitLines(content.trim());
 	if (lines.length === 0) {
 		throw new Error("File is empty");
 	}
@@ -292,7 +305,7 @@ function parseDelimited(
 	overrideDelimiter?: string,
 	commentMarkers: string[] = ["#", "%", "//"],
 ): ParsedData {
-	const lines = content.trim().split("\n");
+	const lines = splitLines(content.trim());
 	if (lines.length === 0) {
 		throw new Error("File is empty");
 	}

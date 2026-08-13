@@ -176,7 +176,7 @@ suite("Edge Cases and Robustness Tests", () => {
 		assert.strictEqual(data?.headers.length, 3, "Should have 3 columns");
 		assert.strictEqual(data?.rows.length, 2, "Should have 2 data rows");
 		assert.strictEqual(
-			(data?.rows[0][0] as string).length,
+			(data.rows[0][0] as string).length,
 			1000,
 			"First cell should have 1000 characters",
 		);
