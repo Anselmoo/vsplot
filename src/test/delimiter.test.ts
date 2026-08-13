@@ -43,7 +43,7 @@ suite("Delimiter Detection Tests", () => {
 	test("Handles classic Mac (CR-only) line endings", async function () {
 		this.timeout(10000);
 		const uri = vscode.Uri.file(
-			path.join(__dirname, "../../test-data/cr-line-endings-pseudo-rixs.dat"),
+			path.join(__dirname, "../../test-data/cr-line-endings-pseudo-l-edge.dat"),
 		);
 		const data = await parseDataFile(uri);
 

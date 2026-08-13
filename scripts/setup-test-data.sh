@@ -233,7 +233,7 @@ echo "✅ Test delimiter fixtures created successfully"
 # spectrometer/beamline export software (regression test for parsing failures
 # on such files, which previously collapsed to a single garbled row)
 echo "📊 Creating CR-only line-ending test fixture..."
-printf 'energy_eV\tintensity\n700.0\t0.05\n700.5\t0.12\n701.0\t0.31\n701.5\t0.80\n702.0\t1.00\n702.5\t0.78\n703.0\t0.29\n703.5\t0.11\n' | tr '\n' '\r' > "$TEST_DATA_DIR/cr-line-endings-pseudo-rixs.dat"
+printf 'energy_eV\tintensity\n700.0\t0.05\n700.5\t0.12\n701.0\t0.31\n701.5\t0.80\n702.0\t1.00\n702.5\t0.78\n703.0\t0.29\n703.5\t0.11\n' | tr '\n' '\r' > "$TEST_DATA_DIR/cr-line-endings-pseudo-l-edge.dat"
 echo "✅ CR-only line-ending test fixture created successfully"
 
 # Create test files with comments for comment handling tests
@@ -317,7 +317,7 @@ echo "  - csv-with-comments.csv: CSV with comment lines (comment handling tests)
 echo "  - txt-with-comments.txt: TXT with hash comments (comment handling tests)"
 echo "  - dat-with-comments.dat: DAT with multiple comment markers (comment handling tests)"
 echo "  - custom-comment-markers.txt: File for custom comment marker tests"
-echo "  - cr-line-endings-pseudo-rixs.dat: Classic Mac (CR-only) line-ending regression test"
+echo "  - cr-line-endings-pseudo-l-edge.dat: Classic Mac (CR-only) line-ending regression test"
 echo "  - scatter-numeric-regression.csv: Regression test for issue #30 (numeric X-axis scatter plots)"
 echo ""
 echo "⚠️  IMPORTANT: Run this script before running tests locally!"
